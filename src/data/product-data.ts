@@ -25,6 +25,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -65,6 +67,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -106,6 +110,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -146,6 +152,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -185,6 +193,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -224,6 +234,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -263,6 +275,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -304,6 +318,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -343,6 +359,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -382,6 +400,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -421,6 +441,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -460,6 +482,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -499,6 +523,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -538,6 +564,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',
@@ -577,6 +605,8 @@ const product_data:IProduct[] = [
     dimension: 'Digital Delivery',
     reviews: [
       {
+        id: '1',
+        userId: 'admin',
         img: '/assets/img/blog/comments/avater-1.png',
         name: 'Verified Buyer',
         time: '1 Month Ago',

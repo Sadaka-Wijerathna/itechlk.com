@@ -9,6 +9,7 @@ export interface IProduct {
     price:number;
     old_price?:number;
     discount?:number;
+    quantity?:number;
     rating?:number;
     status?:string;
     active?: boolean;
