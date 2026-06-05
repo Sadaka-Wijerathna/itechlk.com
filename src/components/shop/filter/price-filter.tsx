@@ -1,15 +1,20 @@
 import InputRange from "@/ui/input-range";
-import { maxPrice } from "@/utils/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { set_price_value } from "@/redux/features/filter";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const PriceFilter = () => {
-  const {priceValue} = useAppSelector(state => state.filter);
+  const { priceValue } = useAppSelector(state => state.filter);
+  const { symbol, rate } = useCurrency();
   const dispatch = useAppDispatch();
+  
+  const MAX_LIMIT = 500; // Fixed max as requested ($0 - $500)
+
   // handleChanges
   const handleChanges = (val: number[]) => {
     dispatch(set_price_value(val));
   };
+  
   return (
     <div className="sidebar__widget mb-55">
       <div className="sidebar__widget-title mb-30">
@@ -19,7 +24,7 @@ const PriceFilter = () => {
         <div className="price__slider">
           <div className="mb-25">
             <InputRange
-              MAX={maxPrice()}
+              MAX={MAX_LIMIT}
               MIN={0}
               STEP={1}
               values={priceValue}
@@ -30,7 +35,7 @@ const PriceFilter = () => {
             <button type="submit">Filter</button>
             <label htmlFor="amount">Price :</label>
             <span className="input-range">
-              ${ priceValue[0] } - ${ priceValue[1] }
+              {symbol}{Math.round(priceValue[0] * rate).toLocaleString()} - {symbol}{Math.round(priceValue[1] * rate).toLocaleString()}
             </span>
           </div>
         </div>

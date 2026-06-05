@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { maxPrice } from "@/utils/utils";
+
 
 // Define a type for the slice state
 interface IFilterState {
@@ -21,7 +21,7 @@ const initialState: IFilterState = {
   colors: [],
   brand: "",
   itemOffset: 0,
-  priceValue:[0, maxPrice()],
+  priceValue: [0, 500],
   availability: [],
 };
 
@@ -92,7 +92,7 @@ export const filterSlice = createSlice({
       state.colors = [];
       state.brand = "";
       state.availability = [];
-      state.priceValue = [0, maxPrice()];
+      state.priceValue = [0, 500];
     },
   },
 });
