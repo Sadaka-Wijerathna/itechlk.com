@@ -63,7 +63,7 @@ const FooterThree = () => {
                             <i className="fal fa-map-marker-alt"></i>
                           </div>
                           <div className="text">
-                            <span>Add: 1234 Heaven Stress, Beverly Hill, Melbourne, USA.</span>
+                            <span>Add: Dewalegma, Dellawa, Morawaka (Mathara, Sri Lanka)</span>
                           </div>
                         </li>
                         <li>
@@ -71,7 +71,7 @@ const FooterThree = () => {
                             <i className="fal fa-envelope-open-text"></i>
                           </div>
                           <div className="text">
-                            <span>Email: Contact@basictheme.com</span>
+                            <span>Email: indiraumamga@gmail.com</span>
                           </div>
                         </li>
                         <li>
@@ -79,7 +79,7 @@ const FooterThree = () => {
                             <i className="fal fa-phone-alt"></i>
                           </div>
                           <div className="text">
-                            <span>Phone Number: (800) 123 456 789</span>
+                            <span>Phone Number: +94701751530</span>
                           </div>
                         </li>
                       </ul>

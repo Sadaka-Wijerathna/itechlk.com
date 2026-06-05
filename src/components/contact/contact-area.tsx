@@ -5,17 +5,17 @@ const contactInfo = [
   {
     icon: "fal fa-map-marker-alt",
     title: "Address:",
-    subtitle: "1234 Heaven Stress, Beverly Hill, Melbourne, USA.",
+    subtitle: "Dewalegma, Dellawa, Morawaka (Mathara, Sri Lanka)",
   },
   {
     icon: "fal fa-envelope-open-text",
     title: "Email:",
-    subtitle: "Contact@erentheme.com",
+    subtitle: "indiraumamga@gmail.com",
   },
   {
     icon: "fal fa-phone-alt",
     title: "Number Phone:",
-    subtitle: "(800) 123 456 789, (800) 987 654 321",
+    subtitle: "+94701751530",
   },
 ];
 
