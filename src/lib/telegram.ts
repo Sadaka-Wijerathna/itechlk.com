@@ -2,11 +2,11 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
 export async function sendTelegramMessage(text: string, inlineKeyboard?: any, customChatIds?: string[]) {
   if (!BOT_TOKEN) {
-    console.error('Telegram bot token missing');
+    console.error('[Telegram] BOT_TOKEN is missing in environment variables!');
     return;
   }
-
   const ids = customChatIds || [];
+  console.log(`[Telegram] Sending message to ${ids.length} IDs: ${ids.join(', ')}`);
   if (ids.length === 0) return;
 
   for (const id of ids) {
@@ -25,23 +25,17 @@ export async function sendTelegramMessage(text: string, inlineKeyboard?: any, cu
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    })
-    .then(async res => {
-      const data = await res.json();
-      if (!res.ok) console.error(`Telegram API error for ${id}:`, data);
-      else console.log(`Telegram message sent successfully to ${id}`);
-    })
-    .catch(err => console.error(`Error sending to ${id}:`, err));
+    }).catch(err => console.error(`Error sending to ${id}:`, err));
   }
 }
 
 export async function sendTelegramPhoto(photoUrl: string, caption: string, inlineKeyboard?: any, customChatIds?: string[]) {
   if (!BOT_TOKEN) {
-    console.error('Telegram bot token missing');
+    console.error('[Telegram] BOT_TOKEN is missing in environment variables!');
     return;
   }
-
   const ids = customChatIds || [];
+  console.log(`[Telegram] Sending photo to ${ids.length} IDs: ${ids.join(', ')}`);
   if (ids.length === 0) return;
 
   for (const id of ids) {
@@ -61,12 +55,6 @@ export async function sendTelegramPhoto(photoUrl: string, caption: string, inlin
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    })
-    .then(async res => {
-      const data = await res.json();
-      if (!res.ok) console.error(`Telegram API error (photo) for ${id}:`, data);
-      else console.log(`Telegram photo sent successfully to ${id}`);
-    })
-    .catch(err => console.error(`Error sending to ${id}:`, err));
+    }).catch(err => console.error(`Error sending to ${id}:`, err));
   }
 }

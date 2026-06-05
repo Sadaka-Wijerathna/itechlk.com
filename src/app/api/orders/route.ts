@@ -66,7 +66,12 @@ export async function POST(req: Request) {
       });
       const settingsChatIds = settingsRows[0]?.value?.split(',').map((s: string) => s.trim()).filter(Boolean) || [];
       
-      const { sendTelegramMessage } = await import('@/lib/telegram');
+      console.log(`[Telegram] Found ${settingsChatIds.length} admin IDs in database.`);
+      if (settingsChatIds.length === 0) {
+        console.warn('[Telegram] No admin IDs found in database (key: telegramChatIds). Notification skipped.');
+      }
+
+      const { sendTelegramPhoto } = await import('@/lib/telegram');
       const orderDetails = items.map((i: any) => `- ${i.title} (${i.duration}) x${i.quantity}`).join('\n');
       const caption = `<b>🚀 New Order Received!</b>\n\n` +
         `<b>Order ID:</b> #${order.id.slice(-6).toUpperCase()}\n` +
@@ -85,22 +90,15 @@ export async function POST(req: Request) {
         ]
       ];
 
-      let notificationSent = false;
-      if (receiptUrl && (receiptUrl.startsWith('http://') || receiptUrl.startsWith('https://'))) {
-        try {
-          const { sendTelegramPhoto } = await import('@/lib/telegram');
-          await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
-          notificationSent = true;
-        } catch (photoError) {
-          console.error('Telegram Photo Notification Error:', photoError);
-        }
-      }
-
-      if (!notificationSent) {
+      if (receiptUrl) {
+        await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
+      } else {
+        const { sendTelegramMessage } = await import('@/lib/telegram');
         await sendTelegramMessage(caption, keyboard, settingsChatIds);
       }
+      console.log('[Telegram] Notification attempt completed.');
     } catch (tgError) {
-      console.error('Telegram Notification Error:', tgError);
+      console.error('[Telegram] Critical Notification Error:', tgError);
     }
 
     return NextResponse.json({ success: true, order });
