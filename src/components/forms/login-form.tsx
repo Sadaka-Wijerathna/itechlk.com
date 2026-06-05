@@ -22,6 +22,7 @@ const LoginForm = () => {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
@@ -56,7 +57,32 @@ const LoginForm = () => {
 
         <div className='mb-20'>
           <label htmlFor="password">Password <span>**</span></label>
-          <input id="password" {...register("password")} type="password" placeholder="Enter password..." />
+          <div style={{ position: 'relative' }}>
+            <input 
+              id="password" 
+              {...register("password")} 
+              type={showPassword ? "text" : "password"} 
+              placeholder="Enter password..." 
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#666',
+                padding: '5px'
+              }}
+            >
+              <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
           <ErrorMsg msg={errors.password?.message!} />
         </div>
 
@@ -68,7 +94,7 @@ const LoginForm = () => {
             <label htmlFor="remember">Remember me!</label>
           </span>
           <span className="forgot-login f-right">
-            <a href="#">Lost your password?</a>
+            <Link href="#">Forget password?</Link>
           </span>
         </div>
 

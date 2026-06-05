@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ErrorMsg from '../common/error-msg';
 import { signIn } from "next-auth/react";
+import { COUNTRY_DATA } from "@/data/country-data";
 
 type FormData = {
   firstName: string;
@@ -30,6 +31,8 @@ const RegisterForm = () => {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
@@ -87,7 +90,18 @@ const RegisterForm = () => {
 
         <div className='mb-20'>
           <label htmlFor="country">Country <span>**</span></label>
-          <input id='country' {...register("country")} type="text" placeholder='Your country...' />
+          <div className="country-select">
+            <select 
+              id='country' 
+              {...register("country")} 
+              style={{ height: '50px', border: '1px solid #eaedff', padding: '0 20px', borderRadius: '0', outline: 'none', width: '100%' }}
+            >
+              <option value="">-- Select Country --</option>
+              {COUNTRY_DATA.map(c => (
+                <option key={c.name} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+          </div>
           <ErrorMsg msg={errors.country?.message!} />
         </div>
 
@@ -99,13 +113,63 @@ const RegisterForm = () => {
 
         <div className='mb-20'>
           <label htmlFor="password">Password <span>**</span></label>
-          <input id="password" {...register("password")} type="password" placeholder="Enter password..." />
+          <div style={{ position: 'relative' }}>
+            <input 
+              id="password" 
+              {...register("password")} 
+              type={showPassword ? "text" : "password"} 
+              placeholder="Enter password..." 
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#666',
+                padding: '5px'
+              }}
+            >
+              <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
           <ErrorMsg msg={errors.password?.message!} />
         </div>
 
         <div className='mb-20'>
           <label htmlFor="confirmPassword">Confirm Password <span>**</span></label>
-          <input id="confirmPassword" {...register("confirmPassword")} type="password" placeholder="Confirm password..." />
+          <div style={{ position: 'relative' }}>
+            <input 
+              id="confirmPassword" 
+              {...register("confirmPassword")} 
+              type={showConfirmPassword ? "text" : "password"} 
+              placeholder="Confirm password..." 
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#666',
+                padding: '5px'
+              }}
+            >
+              <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
           <ErrorMsg msg={errors.confirmPassword?.message!} />
         </div>
 
