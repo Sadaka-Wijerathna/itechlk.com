@@ -1,17 +1,17 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
+import authConfig from "./auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   trustHost: true,
   adapter: PrismaAdapter(prisma),
 
   providers: [
-    // ─── Email / Password ───────────────────────────────────────────────────────
+    ...authConfig.providers,
     Credentials({
       name: "credentials",
       credentials: {
@@ -39,18 +39,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         return user;
       },
-    }),
-
-    // ─── Google ─────────────────────────────────────────────────────────────────
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    }),
-
-    // ─── GitHub ─────────────────────────────────────────────────────────────────
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID ?? "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
     }),
   ],
 
