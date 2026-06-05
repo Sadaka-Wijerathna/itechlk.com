@@ -65,8 +65,8 @@ export async function POST(req: Request) {
         where: { key: 'telegramChatIds' }
       });
       const settingsChatIds = settingsRows[0]?.value?.split(',').map((s: string) => s.trim()).filter(Boolean) || [];
-
-      const { sendTelegramPhoto } = await import('@/lib/telegram');
+      
+      const { sendTelegramMessage } = await import('@/lib/telegram');
       const orderDetails = items.map((i: any) => `- ${i.title} (${i.duration}) x${i.quantity}`).join('\n');
       const caption = `<b>🚀 New Order Received!</b>\n\n` +
         `<b>Order ID:</b> #${order.id.slice(-6).toUpperCase()}\n` +
@@ -85,10 +85,18 @@ export async function POST(req: Request) {
         ]
       ];
 
-      if (receiptUrl) {
-        await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
-      } else {
-        const { sendTelegramMessage } = await import('@/lib/telegram');
+      let notificationSent = false;
+      if (receiptUrl && (receiptUrl.startsWith('http://') || receiptUrl.startsWith('https://'))) {
+        try {
+          const { sendTelegramPhoto } = await import('@/lib/telegram');
+          await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
+          notificationSent = true;
+        } catch (photoError) {
+          console.error('Telegram Photo Notification Error:', photoError);
+        }
+      }
+
+      if (!notificationSent) {
         await sendTelegramMessage(caption, keyboard, settingsChatIds);
       }
     } catch (tgError) {

@@ -25,7 +25,13 @@ export async function sendTelegramMessage(text: string, inlineKeyboard?: any, cu
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    }).catch(err => console.error(`Error sending to ${id}:`, err));
+    })
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok) console.error(`Telegram API error for ${id}:`, data);
+      else console.log(`Telegram message sent successfully to ${id}`);
+    })
+    .catch(err => console.error(`Error sending to ${id}:`, err));
   }
 }
 
@@ -55,6 +61,12 @@ export async function sendTelegramPhoto(photoUrl: string, caption: string, inlin
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    }).catch(err => console.error(`Error sending to ${id}:`, err));
+    })
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok) console.error(`Telegram API error (photo) for ${id}:`, data);
+      else console.log(`Telegram photo sent successfully to ${id}`);
+    })
+    .catch(err => console.error(`Error sending to ${id}:`, err));
   }
 }
