@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import ErrorMsg from '../common/error-msg';
 import { signIn } from "next-auth/react";
 import { COUNTRY_DATA } from "@/data/country-data";
+import { useGeoLocation } from "@/hooks/use-geo-location";
+import { useEffect } from "react";
 
 type FormData = {
   firstName: string;
@@ -34,9 +36,17 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
+
+  const { geo } = useGeoLocation();
+
+  useEffect(() => {
+    if (geo?.countryName) {
+      setValue("country", geo.countryName);
+    }
+  }, [geo, setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
