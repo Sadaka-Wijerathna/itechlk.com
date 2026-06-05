@@ -9,6 +9,10 @@ import { CurrencyProvider } from '@/context/CurrencyContext';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
 
+export const viewport = {
+  themeColor: '#D55433',
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -59,7 +63,6 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#D55433',
   verification: {
     google: '', // Add your Google Search Console verification code here
   },
