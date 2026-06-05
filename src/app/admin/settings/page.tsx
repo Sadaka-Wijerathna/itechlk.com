@@ -8,7 +8,7 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState({
-    whatsappNumber: "+9472790749",
+    whatsappNumber: "+94742570943",
     telegramChatIds: "",
   });
 
@@ -74,10 +74,10 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={settings.whatsappNumber}
                     onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
-                    placeholder="+9472790749"
+                    placeholder="+94742570943"
                   />
                   <small style={{ color: "#6b7280", fontSize: 12, marginTop: 4, display: "block" }}>
-                    Include country code, e.g. +9472790749.
+                    Include country code, e.g. +94742570943.
                   </small>
                 </div>
               </div>

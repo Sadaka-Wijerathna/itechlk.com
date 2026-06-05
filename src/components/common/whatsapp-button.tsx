@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 
 const WhatsappButton = () => {
-  const [phone, setPhone] = useState('+9472790749'); // fallback default
+  const [phone, setPhone] = useState('+94742570943'); // fallback default
 
   useEffect(() => {
     fetch('/api/settings')

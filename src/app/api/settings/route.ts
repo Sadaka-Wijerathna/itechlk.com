@@ -11,7 +11,7 @@ export async function GET() {
     }
     // Provide defaults if not set yet
     const defaults: Record<string, string> = {
-      whatsappNumber: "+9472790749",
+      whatsappNumber: "+94742570943",
       telegramChatIds: "",
       storeName: "ITechLK",
       supportEmail: "support@itechlk.com",

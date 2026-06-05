@@ -1,5 +1,4 @@
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID;
 
 export async function sendTelegramMessage(text: string, inlineKeyboard?: any, customChatIds?: string[]) {
   if (!BOT_TOKEN) {
@@ -7,7 +6,7 @@ export async function sendTelegramMessage(text: string, inlineKeyboard?: any, cu
     return;
   }
 
-  const ids = customChatIds && customChatIds.length > 0 ? customChatIds : (CHAT_ID ? [CHAT_ID] : []);
+  const ids = customChatIds || [];
   if (ids.length === 0) return;
 
   for (const id of ids) {
@@ -36,7 +35,7 @@ export async function sendTelegramPhoto(photoUrl: string, caption: string, inlin
     return;
   }
 
-  const ids = customChatIds && customChatIds.length > 0 ? customChatIds : (CHAT_ID ? [CHAT_ID] : []);
+  const ids = customChatIds || [];
   if (ids.length === 0) return;
 
   for (const id of ids) {
