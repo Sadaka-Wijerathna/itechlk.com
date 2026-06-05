@@ -100,17 +100,40 @@ const RegisterForm = () => {
 
         <div className='mb-20'>
           <label htmlFor="country">Country <span>**</span></label>
-          <div className="country-select">
+          <div className="country-select" style={{ position: 'relative' }}>
             <select 
               id='country' 
               {...register("country")} 
-              style={{ height: '50px', border: '1px solid #eaedff', padding: '0 20px', borderRadius: '0', outline: 'none', width: '100%' }}
+              style={{ 
+                height: '50px', 
+                border: '1px solid #eaedff', 
+                padding: '0 40px 0 20px', 
+                borderRadius: '0', 
+                outline: 'none', 
+                width: '100%',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+              }}
             >
               <option value="">-- Select Country --</option>
               {COUNTRY_DATA.map(c => (
                 <option key={c.name} value={c.name}>{c.name}</option>
               ))}
             </select>
+            <span style={{
+              position: 'absolute',
+              right: '15px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+              color: '#666',
+              fontSize: '12px',
+            }}>
+              <i className="fas fa-chevron-down"></i>
+            </span>
           </div>
           <ErrorMsg msg={errors.country?.message!} />
         </div>
