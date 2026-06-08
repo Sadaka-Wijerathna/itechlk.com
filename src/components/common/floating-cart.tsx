@@ -71,9 +71,9 @@ const FloatingCart = () => {
 
             <div className="floating-cart-popup" style={{
               position: 'absolute',
-              bottom: '100%',
+              bottom: '50px', // button height
               right: '0',
-              marginBottom: '10px',
+              paddingBottom: '15px', // bridge the gap
               visibility: isOpen ? 'visible' : 'hidden',
               opacity: isOpen ? 1 : 0,
               transition: 'all 0.3s ease-out',

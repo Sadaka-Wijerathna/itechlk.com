@@ -14,6 +14,7 @@ export interface IProduct {
     status?:string;
     active?: boolean;
     selectedDuration?: string;
+    durationPrices?: Record<string, { price: number; oldPrice?: number | null }> | null;
     related_images: string[];
     orderQuantity?: number;
     sizes: string[];

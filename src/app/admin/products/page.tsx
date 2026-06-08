@@ -22,6 +22,7 @@ type Product = {
   sizes: string[];
   brand: string;
   createdAt: string;
+  durationPrices?: Record<string, { price: number; oldPrice?: number | null }> | null;
 };
 
 const PREDEFINED_CATEGORIES = [
@@ -64,6 +65,7 @@ const emptyForm = {
   detailsText2: "",
   detailsList: "Instant delivery via email\n24/7 Premium Support\n100% money back guarantee",
   sizes: [] as string[],
+  durationPrices: {} as Record<string, { price: string; oldPrice: string; discount: string; isDiscounted: boolean }>,
 };
 
 export default function AdminProductsPage() {
@@ -82,9 +84,13 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const res = await fetch("/api/products/all");
-    const data = await res.json();
-    setProducts(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch("/api/products/all");
+      const data = await res.json();
+      setProducts(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch products failed", error);
+    }
     setLoading(false);
   };
 
@@ -102,6 +108,24 @@ export default function AdminProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditingId(p.id);
+    const durPrices: Record<string, any> = {};
+    if (p.durationPrices) {
+      Object.entries(p.durationPrices).forEach(([dur, data]: [string, any]) => {
+        const price = data.price * rate;
+        const oldPrice = data.oldPrice ? data.oldPrice * rate : null;
+        let discount = "";
+        if (price && oldPrice && oldPrice > 0) {
+          discount = String(Math.round(((oldPrice - price) / oldPrice) * 100));
+        }
+        durPrices[dur] = {
+          price: String(Math.round(price)),
+          oldPrice: oldPrice ? String(Math.round(oldPrice)) : "",
+          discount: discount,
+          isDiscounted: !!data.oldPrice
+        };
+      });
+    }
+
     setForm({
       title: p.title,
       price: String(Math.round(p.price * rate)), 
@@ -119,6 +143,7 @@ export default function AdminProductsPage() {
       detailsText2: p.detailsText2,
       detailsList: p.detailsList.join("\n"),
       sizes: p.sizes ?? [],
+      durationPrices: durPrices,
     });
     setSelectedFile(null);
     setPreviewUrl(null);
@@ -136,11 +161,15 @@ export default function AdminProductsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Permanently delete this product? This cannot be undone.")) return;
     setDeleting(id);
-    const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      fetchProducts();
-    } else {
-      alert("Failed to delete.");
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchProducts();
+      } else {
+        alert("Failed to delete.");
+      }
+    } catch (error) {
+      alert("Error deleting product");
     }
     setDeleting(null);
   };
@@ -148,9 +177,24 @@ export default function AdminProductsPage() {
   const toggleDuration = (duration: string) => {
     setForm((prev) => {
       const current = prev.sizes;
-      return current.includes(duration)
-        ? { ...prev, sizes: current.filter((d) => d !== duration) }
-        : { ...prev, sizes: [...current, duration] };
+      const isRemoving = current.includes(duration);
+      const newSizes = isRemoving
+        ? current.filter((d: string) => d !== duration)
+        : [...current, duration];
+      
+      const newDurPrices = { ...prev.durationPrices };
+      if (isRemoving) {
+        delete newDurPrices[duration];
+      } else if (!newDurPrices[duration]) {
+        newDurPrices[duration] = { 
+          price: "", 
+          oldPrice: "", 
+          discount: "",
+          isDiscounted: false 
+        };
+      }
+      
+      return { ...prev, sizes: newSizes, durationPrices: newDurPrices };
     });
   };
 
@@ -158,8 +202,8 @@ export default function AdminProductsPage() {
     e.preventDefault();
     const isEdit = !!editingId;
 
-    if (!form.title || !form.price || (!isEdit && !form.img && !selectedFile)) {
-      alert("Title, Price and Image are required.");
+    if (!form.title || form.sizes.length === 0 || (!isEdit && !form.img && !selectedFile)) {
+      alert("Title, at least one Duration, and Image are required.");
       return;
     }
     setSaving(true);
@@ -169,12 +213,18 @@ export default function AdminProductsPage() {
     if (selectedFile) {
       const formData = new FormData();
       formData.append("file", selectedFile);
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-      if (uploadRes.ok) {
-        const uploadData = await uploadRes.json();
-        uploadedImageUrl = uploadData.url;
-      } else {
-        alert("Image upload failed.");
+      try {
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          uploadedImageUrl = uploadData.url;
+        } else {
+          alert("Image upload failed.");
+          setSaving(false);
+          return;
+        }
+      } catch (error) {
+        alert("Upload error");
         setSaving(false);
         return;
       }
@@ -185,18 +235,42 @@ export default function AdminProductsPage() {
         ? `Get access to premium features and elevate your experience with ${form.title}.`
         : form.smDesc;
 
-    // Convert LKR input back to USD base for storage
-    const priceInLKR = parseFloat(form.price);
+    // Find the entry-level price (shortest duration selected)
+    const sortedSelected = [...form.sizes].sort((a, b) => 
+      AVAILABLE_DURATIONS.indexOf(a) - AVAILABLE_DURATIONS.indexOf(b)
+    );
+    const shortestDuration = sortedSelected[0];
+    const shortestData = form.durationPrices[shortestDuration];
+
+    if (!shortestData || !shortestData.price) {
+      alert(`Please set a price for the entry-level duration: ${shortestDuration}`);
+      setSaving(false);
+      return;
+    }
+
+    const priceInLKR = parseFloat(shortestData.price);
     const priceInUSD = priceInLKR / rate;
     
-    const oldPriceInLKR = form.isDiscounted && form.oldPrice ? parseFloat(form.oldPrice) : null;
+    const oldPriceInLKR = shortestData.isDiscounted && shortestData.oldPrice ? parseFloat(shortestData.oldPrice) : null;
     const oldPriceInUSD = oldPriceInLKR ? oldPriceInLKR / rate : null;
+    const mainDiscount = shortestData.isDiscounted && shortestData.discount ? parseFloat(shortestData.discount) : null;
+
+    const durationPricesUSD: Record<string, any> = {};
+    form.sizes.forEach(dur => {
+      const dData = form.durationPrices[dur];
+      if (dData) {
+        durationPricesUSD[dur] = {
+          price: parseFloat(dData.price) / rate,
+          oldPrice: dData.isDiscounted && dData.oldPrice ? parseFloat(dData.oldPrice) / rate : null
+        };
+      }
+    });
 
     const payload = {
       title: form.title,
       price: priceInUSD,
       oldPrice: oldPriceInUSD,
-      discount: form.isDiscounted && form.discount ? parseFloat(form.discount) : null,
+      discount: mainDiscount,
       img: uploadedImageUrl,
       thumbImg: uploadedImageUrl,
       relatedImages: [uploadedImageUrl],
@@ -210,55 +284,77 @@ export default function AdminProductsPage() {
       detailsList: form.detailsList.split("\n").filter(Boolean),
       sizes: form.sizes.length > 0 ? form.sizes : ["Standard"],
       colors: ["Default"],
+      durationPrices: durationPricesUSD,
     };
 
-    let res: Response;
-    if (isEdit) {
-      res = await fetch(`/api/products/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } else {
-      res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    try {
+      let res: Response;
+      if (isEdit) {
+        res = await fetch(`/api/products/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        res = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (res.ok) {
+        alert(isEdit ? "Product updated!" : "Product created!");
+        closeForm();
+        fetchProducts();
+      } else {
+        const err = await res.json();
+        alert(`Failed to save. Details: ${err.details ?? err.error}`);
+      }
+    } catch (error) {
+      alert("Error saving product");
     }
 
     setSaving(false);
-
-    if (res.ok) {
-      alert(isEdit ? "Product updated!" : "Product created!");
-      closeForm();
-      fetchProducts();
-    } else {
-      const err = await res.json();
-      alert(`Failed to update. Details: ${err.details ?? err.error}`);
-    }
   };
 
-  const handleOldPriceChange = (val: string) => {
+
+  const handleDurationOldPriceChange = (dur: string, val: string) => {
+    const dData = form.durationPrices[dur];
     const oldP = parseFloat(val);
-    const currP = parseFloat(form.price);
+    const currP = parseFloat(dData.price);
+    
+    let disc = dData.discount;
     if (!isNaN(oldP) && !isNaN(currP) && oldP > 0) {
-      const disc = Math.round(((oldP - currP) / oldP) * 100);
-      setForm({ ...form, oldPrice: val, discount: String(disc) });
-    } else {
-      setForm({ ...form, oldPrice: val });
+      disc = String(Math.round(((oldP - currP) / oldP) * 100));
     }
+
+    setForm(prev => ({
+      ...prev,
+      durationPrices: {
+        ...prev.durationPrices,
+        [dur]: { ...dData, oldPrice: val, discount: disc }
+      }
+    }));
   };
 
-  const handleDiscountChange = (val: string) => {
+  const handleDurationDiscountChange = (dur: string, val: string) => {
+    const dData = form.durationPrices[dur];
     const disc = parseFloat(val);
-    const currP = parseFloat(form.price);
+    const currP = parseFloat(dData.price);
+    
+    let oldP = dData.oldPrice;
     if (!isNaN(disc) && !isNaN(currP) && disc < 100) {
-      const oldP = currP / (1 - disc / 100);
-      setForm({ ...form, discount: val, oldPrice: Math.round(oldP).toString() });
-    } else {
-      setForm({ ...form, discount: val });
+      oldP = String(Math.round(currP / (1 - disc / 100)));
     }
+
+    setForm(prev => ({
+      ...prev,
+      durationPrices: {
+        ...prev.durationPrices,
+        [dur]: { ...dData, discount: val, oldPrice: oldP }
+      }
+    }));
   };
 
   const filtered = products.filter(
@@ -330,7 +426,7 @@ export default function AdminProductsPage() {
                           {p.oldPrice && (
                             <>
                               <small style={{ color: "#848b8a", textDecoration: "line-through" }}>{formatPrice(p.oldPrice)}</small>
-                              {p.discount && <small style={{ color: "#e32636", fontWeight: 600 }}>({p.discount}%)</small>}
+                              <small style={{ color: "#e32636", fontWeight: 600 }}>({Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}%)</small>
                             </>
                           )}
                         </div>
@@ -386,35 +482,6 @@ export default function AdminProductsPage() {
                     </select>
                   </div>
                 </div>
-
-                <div className="col-lg-12">
-                  <div className="checkout-form-list mb-20">
-                    <div className="row g-3">
-                      <div className="col-md-4">
-                        <label>Price (LKR) <span className="required">*</span></label>
-                        <input type="number" step="1" placeholder="3250" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
-                        <label className="d-flex align-items-center gap-2 mt-2" style={{ cursor: "pointer", fontSize: 13 }}>
-                          <input type="checkbox" checked={form.isDiscounted} onChange={(e) => setForm(prev => ({ ...prev, isDiscounted: e.target.checked }))} style={{ width: 16, height: 16 }} />
-                          <span>Discounted</span>
-                        </label>
-                      </div>
-
-                      {form.isDiscounted && (
-                        <>
-                          <div className="col-md-4">
-                            <label>Old Price (LKR)</label>
-                            <input type="number" step="1" placeholder="4500" value={form.oldPrice} onChange={(e) => handleOldPriceChange(e.target.value)} />
-                          </div>
-                          <div className="col-md-4">
-                            <label>Discount %</label>
-                            <input type="number" min="0" max="100" placeholder="20" value={form.discount} onChange={(e) => handleDiscountChange(e.target.value)} />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
 
                 <div className="col-lg-12">
                   <div className="checkout-form-list mb-20">
@@ -479,8 +546,8 @@ export default function AdminProductsPage() {
 
                 <div className="col-lg-12">
                   <div className="checkout-form-list mb-20">
-                    <label>Available Durations</label>
-                    <div className="d-flex flex-wrap gap-3 pt-2">
+                    <label>Available Durations & Prices</label>
+                    <div className="d-flex flex-wrap gap-3 pt-2 mb-20">
                        {AVAILABLE_DURATIONS.map((duration) => (
                         <label key={duration} className="d-flex align-items-center gap-2" style={{ cursor: "pointer", fontSize: 14 }}>
                           <input type="checkbox" checked={form.sizes.includes(duration)} onChange={() => toggleDuration(duration)} style={{ width: 16, height: 16 }} />
@@ -488,6 +555,76 @@ export default function AdminProductsPage() {
                         </label>
                       ))}
                     </div>
+
+                    {form.sizes.map(dur => (
+                      <div key={dur} className="duration-price-row p-3 mb-3" style={{ border: '1px solid #ebebeb', borderRadius: '0' }}>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="mb-0">{dur} Price</h6>
+                        </div>
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="small">Price (LKR)</label>
+                            <input 
+                              type="number" 
+                              value={form.durationPrices[dur]?.price || ""} 
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setForm(prev => ({
+                                  ...prev,
+                                  durationPrices: {
+                                    ...prev.durationPrices,
+                                    [dur]: { ...prev.durationPrices[dur], price: val }
+                                  }
+                                }));
+                              }}
+                              placeholder="Price"
+                            />
+                            <label className="d-flex align-items-center gap-2 mt-2" style={{ cursor: "pointer", fontSize: 12 }}>
+                              <input 
+                                type="checkbox" 
+                                checked={form.durationPrices[dur]?.isDiscounted || false} 
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setForm(prev => ({
+                                    ...prev,
+                                    durationPrices: {
+                                      ...prev.durationPrices,
+                                      [dur]: { ...prev.durationPrices[dur], isDiscounted: checked }
+                                    }
+                                  }));
+                                }}
+                                style={{ width: 14, height: 14 }} 
+                              />
+                              <span>Discounted</span>
+                            </label>
+                          </div>
+                          {form.durationPrices[dur]?.isDiscounted && (
+                            <>
+                              <div className="col-md-4">
+                                <label className="small">Old Price (LKR)</label>
+                                <input 
+                                  type="number" 
+                                  value={form.durationPrices[dur]?.oldPrice || ""} 
+                                  onChange={(e) => handleDurationOldPriceChange(dur, e.target.value)}
+                                  placeholder="Old Price"
+                                />
+                              </div>
+                              <div className="col-md-4">
+                                <label className="small">Discount %</label>
+                                <input 
+                                  type="number" 
+                                  min="0" 
+                                  max="100" 
+                                  value={form.durationPrices[dur]?.discount || ""} 
+                                  onChange={(e) => handleDurationDiscountChange(dur, e.target.value)}
+                                  placeholder="20"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

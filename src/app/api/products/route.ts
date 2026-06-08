@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       title, img, thumbImg, relatedImages, parentCategory, category,
       brand, price, oldPrice, discount, rating, smDesc,
       sizes, colors, weight, dimension, trending, topRated, bestSeller,
-      isNew, status, detailsText, detailsList, detailsText2,
+      isNew, status, detailsText, detailsList, detailsText2, durationPrices,
     } = body;
 
     if (!title || !img || !price) {
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
         price: parseFloat(price),
         oldPrice: oldPrice ? parseFloat(oldPrice) : null,
         discount: discount ? parseFloat(discount) : null,
+        durationPrices: durationPrices || null,
         rating: rating ? parseFloat(rating) : 5,
         smDesc: smDesc || `Get access to premium features with ${title}.`,
         sizes: sizes || ["Standard"],

@@ -40,6 +40,7 @@ export async function getDbProducts(): Promise<IProduct[]> {
     topRated: p.topRated,
     bestSeller: p.bestSeller,
     new: p.isNew,
+    durationPrices: p.durationPrices as any,
     details: {
       details_text: p.detailsText,
       details_list: p.detailsList,

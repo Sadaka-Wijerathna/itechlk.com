@@ -37,7 +37,16 @@ const ProductDetailsUpper = ({
       notifyError("Please select a duration");
       return;
     }
-    dispatch(add_cart_product({ ...product, selectedDuration }));
+    
+    let price = product.price;
+    let old_price = product.old_price;
+    
+    if (product.durationPrices && product.durationPrices[selectedDuration]) {
+      price = product.durationPrices[selectedDuration].price;
+      old_price = product.durationPrices[selectedDuration].oldPrice ?? undefined;
+    }
+
+    dispatch(add_cart_product({ ...product, selectedDuration, price, old_price }));
   };
 
   return (
@@ -86,7 +95,18 @@ const ProductDetailsUpper = ({
                     ) : (
                       <>
                         {product.new && <span className="new">new</span>}
-                        {(product.discount ?? 0) > 0 && <span className="percent">-{product.discount}%</span>}
+                        {(() => {
+                          let displayDiscount = product.discount;
+                          if (selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]) {
+                            const d = product.durationPrices[selectedDuration];
+                            if (d.price && d.oldPrice && d.oldPrice > 0) {
+                              displayDiscount = Math.round(((d.oldPrice - d.price) / d.oldPrice) * 100);
+                            } else {
+                              displayDiscount = 0;
+                            }
+                          }
+                          return (displayDiscount ?? 0) > 0 ? <span className="percent">-{displayDiscount}%</span> : null;
+                        })()}
                       </>
                     )}
                   </div>
@@ -116,7 +136,18 @@ const ProductDetailsUpper = ({
                     ) : (
                       <>
                         {product.new && <span className="new">new</span>}
-                        {(product.discount ?? 0) > 0 && <span className="percent">-{product.discount}%</span>}
+                        {(() => {
+                          let displayDiscount = product.discount;
+                          if (selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]) {
+                            const d = product.durationPrices[selectedDuration];
+                            if (d.price && d.oldPrice && d.oldPrice > 0) {
+                              displayDiscount = Math.round(((d.oldPrice - d.price) / d.oldPrice) * 100);
+                            } else {
+                              displayDiscount = 0;
+                            }
+                          }
+                          return (displayDiscount ?? 0) > 0 ? <span className="percent">-{displayDiscount}%</span> : null;
+                        })()}
                       </>
                     )}
                   </div>
@@ -157,10 +188,18 @@ const ProductDetailsUpper = ({
               </Link>
             </h4>
             <div className="product__price-2 mb-25">
-              <span>{formatPrice(product.price)}</span>
-              {product.old_price && (
+              <span>
+                {selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]
+                  ? formatPrice(product.durationPrices[selectedDuration].price)
+                  : formatPrice(product.price)}
+              </span>
+              {(selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]
+                ? product.durationPrices[selectedDuration].oldPrice
+                : product.old_price) && (
                 <span className="old-price">
-                  {formatPrice(product.old_price)}
+                  {formatPrice(selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]
+                    ? (product.durationPrices[selectedDuration].oldPrice as number)
+                    : (product.old_price as number))}
                 </span>
               )}
             </div>
