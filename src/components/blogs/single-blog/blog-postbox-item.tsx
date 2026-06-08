@@ -15,14 +15,15 @@ const imgStyle = {
 }
 
 const BlogPostboxItem = ({blog,blog_col_cls=false}:IProps) => {
-  const date = new Date(blog.createdAt);
+  const dateStr = blog.createdAt || blog.date || new Date().toISOString();
+  const date = new Date(dateStr);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   
   return (
     <div className={`blog__item mb-60 ${blog_col_cls?'':'blog__border-bottom pb-60'}`}>
       <div className="blog__thumb fix">
         <Link href={`/blog/${blog.slug}`} className="w-img">
-          <img src={blog.image} alt="blog" style={{ width: '100%', height: 'auto' }} />
+          <img src={blog.image || blog.img} alt="blog" style={{ width: '100%', height: 'auto' }} />
         </Link>
       </div>
       <div className="blog__content">
@@ -37,7 +38,7 @@ const BlogPostboxItem = ({blog,blog_col_cls=false}:IProps) => {
         </div>
         <div 
           style={{ marginBottom: '20px' }}
-          dangerouslySetInnerHTML={{ __html: blog.content.length > 200 ? blog.content.substring(0, 200) + '...' : blog.content }}
+          dangerouslySetInnerHTML={{ __html: (blog.content || blog.desc || '').length > 200 ? (blog.content || blog.desc || '').substring(0, 200) + '...' : (blog.content || blog.desc || '') }}
         />
         <Link href={`/blog/${blog.slug}`} className="os-btn">
           read more

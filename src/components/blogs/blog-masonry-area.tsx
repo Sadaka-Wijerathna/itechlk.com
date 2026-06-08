@@ -19,7 +19,7 @@ const BlogTwoCalMasonryArea = () => {
                     <div className="blog__item mb-60">
                       <div className="blog__thumb fix">
                         <Link href={`/blog-details/${item.id}`} className="w-img">
-                            <img src={item.img} alt="blog" />
+                            <img src={item.image || item.img} alt="blog" />
                         </Link>
                       </div>
                       <div className="blog__content">
@@ -30,9 +30,9 @@ const BlogTwoCalMasonryArea = () => {
                         </h4>
                         <div className="blog__meta">
                           <span>By <a href="#">{item.author}</a></span>
-                          <span>/ {item.date}</span>
+                          <span>/ {item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '')}</span>
                         </div>
-                        <p>{item.desc}</p>
+                        <p>{item.desc || item.content?.substring(0, 100)}...</p>
                         <Link href={`/blog-details/${item.id}`} className="os-btn">
                            read more
                         </Link>

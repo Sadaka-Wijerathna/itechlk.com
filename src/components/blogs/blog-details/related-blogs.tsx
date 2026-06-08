@@ -24,7 +24,7 @@ const RelatedBlogs = ({ blog }: IProps) => {
             <div className="blog__item mb-30">
               <div className="blog__thumb fix">
                 <Link href={`/blog-details/${blog.id}`} className="w-img">
-                  <Image src={blog.img} alt="blog" width={404} height={238} style={imgStyle} />
+                  <Image src={blog.image || blog.img || ''} alt="blog" width={404} height={238} style={imgStyle} />
                 </Link>
               </div>
               <div className="blog__content">
@@ -35,7 +35,7 @@ const RelatedBlogs = ({ blog }: IProps) => {
                   <span>
                     By <a href="#">{blog.author}</a>
                   </span>
-                  <span>/ {blog.date}</span>
+                  <span>/ {blog.date || (blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : '')}</span>
                 </div>
               </div>
             </div>
