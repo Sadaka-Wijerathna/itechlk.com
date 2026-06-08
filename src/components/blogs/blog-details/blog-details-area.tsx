@@ -19,15 +19,17 @@ type IProps = {
 
 const BlogDetailsArea = ({blog}:IProps) => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
-  const date = new Date(blog.createdAt);
+  const dateStr = blog.createdAt || blog.date || new Date().toISOString();
+  const date = new Date(dateStr);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   
+  const blogImage = blog.image || blog.img || '';
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: blog.title,
     image: [
-      blog.image ? (blog.image.startsWith('http') ? blog.image : `${siteUrl}${blog.image}`) : `${siteUrl}/assets/img/logo/logo.png`,
+      blogImage ? (blogImage.startsWith('http') ? blogImage : `${siteUrl}${blogImage}`) : `${siteUrl}/assets/img/logo/logo.png`,
     ],
     datePublished: date.toISOString(),
     author: [{
@@ -67,12 +69,12 @@ const BlogDetailsArea = ({blog}:IProps) => {
             </div>
           </div>
           <div className="postbox__thumb w-img mb-60">
-             <img src={blog.image} alt="blog" style={{ width: '100%', height: 'auto' }} />
+             <img src={blogImage} alt="blog" style={{ width: '100%', height: 'auto' }} />
           </div>
           <div className="postbox__wrapper mb-70">
             <div 
               className="postbox__text mt-65 dynamic-content" 
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: blog.content || blog.desc || '' }}
             />
           </div>
           <div className="postbox__share mb-95">
