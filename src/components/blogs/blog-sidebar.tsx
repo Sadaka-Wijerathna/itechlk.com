@@ -35,7 +35,7 @@ const BlogSidebar = () => {
         // ── Archives: group by Month Year ──────────────────────────────────
         const archiveMap: Record<string, number> = {};
         activeBlogs.forEach((b) => {
-          const d = new Date(b.createdAt);
+          const d = new Date(b.createdAt || b.date || new Date().toISOString());
           const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
           archiveMap[label] = (archiveMap[label] || 0) + 1;
         });
@@ -130,7 +130,7 @@ const BlogSidebar = () => {
                     <div className="rc__post-thumb mr-20">
                       <Link href={`/blog/${b.slug}`}>
                         <img
-                          src={b.image}
+                          src={b.image || b.img}
                           alt={b.title}
                           width={70}
                           height={70}
@@ -147,7 +147,7 @@ const BlogSidebar = () => {
                       </h6>
                       <div className="rc__meta">
                         <span>
-                          {new Date(b.createdAt).toLocaleDateString("en-US", {
+                          {new Date(b.createdAt || b.date || new Date().toISOString()).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
