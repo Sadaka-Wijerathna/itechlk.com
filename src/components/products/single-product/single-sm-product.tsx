@@ -2,18 +2,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { IProduct } from "@/types/product-d-t";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { add_cart_product } from "@/redux/features/cart";
 import { useCurrency } from "@/context/CurrencyContext";
 
 const SingleSmProduct = ({ product }: { product: IProduct }) => {
+  const router = useRouter();
   const [isItemAddToCart, setIsItemAddToCart] = useState(false);
   const { cart_products } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
   const { formatPrice } = useCurrency();
 
-    useEffect(() => {
+  useEffect(() => {
     // asynchronous update to avoid cascading render warning
     const timer = setTimeout(() => {
       setIsItemAddToCart(cart_products.some((i) => i.id === product.id));
@@ -42,13 +44,9 @@ const SingleSmProduct = ({ product }: { product: IProduct }) => {
             <div className="add-cart p-absolute transition-3">
               {(product as any).active === false || product.status?.toLowerCase() === "out of stock" ? (
                 <span className="text-danger" style={{ fontSize: '12px', fontWeight: 600 }}>Out of Stock</span>
-              ) : isItemAddToCart ? (
-                <Link href="/cart" className="cursor-pointer">
-                  View Cart
-                </Link>
               ) : (
-                <button onClick={() => dispatch(add_cart_product(product))}>
-                  + Add to Cart
+                <button onClick={() => router.push(`/product-details/${product.id}`)}>
+                  Select duration
                 </button>
               )}
             </div>

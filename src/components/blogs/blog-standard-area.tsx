@@ -1,16 +1,14 @@
 "use client";
-import blog_data from "@/data/blog-data";
+
 import usePagination from "@/hooks/use-pagination";
 import IBlogType from "@/types/blog-d-t";
 import BlogSidebar from "./blog-sidebar";
 import Pagination from "@/ui/pagination";
 import BlogPostboxItem from "./single-blog/blog-postbox-item";
 
-// blog items
-const blogs = blog_data.filter((b) => b.blog === "blog-standard");
-
 // props type
 type IProps = {
+  blogs: IBlogType[];
   left_side?: boolean;
   no_sidebar?: boolean;
   blog_col?: string;
@@ -18,7 +16,7 @@ type IProps = {
   blog_3?: boolean;
 };
 
-const BlogStandardArea = ({left_side,no_sidebar,blog_col,blog_col_cls,blog_3}:IProps) => {
+const BlogStandardArea = ({blogs, left_side,no_sidebar,blog_col,blog_col_cls,blog_3}:IProps) => {
   const {currentItems,handlePageClick,pageCount} = usePagination<IBlogType>(blogs,blog_3?6:4);
   return (
     <section className="blog__area pt-100 pb-100">

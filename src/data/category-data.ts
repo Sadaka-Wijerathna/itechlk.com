@@ -3,42 +3,33 @@ import { ICategoryType } from "../types/category-d-t";
 const category_data:ICategoryType[] = [
   {
     id: 1,
-    img: '/assets/img/shop/banner/banner-sm-1.jpg',
-    parentTitle: "Lighting & Chair",
-    children:['Lighting','Chair']
+    parentTitle: "AI Tools",
+    children: ['AI Tools']
   },
   {
     id: 2,
-    img: '/assets/img/shop/banner/banner-sm-2.jpg',
-    parentTitle: "Decoration & Accessories",
-    children:['Decoration','Accessories']
+    parentTitle: "Creative & Editing",
+    children: ['Creative & Editing']
   },
   {
     id: 3,
-    img: '/assets/img/shop/banner/banner-sm-3.jpg',
-    parentTitle: "Clothing & Oil",
-    children:['Clothing','Oil']
+    parentTitle: "Work & OS",
+    children: ['Work & OS']
   },
   {
     id: 4,
-    img: '/assets/img/shop/banner/02/banner-1.webp',
-    parentTitle: "FASHION FOR MEN’S",
-    children:['Shirt'],
-    smDesc:"Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum."
+    parentTitle: "Streaming",
+    children: ['Streaming']
   },
   {
     id: 5,
-    img: '/assets/img/shop/banner/02/banner-2.webp',
-    parentTitle: "FASHION FOR WOMEN’S",
-    children:['Shoes'],
-    smDesc:"Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum."
+    parentTitle: "VPNs",
+    children: ['VPNs']
   },
   {
     id: 6,
-    img: '/assets/img/shop/banner/02/banner-3.webp',
-    parentTitle: "FASHION FOR BABY",
-    children:['Shoes'],
-    smDesc:"Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum."
+    parentTitle: "Adults",
+    children: ['Adults']
   },
 ]
 

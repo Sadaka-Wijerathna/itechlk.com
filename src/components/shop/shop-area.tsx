@@ -77,7 +77,12 @@ const ShopArea = ({product_data,shop_right,shop_col}:IProps) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    dispatch(reset());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (categoryParam) {
+      // Small timeout to ensure reset happened first if they both trigger
       dispatch(add_sub_category(categoryParam));
     }
   }, [categoryParam, dispatch]);
@@ -246,7 +251,7 @@ const ShopArea = ({product_data,shop_right,shop_col}:IProps) => {
               </div>
               <div className="row mt-40">
                 <div className="col-xl-12">
-                  <div className="shop-pagination-wrapper d-md-flex justify-content-center align-items-center">
+                  <div className="shop-pagination-wrapper d-flex justify-content-center align-items-center">
                     <div className="basic-pagination">
                       <nav>
                         <Pagination

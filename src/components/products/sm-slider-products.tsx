@@ -31,18 +31,52 @@ const SmSliderProducts = ({ products }: IProps) => {
   const trendingRef = useRef<Slider | null>(null);
   const discountRef = useRef<Slider | null>(null);
   const topRatedRef = useRef<Slider | null>(null);
-  const trending_slider_products = chunkArray(
-    products.filter((p) => p.trending),
-    4
-  );
-  const discount_slider_products = chunkArray(
-    products.filter((p) => p.discount! > 0),
-    4
-  );
-  const top_rated_slider_products = chunkArray(
-    products.filter((p) => p.topRated),
-    4
-  );
+  // Smarter unique product selection
+  const usedIds = new Set();
+
+  // Robust filtering for out-of-stock and inactive products
+  const filterStock = (p: IProduct) => {
+    const isInactive = (p as any).active === false;
+    const isOutOfStock = p.status?.toLowerCase() === "out of stock";
+    const isZeroQuantity = p.quantity === 0;
+    return !isInactive && !isOutOfStock && !isZeroQuantity;
+  };
+
+  const onSaleProductsList = products
+    .filter((p) => p.discount! > 0 && filterStock(p))
+    .slice(0, 12);
+  onSaleProductsList.forEach(p => usedIds.add(p.id));
+
+  const trendingProductsList = products
+    .filter((p) => (p.trending || p.bestSeller) && !usedIds.has(p.id) && filterStock(p))
+    .slice(0, 12);
+  
+  // If trending is too empty, add some even if they are on sale
+  if (trendingProductsList.length < 4) {
+    const extraTrending = products
+      .filter(p => (p.trending || p.bestSeller) && !trendingProductsList.some(tp => tp.id === p.id) && filterStock(p))
+      .slice(0, 4 - trendingProductsList.length);
+    trendingProductsList.push(...extraTrending);
+  }
+  trendingProductsList.forEach(p => usedIds.add(p.id));
+
+  const topRatedProductsList = products
+    .filter((p) => (p.topRated || (p.rating && p.rating >= 4)) && !usedIds.has(p.id) && filterStock(p))
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 12);
+
+  // Fallback for top rated if empty
+  if (topRatedProductsList.length < 4) {
+    const extraRated = products
+      .filter(p => !topRatedProductsList.some(rp => rp.id === p.id) && filterStock(p))
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, 8 - topRatedProductsList.length);
+    topRatedProductsList.push(...extraRated);
+  }
+
+  const trending_slider_products = chunkArray(trendingProductsList, 4);
+  const discount_slider_products = chunkArray(onSaleProductsList, 4);
+  const top_rated_slider_products = chunkArray(topRatedProductsList, 4);
   return (
     <div className="row">
       <div className="col-xl-4 col-lg-4 col-md-6">

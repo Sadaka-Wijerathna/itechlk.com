@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ChangePasswordForm from '../forms/change-password-form';
 import { useSession, signOut } from 'next-auth/react';
 import { useGeoLocation } from '@/hooks/use-geo-location';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const COUNTRY_DATA = [
   { name: "Afghanistan", code: "+93" }, { name: "Albania", code: "+355" }, { name: "Algeria", code: "+213" },
@@ -57,6 +58,7 @@ const COUNTRY_DATA = [
 const ProfileMenuArea = () => {
   const { data: session, update } = useSession();
   const { geo } = useGeoLocation();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -137,7 +139,7 @@ const ProfileMenuArea = () => {
   };
 
   const downloadInvoice = (order: any, item: any) => {
-    const content = `ITechLK eCommerce Invoice\n------------------------------------------------\nOrder ID: ${order.id}\nDate: ${new Date(order.createdAt).toLocaleDateString()}\nStatus: ${order.status}\n\nBilled To:\n${order.firstName} ${order.lastName}\n${order.email} | ${order.phone}\nCountry: ${order.country}\n\nProduct: ${item.title}\nQuantity: ${item.quantity}\nPrice: $${item.price.toFixed(2)}\n\nOrder Total: $${order.totalAmount.toFixed(2)}\n------------------------------------------------\nThank you for your purchase!`;
+    const content = `ITechLK eCommerce Invoice\n------------------------------------------------\nOrder ID: ${order.id}\nDate: ${new Date(order.createdAt).toLocaleDateString()}\nStatus: ${order.status}\n\nBilled To:\n${order.firstName} ${order.lastName}\n${order.email} | ${order.phone}\nCountry: ${order.country}\n\nProduct: ${item.title}\nQuantity: ${item.quantity}\nPrice: ${formatPrice(item.price)}\n\nOrder Total: ${formatPrice(order.totalAmount)}\n------------------------------------------------\nThank you for your purchase!`;
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -233,9 +235,6 @@ const ProfileMenuArea = () => {
                     <div className="order__info">
                       <div className="order__info-top d-flex justify-content-between align-items-center">
                         <h3 className="order__info-title">My Orders</h3>
-                        <button type="button" className="order__info-btn">
-                          <i className="fa-regular fa-trash-can"></i> Clear
-                        </button>
                       </div>
 
                       <div className="order__list white-bg table-responsive">
@@ -265,7 +264,7 @@ const ProfileMenuArea = () => {
                                       </div>
                                     ))}
                                   </td>
-                                  <td>${order.totalAmount.toFixed(2)}</td>
+                                  <td>{formatPrice(order.totalAmount)}</td>
                                   <td>
                                     <span style={{
                                       padding: '4px 10px',

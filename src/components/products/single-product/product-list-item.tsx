@@ -1,6 +1,7 @@
 'use client'
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { IProduct } from "@/types/product-d-t";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { add_cart_product } from "@/redux/features/cart";
@@ -21,6 +22,7 @@ const imgStyle = {
 };
 
 const ProductListItem = ({ product }: IProps) => {
+  const router = useRouter();
   const { id, img, details, title, old_price, discount, thumb_img, price, sm_desc } = product || {};
   const { cart_products } = useAppSelector((state) => state.cart);
   const { wishlist } = useAppSelector((state) => state.wishlist);
@@ -83,16 +85,13 @@ const ProductListItem = ({ product }: IProps) => {
                 <span className="add-cart-btn mr-10" style={{ cursor: 'not-allowed', backgroundColor: '#ccc', borderColor: '#ccc', color: '#666' }}>
                   Out of Stock
                 </span>
-              ) : isItemAddToCart ? (
-                <Link href="/cart" className="add-cart-btn mr-10">View cart</Link>
-              ) : product.sizes && product.sizes.length > 0 ? (
-                <Link href={`/product-details/${product.id}`} className="add-cart-btn mr-10 cursor-pointer">
-                   Select Duration
-                </Link>
               ) : (
-                <a onClick={() => dispatch(add_cart_product(product))} className="add-cart-btn mr-10 cursor-pointer">
-                  <i className="fal fa-plus"></i> Add to Cart
-                </a>
+                <button
+                  onClick={() => router.push(`/product-details/${id}`)}
+                  className="add-cart-btn mr-10 cursor-pointer"
+                >
+                  Select duration
+                </button>
               )}
               <div className="product__action-2 transition-3 mr-20">
                 <a onClick={() => dispatch(add_to_wishlist(product))} className={`cursor-pointer ${isWishlistAdd ? "active" : ""}`} title="Add to Wishlist">

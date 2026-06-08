@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 // internal
 import { IProduct } from "@/types/product-d-t";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { add_to_wishlist } from "@/redux/features/wishlist";
 import { add_to_compare } from "@/redux/features/compare";
-import { add_cart_product } from "@/redux/features/cart";
 import { handleModalProduct, handleOpenModal } from "@/redux/features/utility";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -14,6 +14,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 const imgStyle = { width: "100%", height: "100%", };
 
 const ProductItem = ({ product }: { product: IProduct }) => {
+  const router = useRouter();
   const { cart_products } = useAppSelector((state) => state.cart);
   const { wishlist } = useAppSelector((state) => state.wishlist);
   const { compare_products } = useAppSelector((state) => state.compare);
@@ -86,21 +87,13 @@ const ProductItem = ({ product }: { product: IProduct }) => {
         <div className="add-cart p-absolute transition-3">
           {isOutOfStock ? (
             <span style={{ color: "#cc0000", fontWeight: 600, fontSize: 13, cursor: "default" }}>Out of Stock</span>
-          ) : isItemAddToCart ? (
-            <Link href="/cart" className="cursor-pointer">
-              View Cart
-            </Link>
-          ) : product.sizes && product.sizes.length > 0 ? (
-            <Link href={`/product-details/${product.id}`} className="cursor-pointer">
-              + Select Duration
-            </Link>
           ) : (
-            <a
-              onClick={() => dispatch(add_cart_product(product))}
+            <button
+              onClick={() => router.push(`/product-details/${product.id}`)}
               className="cursor-pointer"
             >
-              + Add to Cart
-            </a>
+              + Select duration
+            </button>
           )}
         </div>
       </div>

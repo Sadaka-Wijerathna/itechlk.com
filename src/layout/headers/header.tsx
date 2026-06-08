@@ -60,14 +60,6 @@ const Header = ({header_big,white_bg}:IProps) => {
                       Search
                     </button>
                   </li>
-                  <li>
-                    <button className="cart">
-                      <i className="ion-bag"></i> Cart <span>({quantity})</span>
-                    </button>
-                    {/* cart area start */}
-                    <MiniCart/>
-                    {/* cart area end */}
-                  </li>
                   <li> 
                     <button >
                       <i className="far fa-bars"></i>

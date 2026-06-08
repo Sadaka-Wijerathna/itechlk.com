@@ -10,16 +10,8 @@ type IProps = {
   setShowSearch: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-  // Get all the children from the category_data array
-  const allChildren: string[] = category_data.reduce((children: string[], category: ICategoryType) => {
-    if (category.children && category.children.length > 0) {
-      children.push(...category.children);
-    }
-    return children;
-  }, []);
-
-  // Create a new unique children array
-  const uniqueCategory = [...new Set(allChildren)];
+  // Real categories for search
+  const uniqueCategory = ['AI Tools', 'Creative & Editing', 'Work & OS', 'Streaming', 'VPNs', 'Adults'];
 
 const SearchPopup = ({showSearch,setShowSearch}:IProps) => {
   const router = useRouter();
@@ -40,15 +32,27 @@ const SearchPopup = ({showSearch,setShowSearch}:IProps) => {
     return queryParams.join("&");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const queryParams = generateQueryParams();
     if (queryParams) {
-      router.push(`/search?${queryParams}`);
+      router.push(`/shop?${queryParams}`);
+      setShowSearch(false);
     } else {
-      router.push(`/`);
+      router.push(`/shop`);
       setCategoryVal("");
     }
+  };
+
+  const handleCategorySearch = (c: string) => {
+    setCategoryVal(c);
+    // Use the value directly since state update is async
+    const queryParams = [];
+    if (c) queryParams.push(`category=${c}`);
+    if (searchText) queryParams.push(`searchText=${searchText.toLowerCase()}`);
+    
+    router.push(`/shop?${queryParams.join("&")}`);
+    setShowSearch(false);
   };
   
   return (
@@ -72,7 +76,7 @@ const SearchPopup = ({showSearch,setShowSearch}:IProps) => {
                     {uniqueCategory.map((c, index) => {
                       return (
                         <li key={index}>
-                          <a className={`cursor-pointer ${categoryVal === c ? 'active' : ''}`} onClick={() => setCategoryVal(c)}>
+                          <a className={`cursor-pointer ${categoryVal === c ? 'active' : ''}`} onClick={() => handleCategorySearch(c)}>
                             {c}
                           </a>
                         </li>

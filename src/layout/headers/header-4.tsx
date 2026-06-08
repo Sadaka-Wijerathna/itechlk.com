@@ -56,17 +56,6 @@ const HeaderFour = () => {
                         </button>
                       </li>
                       <li>
-                        <button className="cart">
-                          <i className="fas fa-cart-plus"></i>
-                          <span className="cart-number-2">{quantity}</span>
-                        </button>
-                        <nav>
-                          {/* cart area start */}
-                          <MiniCart />
-                          {/* cart area end */}
-                        </nav>
-                      </li>
-                      <li>
                         <button>
                           <i className="fas fa-user"></i>
                         </button>

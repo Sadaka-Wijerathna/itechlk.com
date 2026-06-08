@@ -140,6 +140,7 @@ model SiteSettings {
 }
 
 // ─── Review Model ──────────────────────────────────────────────────────────────
+// ─── Review Model ──────────────────────────────────────────────────────────────
 model Review {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   productId   String   @db.ObjectId
@@ -149,5 +150,30 @@ model Review {
   rating      Int
   comment     String
   createdAt   DateTime @default(now())
+}
+
+// ─── Blog Model ──────────────────────────────────────────────────────────────
+model Blog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  slug      String   @unique
+  content   String   // Main article text
+  image     String   // Featured image URL
+  author    String   @default("Admin")
+  category  String   @default("Digital")
+  tags      String[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+// ─── Blog Comment Model ───────────────────────────────────────────────────────
+model BlogComment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  blogId    String   @db.ObjectId
+  name      String
+  email     String
+  comment   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 

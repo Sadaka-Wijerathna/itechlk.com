@@ -1,180 +1,207 @@
-import Image from 'next/image';
-import avatar from '@/assets/img/blog/comments/avater-3.png';
-import blog_data from '@/data/blog-data';
-import Link from 'next/link';
+"use client";
 
-// recent blogs 
-const recent_blogs = blog_data.slice(-3)
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import IBlogType from "@/types/blog-d-t";
 
 const BlogSidebar = () => {
+  const [recentBlogs, setRecentBlogs] = useState<IBlogType[]>([]);
+  const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
+  const [archives, setArchives] = useState<{ label: string; count: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSidebarData = async () => {
+      try {
+        const res = await fetch("/api/blogs");
+        const data: IBlogType[] = await res.json();
+        const activeBlogs = Array.isArray(data) ? data.filter((b) => b.active) : [];
+
+        // ── Recent Posts: latest 4 ──────────────────────────────────────────
+        setRecentBlogs(activeBlogs.slice(0, 4));
+
+        // ── Categories: count per category ─────────────────────────────────
+        const catMap: Record<string, number> = {};
+        activeBlogs.forEach((b) => {
+          const cat = b.category || "Uncategorized";
+          catMap[cat] = (catMap[cat] || 0) + 1;
+        });
+        setCategories(
+          Object.entries(catMap)
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, count]) => ({ name, count }))
+        );
+
+        // ── Archives: group by Month Year ──────────────────────────────────
+        const archiveMap: Record<string, number> = {};
+        activeBlogs.forEach((b) => {
+          const d = new Date(b.createdAt);
+          const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+          archiveMap[label] = (archiveMap[label] || 0) + 1;
+        });
+        setArchives(
+          Object.entries(archiveMap)
+            .slice(0, 6)
+            .map(([label, count]) => ({ label, count }))
+        );
+      } catch (err) {
+        console.error("BlogSidebar fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSidebarData();
+  }, []);
+
   return (
     <div className="sidebar__wrapper">
+
+      {/* ── Search ── */}
       <div className="sidebar__widget mb-55">
-          <div className="widget__search p-relative">
-              <form action="#">
-                  <input type="text" placeholder="Search..."/>
-                  <button type="submit"><i className="far fa-search"></i></button>
-              </form>
-          </div>
+        <div className="widget__search p-relative">
+          <form
+            action="/blog"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value;
+              if (q) window.location.href = `/blog?q=${encodeURIComponent(q)}`;
+            }}
+          >
+            <input type="text" name="q" placeholder="Search articles..." />
+            <button type="submit"><i className="far fa-search" /></button>
+          </form>
+        </div>
       </div>
+
+      {/* ── Blog Categories ── */}
       <div className="sidebar__widget mb-55">
-          <div className="sidebar__widget-title mb-25">
-              <h3>Product Categories</h3>
+        <div className="sidebar__widget-title mb-25">
+          <h3>Blog Categories</h3>
+        </div>
+        <div className="sidebar__widget-content">
+          <div className="sidebar__links">
+            {loading ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
+            ) : categories.length === 0 ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>No categories yet.</p>
+            ) : (
+              <ul>
+                {categories.map(({ name, count }) => (
+                  <li key={name}>
+                    <Link href={`/blog?category=${encodeURIComponent(name)}`}>
+                      {name}
+                      <span
+                        style={{
+                          float: "right",
+                          background: "#f5f5f5",
+                          borderRadius: "10px",
+                          padding: "0 7px",
+                          fontSize: "12px",
+                          color: "#666",
+                        }}
+                      >
+                        {count}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="sidebar__widget-content">
-              <div className="categories">
-                  <div id="accordion">
-                      <div className="card">
-                          <div className="card-header white-bg" id="accessories">
-                          <h5 className="mb-0">
-                              <button className="shop-accordion-btn" data-bs-toggle="collapse" data-bs-target="#collapseAccessories" aria-expanded="true" aria-controls="collapseAccessories">
-                                  Accessories
-                              </button>
-                          </h5>
-                          </div>
-                          <div id="collapseAccessories" className="collapse show" aria-labelledby="accessories" data-bs-parent="#accordion">
-                          <div className="card-body">
-                              <div className="categories__list">
-                                  <ul>
-                                      <li><a href="#">Catagories 1</a></li>
-                                      <li><a href="#">Catagories 2</a></li>
-                                  </ul>
-                              </div>
-                          </div>
-                          </div>
+        </div>
+      </div>
+
+      {/* ── Latest Posts ── */}
+      <div className="sidebar__widget mb-55">
+        <div className="sidebar__widget-title mb-25">
+          <h3>Latest Posts</h3>
+        </div>
+        <div className="sidebar__widget-content">
+          <div className="rc__post-wrapper">
+            {loading ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
+            ) : recentBlogs.length === 0 ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>No posts yet.</p>
+            ) : (
+              <ul>
+                {recentBlogs.map((b) => (
+                  <li key={b.id} className="d-flex" style={{ marginBottom: "16px" }}>
+                    <div className="rc__post-thumb mr-20">
+                      <Link href={`/blog/${b.slug}`}>
+                        <img
+                          src={b.image}
+                          alt={b.title}
+                          width={70}
+                          height={70}
+                          style={{ objectFit: "cover", borderRadius: "4px" }}
+                          onError={(e: any) => { e.target.src = "/assets/img/logo/logo.png"; }}
+                        />
+                      </Link>
+                    </div>
+                    <div className="rc__post-content">
+                      <h6>
+                        <Link href={`/blog/${b.slug}`}>
+                          {b.title.length > 40 ? b.title.slice(0, 40) + "…" : b.title}
+                        </Link>
+                      </h6>
+                      <div className="rc__meta">
+                        <span>
+                          {new Date(b.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
                       </div>
-                      <div className="card">
-                          <div className="card-header white-bg" id="cloth">
-                          <h5 className="mb-0">
-                              <button className="shop-accordion-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapsecloth" aria-expanded="false" aria-controls="collapsecloth">
-                                  Clothing
-                              </button>
-                          </h5>
-                          </div>
-                          <div id="collapsecloth" className="collapse" aria-labelledby="cloth" data-bs-parent="#accordion">
-                          <div className="card-body">
-                              <div className="categories__list">
-                                  <ul>
-                                      <li><a href="#">Catagories 1</a></li>
-                                      <li><a href="#">Catagories 2</a></li>
-                                  </ul>
-                              </div>
-                          </div>
-                          </div>
-                      </div>
-                      <div className="card">
-                          <div className="card-header white-bg" id="men">
-                          <h5 className="mb-0">
-                              <button className="shop-accordion-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapsemen" aria-expanded="false" aria-controls="collapsemen">
-                                  Men
-                              </button>
-                          </h5>
-                          </div>
-                          <div id="collapsemen" className="collapse" aria-labelledby="men" data-bs-parent="#accordion">
-                          <div className="card-body">
-                              <div className="categories__list">
-                                  <ul>
-                                      <li><a href="#">Catagories 1</a></li>
-                                      <li><a href="#">Catagories 2</a></li>
-                                  </ul>
-                              </div>
-                          </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
+        </div>
       </div>
+
+      {/* ── Archives ── */}
       <div className="sidebar__widget mb-55">
-          <div className="sidebar__widget-title mb-25">
-              <h3>Latest Posts</h3>
+        <div className="sidebar__widget-title mb-25">
+          <h3>Archives</h3>
+        </div>
+        <div className="sidebar__widget-content">
+          <div className="sidebar__links">
+            {loading ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
+            ) : archives.length === 0 ? (
+              <p className="text-muted" style={{ fontSize: "13px" }}>No posts yet.</p>
+            ) : (
+              <ul>
+                {archives.map(({ label, count }) => (
+                  <li key={label}>
+                    <a href="#">
+                      {label}
+                      <span
+                        style={{
+                          float: "right",
+                          background: "#f5f5f5",
+                          borderRadius: "10px",
+                          padding: "0 7px",
+                          fontSize: "12px",
+                          color: "#666",
+                        }}
+                      >
+                        {count}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div className="sidebar__widget-content">
-              <div className="rc__post-wrapper">
-                  <ul>
-                    {recent_blogs.map((b,i) => (
-                      <li key={i} className="d-flex">
-                      <div className="rc__post-thumb mr-20 ">
-                          <Link href={`/blog-details/${b.id}`}>
-                            <Image src={b.img} alt="blog-1" width={70} height={70}/>
-                          </Link>
-                      </div>
-                      <div className="rc__post-content">
-                          <h6>
-                              <Link href={`/blog-details/${b.id}`}>{b.title.slice(0,20)}</Link>
-                          </h6>
-                          <div className="rc__meta">
-                              <span>{b.date}</span>
-                          </div>
-                      </div>
-                    </li>
-                    ))}
-                 </ul>
-              </div>
-          </div>
+        </div>
       </div>
-      <div className="sidebar__widget mb-55">
-          <div className="sidebar__widget-title mb-25">
-              <h3>Recent Comments</h3>
-          </div>
-          <div className="sidebar__widget-content">
-              <div className="rc__comments">
-                  <ul>
-                      <li className="d-flex mb-20">
-                          <div className="rc__comments-avater mr-15">
-                              <Image src={avatar} alt="avatar"/>
-                          </div>
-                          <div className="rc__comments-content">
-                              <h6>Salim Rana</h6>
-                              <p>Hi, this is a comment....</p>
-                              <span>on <span className="highlight comment"> Hello world!</span></span>
-                          </div>
-                      </li>
-                      <li className="d-flex mb-20">
-                          <div className="rc__comments-avater mr-15">
-                            <Image src={avatar} alt="avatar"/>
-                          </div>
-                          <div className="rc__comments-content">
-                              <h6>Shahnewaz Sakil</h6>
-                              <p>Hi, this is a comment....</p>
-                              <span>on <span className="highlight comment"> Hello world!</span></span>
-                          </div>
-                      </li>
-                  </ul>
-              </div>
-          </div>
-      </div>
-      <div className="sidebar__widget mb-55">
-          <div className="sidebar__widget-title mb-25">
-              <h3>Archives</h3>
-          </div>
-          <div className="sidebar__widget-content">
-              <div className="sidebar__links">
-                  <ul>
-                      <li><a href="#">December 2023</a></li>
-                      <li><a href="#"> November 2023</a></li>
-                      <li><a href="#"> September 2023</a></li>
-                      <li><a href="#">November 2022</a></li>
-                  </ul>
-              </div>
-          </div>
-      </div>
-      <div className="sidebar__widget mb-55">
-          <div className="sidebar__widget-title mb-25">
-              <h3>Meta</h3>
-          </div>
-          <div className="sidebar__widget-content">
-              <div className="sidebar__links">
-                  <ul>
-                      <li><a href="#">Log in</a></li>
-                      <li><a href="#">Entries RSS</a></li>
-                      <li><a href="#">Comments RSS</a></li>
-                      <li><a href="#">WordPress.org</a></li>
-                  </ul>
-              </div>
-          </div>
-      </div>
-   </div>
+
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 import PriceFilter from "./filter/price-filter";
 import ColorFilter from "./filter/color-filter";
 import AvailabilityFilter from "./filter/availability-filter";
+import CategoryFilter from "./filter/category-filter";
 import { IProduct } from "@/types/product-d-t";
 
 // prop type

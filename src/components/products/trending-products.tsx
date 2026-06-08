@@ -11,7 +11,12 @@ type IProps = {
 };
 
 function TrendingProducts({ products, style_2 = false, container = 'container' }: IProps) {
-  const trendingProducts = products.filter((p) => p.trending);
+  const trendingProducts = products.filter((p) => {
+    const isInactive = (p as any).active === false;
+    const isOutOfStock = p.status?.toLowerCase() === "out of stock";
+    const isZeroQuantity = p.quantity === 0;
+    return p.trending && !isInactive && !isOutOfStock && !isZeroQuantity;
+  });
   const [perView, setPerView] = useState<number>(10);
 
   const handlePerView = () => {

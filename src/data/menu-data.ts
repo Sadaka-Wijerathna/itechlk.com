@@ -16,16 +16,8 @@ const menuData:IMenuType[] = [
   {
     link: '/blog',
     title: 'Blog',
-    hasDropdown: true,
+    hasDropdown: false,
     megamenu: false,
-    dropdownItems: [
-      { link: '/blog', title: 'Blog' },
-      { link: '/blog-left-sidebar', title: 'Blog Left Sidebar' },
-      { link: '/blog-no-sidebar', title: 'Blog No Sidebar' },
-      { link: '/blog-2-col', title: 'Blog 2 Column' },
-      { link: '/blog-3-col', title: 'Blog 3 Column' },
-      { link: '/blog-details', title: 'Blog Details' },
-    ]
   },
   {
     link: '/shop',
@@ -72,14 +64,7 @@ export const mobile_menus:IMobileMenu[] = [
   },
   {
     title: "Blog",
-    dropdownMenu: [
-      { link: '/blog', title: 'Blog' },
-      { link: '/blog-left-sidebar', title: 'Blog Left Sidebar' },
-      { link: '/blog-no-sidebar', title: 'Blog No Sidebar' },
-      { link: '/blog-2-col', title: 'Blog 2 Column' },
-      { link: '/blog-3-col', title: 'Blog 3 Column' },
-      { link: '/blog-details', title: 'Blog Details' },
-    ],
+    link: '/blog',
   },
   {
     title: "Contact",

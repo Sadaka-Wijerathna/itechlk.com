@@ -9,6 +9,7 @@ import { getCompareProducts } from "@/redux/features/compare";
 import ProductModal from "@/components/common/modals/product-modal";
 import BackToTop from "@/components/common/back-to-top";
 import WhatsappButton from "@/components/common/whatsapp-button";
+import FloatingCart from "@/components/common/floating-cart";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -31,6 +32,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
     <>
       {children}
       {pathname === "/" && <WhatsappButton />}
+      {pathname !== "/" && <FloatingCart />}
       <BackToTop />
       <ProductModal />
       <ToastContainer />

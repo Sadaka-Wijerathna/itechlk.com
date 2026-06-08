@@ -27,7 +27,7 @@ export default async function ShopPage() {
   return (
     <Wrapper>
       {/* header start */}
-      <HeaderTwo />
+      <HeaderTwo hideCart={true} />
       {/* header end */}
 
       <main>

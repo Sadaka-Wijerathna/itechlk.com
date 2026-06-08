@@ -1,4 +1,7 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 // prop type
 type IProps = {
   title: string;
@@ -7,6 +10,8 @@ type IProps = {
 
 const Breadcrumb = ({ title, subtitle }: IProps) => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const pathname = usePathname();
+  const fullUrl = `${siteUrl}${pathname}`;
   
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -22,7 +27,7 @@ const Breadcrumb = ({ title, subtitle }: IProps) => {
         '@type': 'ListItem',
         position: 2,
         name: subtitle,
-        item: typeof window !== 'undefined' ? window.location.href : `${siteUrl}`,
+        item: fullUrl,
       },
     ],
   };
@@ -32,6 +37,7 @@ const Breadcrumb = ({ title, subtitle }: IProps) => {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        suppressHydrationWarning
       />
       <section
         className="page__title p-relative d-flex align-items-center"

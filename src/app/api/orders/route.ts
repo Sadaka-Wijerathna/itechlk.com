@@ -139,3 +139,20 @@ export async function GET(req: Request) {
      return NextResponse.json({ error: 'Error fetching orders' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user || session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await prisma.order.deleteMany();
+
+    return NextResponse.json({ success: true, message: 'All orders deleted' });
+  } catch (error: any) {
+    console.error('Delete All Orders Error:', error);
+    return NextResponse.json({ error: 'Error deleting all orders' }, { status: 500 });
+  }
+}
+

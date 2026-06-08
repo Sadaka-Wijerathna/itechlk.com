@@ -16,7 +16,7 @@ const OffCanvas = dynamic(() => import('@/components/common/offcanvas'), {
   ssr: false
 })
 
-const HeaderTwo = () => {
+const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
   const { data: session, status } = useSession();
   const { sticky } = useSticky();
   const { quantity } = useCartInfo();
@@ -61,7 +61,7 @@ const HeaderTwo = () => {
                 <div className="header__right p-relative d-flex justify-content-end align-items-center">
                   <div className="header__action">
                     <ul>
-                      <li className="d-none d-sm-inline-block">
+                      <li className="d-inline-block">
                         <button
                           className="search-toggle"
                           onClick={() => setShowSearch(true)}
@@ -80,19 +80,10 @@ const HeaderTwo = () => {
                           <option value="EUR">EUR</option>
                         </select>
                       </li>
-                      <li className="d-none d-sm-inline-block">
+                      <li className="d-inline-block">
                         <Link href="/wishlist" className="action-btn">
                           <i className="far fa-heart"></i>
                         </Link>
-                      </li>
-                      <li>
-                        <button className="cart">
-                          <i className="ion-bag"></i>{" "}
-                          <span>({quantity})</span>
-                        </button>
-                        {/* cart area start */}
-                        <MiniCart />
-                        {/* cart area end */}
                       </li>
                       <li>
                         {status === "authenticated" ? (

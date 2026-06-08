@@ -38,6 +38,36 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const deleteOrder = async (id: string) => {
+    if (!confirm("Are you sure you want to PERMANENTLY delete this order? This cannot be undone and will delete it from the user's account as well.")) return;
+    if (!confirm("LAST WARNING: This will completely remove the order from the database. Proceed?")) return;
+    
+    const res = await fetch(`/api/orders/${id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      alert("Order deleted successfully");
+      fetchOrders();
+    } else {
+      alert("Failed to delete order");
+    }
+  };
+
+  const deleteAllOrders = async () => {
+    if (!confirm("CRITICAL ACTION: Are you sure you want to PERMANENTLY delete ALL orders in the database? This cannot be undone.")) return;
+    if (!confirm("FINAL CONFIRMATION: Type 'DELETE ALL' in your mind and click OK to confirm absolute deletion of every order.")) return;
+
+    const res = await fetch("/api/orders", {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      alert("All orders deleted");
+      fetchOrders();
+    } else {
+      alert("Failed to delete all orders");
+    }
+  };
+
   const downloadInvoice = (order: any, item: any) => {
     const content = `ITechLK eCommerce Invoice\n------------------------------------------------\nOrder ID: ${order.id}\nDate: ${new Date(order.createdAt).toLocaleDateString()}\nStatus: ${order.status}\n\nBilled To:\n${order.firstName} ${order.lastName}\n${order.email} | ${order.phone}\nCountry: ${order.country}\n\nProduct: ${item.title}\nDuration: ${item.duration || 'N/A'}\nQuantity: ${item.quantity}\nPrice: ${formatPrice(item.price)}\n\nOrder Total: ${formatPrice(order.totalAmount)}\n------------------------------------------------\nThank you for your purchase!`;
     const blob = new Blob([content], { type: 'text/plain' });
@@ -54,10 +84,23 @@ export default function AdminOrdersPage() {
   return (
     <AdminShell>
       <div className="order__info">
-        <div className="order__info-top d-flex justify-content-between align-items-center">
-          <h3 className="order__info-title">
+        <div className="order__info-top d-flex justify-content-between align-items-center mb-3">
+          <h3 className="order__info-title m-0">
             <i className="fa fa-shopping-cart"></i> Manage Orders
           </h3>
+          <button 
+            onClick={deleteAllOrders}
+            className="os-btn os-btn-black"
+            style={{ 
+              backgroundColor: '#dc3545', 
+              borderColor: '#dc3545',
+              padding: '0 20px',
+              height: '40px',
+              lineHeight: '38px'
+            }}
+          >
+            DELETE ALL ORDERS
+          </button>
         </div>
 
         <div className="order__list white-bg table-responsive">
@@ -134,7 +177,7 @@ export default function AdminOrdersPage() {
                       </span>
                     </td>
                     <td>
-                      <div className="d-flex gap-2">
+                      <div className="d-flex gap-2 align-items-center">
                         {o.status === 'Pending' && (
                           <>
                             <button 
@@ -159,6 +202,17 @@ export default function AdminOrdersPage() {
                             </button>
                           </>
                         )}
+                        <button 
+                          onClick={() => deleteOrder(o.id)}
+                          title="Permanently Delete Order"
+                          style={{ 
+                            padding: '0 10px', height: '28px', lineHeight: '26px', fontSize: '11px', 
+                            backgroundColor: '#000', border: '1px solid #000', color: '#fff',
+                            transition: 'none', cursor: 'pointer', borderRadius: '0px'
+                          }}
+                        >
+                          <i className="fa fa-trash"></i>
+                        </button>
                       </div>
                     </td>
                     <td>

@@ -68,7 +68,7 @@ export default function ContactPage() {
             <div className="row g-0">
               <div className="col-xl-12">
                 <div className="contact__map-wrapper p-relative">
-                  <iframe src="https://maps.google.com/maps?hl=en&amp;q=Dhaka+()&amp;ie=UTF8&amp;t=&amp;z=10&amp;iwloc=B&amp;output=embed"></iframe>
+                  <iframe src="https://www.google.com/maps?q=8C9G+FHC+I+TECH+LK+STORE,+Morawaka&ftid=0x3ae161007c3632e1:0x193f8ce13fc7563d&output=embed"></iframe>
                 </div>
               </div>
             </div>
