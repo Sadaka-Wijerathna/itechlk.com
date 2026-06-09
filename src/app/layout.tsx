@@ -6,6 +6,8 @@ import { VideoProvider } from '@/provider/VideoProvider';
 import NextAuthProvider from '@/provider/NextAuthProvider';
 import SmoothScrollProvider from '@/provider/SmoothScrollProvider';
 import { CurrencyProvider } from '@/context/CurrencyContext';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
 
@@ -93,6 +95,8 @@ export default function RootLayout({
               <VideoProvider>
                 <SmoothScrollProvider>
                   {children}
+                  <Analytics />
+                  <SpeedInsights />
                 </SmoothScrollProvider>
               </VideoProvider>
             </Providers>
