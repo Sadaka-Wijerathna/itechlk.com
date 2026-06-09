@@ -193,8 +193,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     formData.append('StoreFile', 'false');
 
     console.log(`[Invoice API] Submitting in-memory PPTX to ConvertAPI...`);
-    const convertRes = await fetch(`https://v2.convertapi.com/convert/pptx/to/pdf?Secret=${convertSecret}`, {
+    const convertRes = await fetch(`https://v2.convertapi.com/convert/pptx/to/pdf`, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${convertSecret}`,
+      },
       body: formData,
     });
 
