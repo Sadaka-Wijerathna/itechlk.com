@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
+import { getCurrencyRates } from '@/lib/currency';
 
 export async function POST(req: Request) {
   try {
@@ -73,6 +74,11 @@ export async function POST(req: Request) {
 
       const { sendTelegramPhoto } = await import('@/lib/telegram');
       const orderDetails = items.map((i: any) => `- ${i.title} (${i.duration}) x${i.quantity}`).join('\n');
+      
+      // Convert to LKR for notification using dynamic rates
+      const rates = await getCurrencyRates();
+      const lkrTotal = totalAmount * rates.LKR;
+      
       const caption = `<b>🚀 New Order Received!</b>\n\n` +
         `<b>Order ID:</b> #${order.id.slice(-6).toUpperCase()}\n` +
         `<b>Customer:</b> ${firstName} ${lastName}\n` +
@@ -80,7 +86,7 @@ export async function POST(req: Request) {
         `<b>Phone:</b> <a href="https://wa.me/${phone.startsWith('0') ? '94' + phone.substring(1).replace(/\D/g, '') : phone.startsWith('94') ? phone.replace(/\D/g, '') : '94' + phone.replace(/\D/g, '')}">${phone}</a>\n` +
         `<b>Country:</b> ${country}\n\n` +
         `<b>Products:</b>\n${orderDetails}\n\n` +
-        `<b>Total:</b> Rs. ${totalAmount.toLocaleString()}\n` +
+        `<b>Total:</b> Rs. ${Math.round(lkrTotal).toLocaleString()}\n` +
         `<b>Status:</b> ${order.status}`;
 
       const keyboard = [
@@ -155,4 +161,3 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'Error deleting all orders' }, { status: 500 });
   }
 }
-

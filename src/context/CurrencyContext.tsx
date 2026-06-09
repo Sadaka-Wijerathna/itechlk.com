@@ -4,8 +4,15 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 export type Currency = 'USD' | 'LKR' | 'EUR';
 
-// Approximate exchange rates: base USD
-const RATES: Record<Currency, number> = {
+interface CurrencyContextType {
+  currency: Currency;
+  setCurrency: (c: Currency) => void;
+  formatPrice: (priceInUSD: number) => string;
+  symbol: string;
+  rate: number;
+}
+
+const DEFAULT_RATES: Record<Currency, number> = {
   USD: 1,
   LKR: 325,
   EUR: 0.92,
@@ -17,14 +24,6 @@ const SYMBOLS: Record<Currency, string> = {
   EUR: '€',
 };
 
-interface CurrencyContextType {
-  currency: Currency;
-  setCurrency: (c: Currency) => void;
-  formatPrice: (priceInUSD: number) => string;
-  symbol: string;
-  rate: number;
-}
-
 const CurrencyContext = createContext<CurrencyContextType>({
   currency: 'LKR',
   setCurrency: () => {},
@@ -35,11 +34,28 @@ const CurrencyContext = createContext<CurrencyContextType>({
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>('LKR');
+  const [rates, setRates] = useState<Record<Currency, number>>(DEFAULT_RATES);
+
+  // Fetch latest rates from DB
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const res = await fetch('/api/settings/currency');
+        const data = await res.json();
+        if (data && data.LKR) {
+          setRates(data);
+        }
+      } catch (err) {
+        console.error("Failed to load live rates", err);
+      }
+    };
+    fetchRates();
+  }, []);
 
   // Persist selection across page loads
   useEffect(() => {
     const saved = localStorage.getItem('currency') as Currency | null;
-    if (saved && RATES[saved]) setCurrencyState(saved);
+    if (saved && DEFAULT_RATES[saved]) setCurrencyState(saved);
   }, []);
 
   const setCurrency = (c: Currency) => {
@@ -47,11 +63,11 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('currency', c);
   };
 
-  const rate = RATES[currency];
+  const currentRate = rates[currency] || DEFAULT_RATES[currency];
   const symbol = SYMBOLS[currency];
 
   const formatPrice = (priceInUSD: number) => {
-    const converted = priceInUSD * rate;
+    const converted = priceInUSD * currentRate;
     if (currency === 'LKR') {
       return `Rs. ${Math.round(converted).toLocaleString()}`;
     }
@@ -62,7 +78,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, symbol, rate }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, symbol, rate: currentRate }}>
       {children}
     </CurrencyContext.Provider>
   );
