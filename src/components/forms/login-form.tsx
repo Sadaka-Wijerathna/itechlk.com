@@ -94,7 +94,7 @@ const LoginForm = () => {
             <label htmlFor="remember">Remember me!</label>
           </span>
           <span className="forgot-login f-right">
-            <Link href="#">Forget password?</Link>
+            <Link href="/forgot-password">Forget password?</Link>
           </span>
         </div>
 

@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin", label: "Overview", icon: "fa fa-tachometer-alt" },
   { href: "/admin/products", label: "Products", icon: "fa fa-archive" },
   { href: "/admin/blogs", label: "Blogs", icon: "fa fa-newspaper" },
+  { href: "/admin/comments", label: "Comments", icon: "fa fa-comments" },
   { href: "/admin/orders", label: "Orders", icon: "fa fa-file" },
   { href: "/admin/users", label: "Users", icon: "fa fa-users" },
   { href: "/admin/settings", label: "Settings", icon: "fa fa-cog" },

@@ -167,15 +167,29 @@ model Blog {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  comments  BlogComment[]
 }
 // ─── Blog Comment Model ───────────────────────────────────────────────────────
 model BlogComment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   blogId    String   @db.ObjectId
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   name      String
   email     String
   comment   String
   approved  Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// ─── Password Reset Token Model ───────────────────────────────────────────────
+model PasswordResetToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
+}
+
 

@@ -6,6 +6,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     const { slug } = await params;
     const blog = await prisma.blog.findUnique({
       where: { slug: slug },
+      include: {
+        comments: {
+          where: { approved: true },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
     });
 
     if (!blog) {

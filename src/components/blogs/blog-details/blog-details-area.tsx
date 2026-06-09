@@ -104,14 +104,21 @@ const BlogDetailsArea = ({blog}:IProps) => {
           </div>
           <RelatedBlogs blog={blog} /> */}
           <div className="postbox__line mt-65"></div>
-          {/* <div className="postbox__comments pt-90">
+          <div className="postbox__comments pt-90">
             <div className="postbox__comment-title mb-30">
-              <h3>Comments</h3>
+              <h3>Comments ({blog.comments?.length || 0})</h3>
             </div>
             <div className="latest-comments mb-30">
-              <BlogReviews/>
+              <BlogReviews comments={blog.comments} />
             </div>
-          </div> */}
+          </div>
+          <div className="postbox__line mt-65"></div>
+          <div className="post-comments-form mb-100">
+            <div className="postbox__comment-title mb-40">
+              <h3>Leave a Comment</h3>
+            </div>
+            <BlogForm blogId={String(blog.id)} />
+          </div>
         </div>
         <div className="col-xl-3 col-lg-4">
           <BlogSidebar />

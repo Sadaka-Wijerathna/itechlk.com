@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { updateProductAverageRating } from "../route";
 
 export async function DELETE(
   req: Request,
@@ -32,10 +33,15 @@ export async function DELETE(
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
+    const productId = (review as any).productId;
+
     // @ts-ignore
     await prisma.review.delete({
       where: { id },
     });
+
+    // Update average rating
+    await updateProductAverageRating(productId);
 
     return NextResponse.json({ message: "Review deleted successfully" });
   } catch (error) {

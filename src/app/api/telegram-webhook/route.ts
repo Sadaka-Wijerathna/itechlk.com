@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendOrderStatusEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   let callbackQueryId = '';
@@ -29,6 +30,13 @@ export async function POST(req: Request) {
             where: { id: orderId },
             data: { status: newStatus },
           });
+
+          // Send email notification to user
+          try {
+            await sendOrderStatusEmail(updatedOrder);
+          } catch (emailErr) {
+            console.error('Failed to send status update email via Telegram Webhook:', emailErr);
+          }
 
           // Prep the update message
           const isPhoto = !!(message.photo || message.caption);

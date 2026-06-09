@@ -40,6 +40,9 @@ export async function POST(req: Request) {
       }
     });
 
+    // Update the average rating for the product
+    await updateProductAverageRating(productId);
+
     return NextResponse.json(
       { message: "Review added successfully", review: newReview },
       { status: 201 }
@@ -50,5 +53,32 @@ export async function POST(req: Request) {
       { message: "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+export async function updateProductAverageRating(productId: string) {
+  try {
+    // @ts-ignore
+    const reviews = await prisma.review.findMany({
+      where: { productId },
+    });
+
+    if (reviews.length === 0) {
+      await prisma.product.update({
+        where: { id: productId },
+        data: { rating: 5 }, // Reset default rating to 5
+      });
+      return;
+    }
+
+    const sum = reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
+    const avg = sum / reviews.length;
+
+    await prisma.product.update({
+      where: { id: productId },
+      data: { rating: parseFloat(avg.toFixed(1)) },
+    });
+  } catch (err) {
+    console.error("Failed to update product average rating:", err);
   }
 }

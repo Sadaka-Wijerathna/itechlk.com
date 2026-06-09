@@ -1,81 +1,41 @@
 import Image from "next/image";
 
-// reviews
-const reviews = [
-  {
-    img: "/assets/img/blog/comments/avater-1.png",
-    name: "Siarhei Dzenisenka",
-    time: "3 Months Ago",
-    rating: 4,
-  },
-  {
-    img: "/assets/img/blog/comments/avater-2.png",
-    name: "Julias Roy",
-    time: "6 Months Ago",
-    rating: 4,
-    children: true,
-  },
-  {
-    img: "/assets/img/blog/comments/avater-3.png",
-    name: "Arista Williamson",
-    time: "6 Months Ago",
-    rating: 4,
-  },
-];
+interface BlogCommentType {
+  id: string;
+  name: string;
+  comment: string;
+  createdAt: string;
+}
 
-const BlogReviews = () => {
+interface BlogReviewsProps {
+  comments?: BlogCommentType[];
+}
+
+const BlogReviews = ({ comments = [] }: BlogReviewsProps) => {
+  if (comments.length === 0) {
+    return <p style={{ color: "#848b8a", fontSize: "14px" }}>No comments yet. Be the first to share your thoughts!</p>;
+  }
+
   return (
     <ul>
-      {reviews.map((review, index) => (
-        <li key={index} className={review.children ? "children" : ""}>
+      {comments.map((comment, index) => (
+        <li key={comment.id || index}>
           <div className="comments-box">
             <div className="comments-avatar">
-              <Image src={review.img} alt="review-img" width={78} height={79} />
+              <Image 
+                src="/assets/img/icon/avatar.jpg" 
+                alt="avatar-img" 
+                width={78} 
+                height={79} 
+                style={{ objectFit: 'cover', borderRadius: '50%' }}
+              />
             </div>
             <div className="comments-text">
               <div className="avatar-name">
-                <h5>{review.name}</h5>
-                <span> - {review.time} </span>
-                <a className="reply" href="#">
-                  Leave Reply
-                </a>
+                <h5>{comment.name}</h5>
+                <span> - {new Date(comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} </span>
               </div>
-              <div className="user-rating">
-                <ul>
-                  <li>
-                    <a href="#">
-                      <i className="fas fa-star"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i className="fas fa-star"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i className="fas fa-star"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i className="fas fa-star"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i className="fal fa-star"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <p>
-                Many desktop publishing packages and web page editors now use
-                Lorem Ipsum as their default model text, and a search for{" "}
-                <span>“lorem ipsum”</span> will uncover many web sites still in
-                their infancy. Various versions have evolved over the years,
-                sometimes by accident, sometimes on purpose.
-              </p>
+              <p>{comment.comment}</p>
             </div>
           </div>
         </li>

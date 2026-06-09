@@ -14,6 +14,7 @@ interface IBlogType {
   tags?: string[];
   active?: boolean;
   blog?: string;
+  comments?: any[];
 }
 
 export default IBlogType;

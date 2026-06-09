@@ -17,24 +17,23 @@ const SearchArea = ({ product_data }: IProps) => {
   const category = searchParams.get("category");
   const searchText = searchParams.get("searchText");
 
-  const categoryMatch = (item: IProduct) => {
-    return (
-      !category || item.category.toLowerCase().includes(category.toLowerCase())
-    );
-  };
-
-  const titleMatch = (item: IProduct) => {
-    return (
-      !searchText || item.title.toLowerCase().includes(searchText.toLowerCase())
-    );
-  };
-
   useEffect(() => {
+    const categoryMatch = (item: IProduct) => {
+      return (
+        !category || item.category.toLowerCase().includes(category.toLowerCase())
+      );
+    };
+
+    const titleMatch = (item: IProduct) => {
+      return (
+        !searchText || item.title.toLowerCase().includes(searchText.toLowerCase())
+      );
+    };
+
     setProductItems(
       product_data.filter((item) => categoryMatch(item) && titleMatch(item))
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [category, searchText, product_data]);
 
   return (
     <>
