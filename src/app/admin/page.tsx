@@ -4,26 +4,46 @@ import AdminShell from "./AdminShell";
 import Link from "next/link";
 
 async function getStats() {
-  const [totalProducts, activeProducts, totalUsers] = await Promise.all([
-    prisma.product.count(),
+  const [activeProducts, totalUsers, totalOrders, revenueData] = await Promise.all([
     prisma.product.count({ where: { active: true } }),
     prisma.user.count(),
+    prisma.order.count(),
+    prisma.order.aggregate({
+      _sum: {
+        totalAmount: true
+      },
+      where: {
+        status: "Confirmed"
+      }
+    })
   ]);
+
   const recentProducts = await prisma.product.findMany({
     where: { active: true },
     orderBy: { createdAt: "desc" },
     take: 5,
   });
-  return { totalProducts, activeProducts, totalUsers, recentProducts };
+
+  return { 
+    activeProducts, 
+    totalUsers, 
+    totalOrders, 
+    revenue: revenueData._sum.totalAmount || 0,
+    recentProducts 
+  };
 }
 
 export default async function AdminDashboard() {
   const session = await auth();
-  const { totalProducts, activeProducts, totalUsers, recentProducts } = await getStats();
+  const { activeProducts, totalUsers, totalOrders, revenue, recentProducts } = await getStats();
+
+  // Currency rate conversion (USD to LKR)
+  const RATE = 325;
+  const lkrRevenue = revenue * RATE;
 
   const stats = [
-    { label: "Total Revenue", value: "Rs. 0.00" },
-    { label: "Total Orders", value: "0" },
+    { label: "Total Revenue", value: `Rs. ${Math.round(lkrRevenue).toLocaleString()}` },
+    { label: "Total Orders", value: totalOrders.toString() },
     { label: "Active Products", value: activeProducts.toString() },
     { label: "Total Users", value: totalUsers.toString() },
   ];
@@ -38,13 +58,15 @@ export default async function AdminDashboard() {
           </h3>
         </div>
 
-        <div className="profile__info-wrapper white-bg">
-          {stats.map((s) => (
-            <div key={s.label} className="profile__info-item">
-              <p>{s.label}</p>
-              <h4>{s.value}</h4>
-            </div>
-          ))}
+        <div className="order__info mt-10" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
+          <div className="d-flex justify-content-between flex-wrap gap-4" style={{ padding: '20px 35px' }}>
+            {stats.map((s) => (
+              <div key={s.label} className="profile__info-item" style={{ borderBottom: '0', padding: '0', minWidth: '150px' }}>
+                <p style={{ textTransform: 'uppercase', fontSize: '11px', letterSpacing: '1.2px', marginBottom: '8px', color: '#848b8a' }}>{s.label}</p>
+                <h4 style={{ fontSize: '22px', fontWeight: '700', color: '#000', margin: '0' }}>{s.value}</h4>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -81,7 +103,7 @@ export default async function AdminDashboard() {
                     <small style={{ color: "#848b8a" }}>{p.brand}</small>
                   </td>
                   <td>{p.category}</td>
-                  <td>Rs. {(p.price * 325).toLocaleString()}</td>
+                  <td>Rs. {Math.round(p.price * RATE).toLocaleString()}</td>
                   <td>
                     <span
                       style={{

@@ -4,6 +4,94 @@ import { useEffect, useState } from "react";
 import AdminShell from "../AdminShell";
 import Link from "next/link";
 import { useCurrency } from "@/context/CurrencyContext";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortableRow({ p, idx, formatPrice, openEdit, handleDelete, deleting, search }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: p.id, disabled: !!search });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative' as any,
+    background: isDragging ? '#fdfdfd' : 'transparent',
+    boxShadow: isDragging ? '0 5px 15px rgba(0,0,0,0.1)' : 'none',
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      <td>
+        <div 
+          {...attributes} 
+          {...listeners} 
+          style={{ 
+            cursor: !!search ? 'not-allowed' : 'grab', 
+            padding: '10px',
+            display: 'inline-block'
+          }}
+          title={!!search ? "Reordering is disabled when searching" : "Drag to reorder"}
+        >
+          <i className="fa fa-bars text-muted"></i>
+        </div>
+      </td>
+      <td>
+        <div className="d-flex align-items-center gap-3">
+          {p.img && (
+            <img src={p.img} alt={p.title} style={{ width: 44, height: 44, objectFit: "cover", border: "1px solid #ebebeb" }} />
+          )}
+          <div>
+            <Link href={`/product-details/${p.id}`} className="order__title">{p.title}</Link>
+            <br /><small style={{ color: "#848b8a" }}>#{p.id.slice(-8)}</small>
+          </div>
+        </div>
+      </td>
+      <td>{p.category}</td>
+      <td>
+        <div className="d-flex align-items-center gap-2">
+          <strong>{formatPrice(p.price)}</strong>
+          {p.oldPrice && (
+            <>
+              <small style={{ color: "#848b8a", textDecoration: "line-through" }}>{formatPrice(p.oldPrice)}</small>
+              <small style={{ color: "#e32636", fontWeight: 600 }}>({Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}%)</small>
+            </>
+          )}
+        </div>
+      </td>
+      <td>
+        <div className="d-flex gap-2">
+          <button onClick={() => openEdit(p)} className="os-btn os-btn-black" style={{ padding: "0 14px", height: 32, lineHeight: "30px", fontSize: 12 }}>
+            Edit
+          </button>
+          <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} className="os-btn" style={{ padding: "0 14px", height: 32, lineHeight: "30px", fontSize: 12, opacity: deleting === p.id ? 0.5 : 1 }}>
+            {deleting === p.id ? "…" : "Delete"}
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
 
 type Product = {
   id: string;
@@ -22,6 +110,7 @@ type Product = {
   sizes: string[];
   brand: string;
   createdAt: string;
+  sortOrder: number;
   durationPrices?: Record<string, { price: number; oldPrice?: number | null }> | null;
 };
 
@@ -65,6 +154,7 @@ const emptyForm = {
   detailsText2: "",
   detailsList: "Instant delivery via email\n24/7 Premium Support\n100% money back guarantee",
   sizes: [] as string[],
+  sortOrder: 0,
   durationPrices: {} as Record<string, { price: string; oldPrice: string; discount: string; isDiscounted: boolean }>,
 };
 
@@ -74,6 +164,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [reordering, setReordering] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -143,6 +234,7 @@ export default function AdminProductsPage() {
       detailsText2: p.detailsText2,
       detailsList: p.detailsList.join("\n"),
       sizes: p.sizes ?? [],
+      sortOrder: p.sortOrder || 0,
       durationPrices: durPrices,
     });
     setSelectedFile(null);
@@ -284,6 +376,7 @@ export default function AdminProductsPage() {
       detailsList: form.detailsList.split("\n").filter(Boolean),
       sizes: form.sizes.length > 0 ? form.sizes : ["Standard"],
       colors: ["Default"],
+      sortOrder: form.sortOrder,
       durationPrices: durationPricesUSD,
     };
 
@@ -338,6 +431,43 @@ export default function AdminProductsPage() {
     }));
   };
 
+  const handleReorder = async (productId: string, direction: "up" | "down" | "top" | "bottom" | "normalize") => {
+    if (productId) setReordering(productId);
+    else setLoading(true);
+    
+    try {
+      const res = await fetch("/api/products/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId, direction }),
+      });
+      if (res.ok) {
+        await fetchProducts();
+      }
+    } catch (error) {
+      console.error("Reorder failed", error);
+    }
+    setReordering(null);
+    setLoading(false);
+  };
+
+  const updateSortOrder = async (productId: string, newOrder: number) => {
+    setReordering(productId);
+    try {
+      const res = await fetch(`/api/products/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sortOrder: newOrder }),
+      });
+      if (res.ok) {
+        await fetchProducts();
+      }
+    } catch (error) {
+      console.error("Update sortOrder failed", error);
+    }
+    setReordering(null);
+  };
+
   const handleDurationDiscountChange = (dur: string, val: string) => {
     const dData = form.durationPrices[dur];
     const disc = parseFloat(val);
@@ -355,6 +485,35 @@ export default function AdminProductsPage() {
         [dur]: { ...dData, discount: val, oldPrice: oldP }
       }
     }));
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = products.findIndex((p) => p.id === active.id);
+    const newIndex = products.findIndex((p) => p.id === over.id);
+
+    const newProducts = arrayMove(products, oldIndex, newIndex);
+    setProducts(newProducts);
+
+    try {
+      await fetch("/api/products/reorder-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productIds: newProducts.map((p) => p.id) }),
+      });
+    } catch (error) {
+      console.error("Failed to sync new order", error);
+    }
   };
 
   const filtered = products.filter(
@@ -376,7 +535,7 @@ export default function AdminProductsPage() {
             </button>
           </div>
 
-          <div className="password__change-top" style={{ paddingTop: 0 }}>
+          <div className="password__change-top d-flex justify-content-between align-items-center" style={{ paddingTop: 0 }}>
             <input
               type="text"
               placeholder="Search by name or category..."
@@ -388,64 +547,62 @@ export default function AdminProductsPage() {
                 padding: "0 15px", fontSize: 14, background: "#fff",
               }}
             />
+            <div className="d-flex gap-2 align-items-center">
+              <span className="small text-muted"><i className="fa fa-info-circle"></i> Drag rows to reorder</span>
+              <button 
+                className="os-btn os-btn-black" 
+                onClick={() => { if(confirm("This will reset all product sort orders to multiples of 10. Continue?")) handleReorder("", "normalize") }}
+                style={{ background: '#f5f5f5', color: '#000', border: '1px solid #ebebeb', padding: '0 15px', height: 44, display: 'flex', alignItems: 'center', gap: '8px' }}
+                title="Normalize all sort orders"
+              >
+                <i className="fa fa-sort-amount-down"></i> Reset
+              </button>
+            </div>
           </div>
 
           <div className="order__list white-bg table-responsive">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Product</th>
-                  <th scope="col">Category</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={4} className="text-center py-5">Loading products…</td></tr>
-                ) : filtered.length === 0 ? (
-                  <tr><td colSpan={4} className="text-center py-5">No products found.</td></tr>
-                ) : (
-                  filtered.map((p) => (
-                    <tr key={p.id}>
-                      <td>
-                        <div className="d-flex align-items-center gap-3">
-                          {p.img && (
-                            <img src={p.img} alt={p.title} style={{ width: 44, height: 44, objectFit: "cover", border: "1px solid #ebebeb" }} />
-                          )}
-                          <div>
-                            <Link href={`/product-details/${p.id}`} className="order__title">{p.title}</Link>
-                            <br /><small style={{ color: "#848b8a" }}>#{p.id.slice(-8)}</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{p.category}</td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <strong>{formatPrice(p.price)}</strong>
-                          {p.oldPrice && (
-                            <>
-                              <small style={{ color: "#848b8a", textDecoration: "line-through" }}>{formatPrice(p.oldPrice)}</small>
-                              <small style={{ color: "#e32636", fontWeight: 600 }}>({Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}%)</small>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          <button onClick={() => openEdit(p)} className="os-btn os-btn-black" style={{ padding: "0 14px", height: 32, lineHeight: "30px", fontSize: 12 }}>
-                            Edit
-                          </button>
-                          <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} className="os-btn" style={{ padding: "0 14px", height: 32, lineHeight: "30px", fontSize: 12, opacity: deleting === p.id ? 0.5 : 1 }}>
-                            {deleting === p.id ? "…" : "Delete"}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col" style={{ width: 70 }}>Order</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan={5} className="text-center py-5">Loading products…</td></tr>
+                  ) : filtered.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center py-5">No products found.</td></tr>
+                  ) : (
+                    <SortableContext 
+                      items={filtered.map(p => p.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {filtered.map((p, idx) => (
+                        <SortableRow 
+                          key={p.id} 
+                          p={p} 
+                          idx={idx} 
+                          formatPrice={formatPrice} 
+                          openEdit={openEdit} 
+                          handleDelete={handleDelete}
+                          deleting={deleting}
+                          search={search}
+                        />
+                      ))}
+                    </SortableContext>
+                  )}
+                </tbody>
+              </table>
+            </DndContext>
           </div>
         </div>
       ) : (
@@ -480,6 +637,18 @@ export default function AdminProductsPage() {
                     >
                       {PREDEFINED_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
+                  </div>
+                </div>
+
+                <div className="col-lg-12">
+                  <div className="checkout-form-list mb-20">
+                    <label>Sort Order (Lower numbers appear first)</label>
+                    <input 
+                      type="number" 
+                      placeholder="0" 
+                      value={form.sortOrder} 
+                      onChange={(e) => setForm({ ...form, sortOrder: parseInt(e.target.value) || 0 })} 
+                    />
                   </div>
                 </div>
 

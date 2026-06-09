@@ -22,7 +22,7 @@ export default function AddBlogPage() {
     title: "",
     slug: "",
     author: "Admin",
-    category: "Digital",
+    category: CATEGORIES[0],
     image: "",
     tags: "",
     content: "",
@@ -39,7 +39,6 @@ export default function AddBlogPage() {
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
 
-    // Auto-generate slug from title unless admin manually edited it
     if (name === "title" && !slugManuallyEdited) {
       setFormData((prev) => ({ ...prev, title: value, slug: slugify(value) }));
     }
@@ -122,170 +121,169 @@ export default function AddBlogPage() {
 
   return (
     <AdminShell>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Add New Blog</h3>
-        <button onClick={() => router.back()} className="tp-btn-2">
-          ← Back
-        </button>
-      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .os-btn:hover::after {
+          display: none !important;
+          height: 0 !important;
+          opacity: 0 !important;
+        }
+        .os-btn:hover {
+          background-color: #f5f5f5 !important;
+          color: #000 !important;
+          border-color: #ebebeb !important;
+          transform: none !important;
+        }
+        .os-btn-black:hover {
+          background-color: #000 !important;
+          color: #fff !important;
+          border-color: #000 !important;
+        }
+        .checkout-form-list select {
+          width: 100%;
+          height: 50px;
+          border: 1px solid #ebebeb;
+          padding: 0 15px;
+          background: #fff;
+          font-size: 14px;
+          color: #201f1f;
+        }
+        .checkout-form-list textarea {
+          width: 100%;
+          border: 1px solid #ebebeb;
+          padding: 12px 15px;
+          font-size: 14px;
+          background: #fff;
+          resize: vertical;
+        }
+      ` }} />
 
-      <form onSubmit={handleSubmit} className="bg-white p-4 shadow-sm">
-
-        {/* ── Row 1: Title + Slug ── */}
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">
-              Title <span className="text-danger">*</span>
-            </label>
-            <input
-              type="text"
-              name="title"
-              className="form-control"
-              placeholder="e.g. Top 5 AI Tools in 2026"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">
-              Slug (URL) <span className="text-danger">*</span>
-              <small className="text-muted fw-normal ms-2">— auto-generated from title</small>
-            </label>
-            <input
-              type="text"
-              name="slug"
-              className="form-control font-monospace"
-              placeholder="top-5-ai-tools-2026"
-              value={formData.slug}
-              onChange={handleChange}
-              required
-            />
-            {formData.slug && (
-              <small className="text-muted">
-                URL: /blog/<strong>{formData.slug}</strong>
-              </small>
-            )}
-          </div>
+      <div className="password__change">
+        <div className="password__change-top d-flex justify-content-between align-items-center">
+          <h3 className="password__change-title">
+            <i className="fa fa-plus"></i> Add New Blog
+          </h3>
+          <button className="profile__info-btn" onClick={() => router.back()}>
+            <i className="fa fa-arrow-left"></i> Back to list
+          </button>
         </div>
 
-        {/* ── Row 2: Author + Category ── */}
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">Author</label>
-            <input
-              type="text"
-              name="author"
-              className="form-control"
-              placeholder="e.g. Sadaka"
-              value={formData.author}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">Category</label>
-            <select
-              name="category"
-              className="form-control"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* ── Row 3: Image URL + Preview ── */}
-        <div className="row">
-          <div className="col-md-7 mb-3">
-            <label className="form-label fw-semibold">
-              Featured Image <span className="text-danger">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control"
-              onChange={handleFileChange}
-              required={!formData.image}
-            />
-            <small className="text-muted">Upload a high-quality image for the blog post.</small>
-          </div>
-          <div className="col-md-5 mb-3">
-            <label className="form-label fw-semibold">Image Preview</label>
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                style={{ width: "100%", height: "250px", objectFit: "cover", borderRadius: "6px", border: "1px solid #ddd" }}
-                onError={(e: any) => { e.target.src = ""; setImagePreview(""); }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "100%", height: "250px", background: "#f5f5f5",
-                  border: "1px dashed #ccc", borderRadius: "6px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#aaa", fontSize: "13px"
-                }}
-              >
-                Enter a file to preview
+        <div className="password__form white-bg">
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Title <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Top 5 AI Tools in 2026"
+                    value={formData.title}
+                    onChange={handleChange}
+                    name="title"
+                    required
+                  />
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Slug (URL) <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    className="font-monospace"
+                    placeholder="top-5-ai-tools-2026"
+                    value={formData.slug}
+                    onChange={handleChange}
+                    name="slug"
+                    required
+                  />
+                </div>
+              </div>
 
-        {/* ── Tags ── */}
-        <div className="row">
-          <div className="col-12 mb-3">
-            <label className="form-label fw-semibold">Tags</label>
-            <input
-              type="text"
-              name="tags"
-              className="form-control"
-              placeholder="e.g. AI, ChatGPT, Productivity  (comma separated)"
-              value={formData.tags}
-              onChange={handleChange}
-            />
-            <small className="text-muted">Separate tags with commas</small>
-          </div>
-        </div>
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Author</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Admin"
+                    value={formData.author}
+                    onChange={handleChange}
+                    name="author"
+                  />
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Category</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-        {/* ── Content ── */}
-        <div className="row">
-          <div className="col-12 mb-3">
-            <label className="form-label fw-semibold">
-              Content <span className="text-danger">*</span>
-              <small className="text-muted fw-normal ms-2">— supports HTML for headings, bold, lists, links, etc.</small>
-            </label>
-            <textarea
-              name="content"
-              className="form-control font-monospace"
-              rows={16}
-              value={formData.content}
-              onChange={handleChange}
-              required
-              placeholder={`<p>Start writing your article here...</p>\n\n<h2>Section Heading</h2>\n<p>Your paragraph text.</p>\n\n<ul>\n  <li>List item 1</li>\n  <li>List item 2</li>\n</ul>`}
-              style={{ fontSize: "13px" }}
-            />
-            <small className="text-muted">
-              Tip: Use <code>&lt;h2&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;strong&gt;</code>, <code>&lt;a href=""&gt;</code>, <code>&lt;img src=""&gt;</code>
-            </small>
-          </div>
-        </div>
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Featured Image <span className="required">*</span></label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required={!formData.image}
+                    style={{ paddingTop: '10px' }}
+                  />
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <img
+                        src={imagePreview}
+                        alt="preview"
+                        style={{ maxWidth: 200, maxHeight: 200, objectFit: "cover", border: "1px solid #ebebeb" }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
 
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Tags (comma separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. AI, ChatGPT, Productivity"
+                    value={formData.tags}
+                    onChange={handleChange}
+                    name="tags"
+                  />
+                </div>
+              </div>
 
-        {/* ── Actions ── */}
-        <div className="d-flex gap-3 pt-2 border-top mt-2">
-          <button type="submit" className="tp-btn" disabled={submitting}>
-            {submitting ? "Publishing..." : "Publish Blog"}
-          </button>
-          <button type="button" onClick={() => router.back()} className="tp-btn-2">
-            Cancel
-          </button>
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Content <span className="required">*</span> (HTML Supported)</label>
+                  <textarea
+                    name="content"
+                    rows={12}
+                    value={formData.content}
+                    onChange={handleChange}
+                    required
+                    placeholder="<p>Write your article content here...</p>"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-end gap-3 mt-10">
+              <button type="button" className="os-btn" onClick={() => router.back()}>Cancel</button>
+              <button type="submit" disabled={submitting} className="os-btn os-btn-black">
+                {submitting ? "Publishing…" : "Publish Blog"}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </AdminShell>
   );
 }

@@ -9,9 +9,9 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("All");
 
   const fetchOrders = async () => {
-    // ... same as before
     setLoading(true);
     const res = await fetch("/api/orders");
     const data = await res.json();
@@ -81,22 +81,101 @@ export default function AdminOrdersPage() {
     URL.revokeObjectURL(url);
   };
 
+  const isPDF = (url: string) => url.toLowerCase().endsWith('.pdf');
+
   return (
     <AdminShell>
-      <div className="order__info">
-        <div className="order__info-top d-flex justify-content-between align-items-center mb-3">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .tab-buttons .os-btn:hover::after, 
+        .order__info-top .os-btn:hover::after {
+          display: none !important;
+          height: 0 !important;
+          opacity: 0 !important;
+        }
+        .tab-buttons .os-btn:hover,
+        .order__info-top .os-btn:hover {
+          background-color: #f5f5f5 !important;
+          color: #000 !important;
+          border-color: #ebebeb !important;
+          transform: none !important;
+        }
+        .tab-buttons .os-btn-black:hover,
+        .order__info-top .os-btn-black:hover {
+          background-color: #000 !important;
+          color: #fff !important;
+          border-color: #000 !important;
+        }
+        .tab-buttons .os-btn-black:hover span {
+          color: #fff !important;
+        }
+        .tab-buttons .os-btn:hover span {
+          color: #000 !important;
+        }
+        .btn-no-hover:hover::after {
+          display: none !important;
+          height: 0 !important;
+        }
+        .btn-no-hover:hover {
+          background-color: #dc3545 !important;
+          border-color: #dc3545 !important;
+          color: #fff !important;
+        }
+      ` }} />
+      <div className="order__info" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
+        <div className="order__info-top d-flex justify-content-between align-items-center mb-10">
           <h3 className="order__info-title m-0">
             <i className="fa fa-shopping-cart"></i> Manage Orders
           </h3>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center mb-25 flex-wrap gap-2" style={{ padding: '0 70px' }}>
+          <div className="tab-buttons d-flex gap-2 flex-wrap">
+            {["All", "Pending", "Confirmed", "Rejected"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`os-btn ${activeTab === tab ? "os-btn-black" : ""}`}
+                style={{
+                  padding: "0 12px",
+                  height: "30px",
+                  lineHeight: "28px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  backgroundColor: activeTab === tab ? "#000" : "#f5f5f5",
+                  color: activeTab === tab ? "#fff" : "#000",
+                  border: "1px solid #ebebeb",
+                  transition: "all 0.3s ease",
+                  borderRadius: "0px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px"
+                }}
+              >
+                {tab}
+                <span style={{ 
+                  marginLeft: "4px",
+                  fontSize: "11px",
+                  color: activeTab === tab ? "#fff" : "#000",
+                  opacity: activeTab === tab ? 1 : 0.7,
+                  fontWeight: 600
+                }}>
+                  ({tab === "All" ? orders.length : orders.filter(o => o.status === tab).length})
+                </span>
+              </button>
+            ))}
+          </div>
+
           <button 
             onClick={deleteAllOrders}
-            className="os-btn os-btn-black"
+            className="os-btn os-btn-black btn-no-hover"
             style={{ 
               backgroundColor: '#dc3545', 
               borderColor: '#dc3545',
-              padding: '0 20px',
-              height: '40px',
-              lineHeight: '38px'
+              padding: '0 12px',
+              height: '30px',
+              lineHeight: '28px',
+              fontSize: '10px',
+              color: '#fff'
             }}
           >
             DELETE ALL ORDERS
@@ -122,12 +201,14 @@ export default function AdminOrdersPage() {
                 <tr>
                   <td colSpan={8} className="text-center py-5">Loading orders...</td>
                 </tr>
-              ) : orders.length === 0 ? (
+              ) : orders.filter(o => activeTab === "All" || o.status === activeTab).length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-5">No orders found.</td>
+                  <td colSpan={8} className="text-center py-5">No {activeTab.toLowerCase()} orders found.</td>
                 </tr>
               ) : (
-                orders.map((o) => (
+                orders
+                  .filter(o => activeTab === "All" || o.status === activeTab)
+                  .map((o) => (
                   <tr key={o.id}>
                     <td>#{o.id.slice(-6).toUpperCase()}</td>
                     <td>
@@ -158,11 +239,22 @@ export default function AdminOrdersPage() {
                       {o.receiptUrl ? (
                          <button 
                            onClick={() => setSelectedReceipt(o.receiptUrl)}
-                           style={{ color: '#21a8c9', textDecoration: 'underline', background: 'none', border: 'none', padding: 0 }}
+                           style={{ background: 'none', border: '1px solid #ebebeb', padding: '2px', display: 'flex', width: '44px', height: '44px', justifyContent: 'center', alignItems: 'center' }}
+                           title={isPDF(o.receiptUrl) ? "View PDF Receipt" : "View Image Receipt"}
                          >
-                           View
+                           {isPDF(o.receiptUrl) ? (
+                             <i className="fa fa-file-pdf" style={{ fontSize: '24px', color: '#dc3545' }}></i>
+                           ) : (
+                             <img 
+                              src={o.receiptUrl} 
+                              alt="Receipt" 
+                              style={{ width: '40px', height: '40px', objectFit: 'cover' }} 
+                             />
+                           )}
                          </button>
-                      ) : 'N/A'}
+                      ) : (
+                        <span style={{ fontSize: '11px', color: '#888' }}>No receipt</span>
+                      )}
                     </td>
                     <td>
                       <span style={{ 
@@ -251,7 +343,7 @@ export default function AdminOrdersPage() {
           zIndex: 9999,
           padding: '40px'
         }}>
-          <div style={{ position: 'relative', maxWidth: '90%', maxHeight: '90%' }}>
+          <div style={{ position: 'relative', width: '90%', height: '90%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <button 
               onClick={() => setSelectedReceipt(null)}
               style={{
@@ -267,11 +359,21 @@ export default function AdminOrdersPage() {
             >
               &times;
             </button>
-            <img 
-              src={selectedReceipt} 
-              alt="Payment Receipt" 
-              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', border: '5px solid #fff', borderRadius: '4px' }} 
-            />
+            
+            {isPDF(selectedReceipt) ? (
+              <iframe 
+                src={selectedReceipt} 
+                style={{ width: '100%', height: '80vh', border: 'none', background: '#fff' }} 
+                title="Receipt PDF"
+              />
+            ) : (
+              <img 
+                src={selectedReceipt} 
+                alt="Payment Receipt" 
+                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', border: '5px solid #fff', borderRadius: '4px' }} 
+              />
+            )}
+
             <div className="mt-20 text-center">
                <a 
                  href={selectedReceipt} 
@@ -279,7 +381,7 @@ export default function AdminOrdersPage() {
                  className="os-btn os-btn-black"
                  style={{ padding: '0 20px', height: '40px', lineHeight: '38px' }}
                 >
-                  <i className="fa fa-download"></i> Download Receipt
+                  <i className="fa fa-download"></i> Download {isPDF(selectedReceipt) ? 'PDF' : 'Receipt'}
                </a>
             </div>
           </div>

@@ -56,7 +56,7 @@ export default function AdminSettingsPage() {
 
   return (
     <AdminShell>
-      <div className="password__change">
+      <div className="order__info" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
         <div className="password__change-top">
           <h3 className="password__change-title">
             <i className="fa fa-cog"></i> Store Settings

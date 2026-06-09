@@ -9,7 +9,7 @@ export default async function AdminUsersPage() {
 
   return (
     <AdminShell>
-      <div className="order__info">
+      <div className="order__info" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
         <div className="order__info-top d-flex justify-content-between align-items-center">
           <h3 className="order__info-title">
             <i className="fa fa-users"></i> Registered Users

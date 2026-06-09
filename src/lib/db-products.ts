@@ -4,7 +4,7 @@ import { IProduct } from "@/types/product-d-t";
 export async function getDbProducts(): Promise<IProduct[]> {
   const products = await prisma.product.findMany({
     where: { active: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: { sortOrder: "asc" },
     include: {
       reviews: {
         include: {

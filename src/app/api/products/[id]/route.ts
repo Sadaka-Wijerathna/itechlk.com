@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       "rating", "smDesc",
       "sizes", "colors", "weight", "dimension",
       "isNew", "trending", "topRated", "bestSeller",
-      "detailsText", "detailsList", "detailsText2", "active", "status", "durationPrices",
+      "detailsText", "detailsList", "detailsText2", "active", "status", "durationPrices", "sortOrder",
     ];
     for (const key of allowed) {
       if (key in body) data[key] = body[key];

@@ -7,15 +7,6 @@ import { toast } from "react-toastify";
 
 const CATEGORIES = ["AI Tools", "Streaming", "Gaming", "Software", "Digital", "Subscriptions", "Tips & Tricks"];
 
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
-
 export default function EditBlogPage() {
   const router = useRouter();
   const params = useParams();
@@ -27,7 +18,7 @@ export default function EditBlogPage() {
     author: "Admin",
     category: "Digital",
     image: "",
-    tags: "",       // stored as comma-separated string in form, sent as array to API
+    tags: "",
     content: "",
     active: true,
   });
@@ -147,187 +138,164 @@ export default function EditBlogPage() {
 
   return (
     <AdminShell>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Edit Blog</h3>
-        <div className="d-flex gap-2">
-          {formData.slug && (
-            <a
-              href={`/blog/${formData.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tp-btn-2"
-            >
-              👁 View on Site
-            </a>
-          )}
-          <button onClick={() => router.back()} className="tp-btn-2">
-            ← Back
+      <style dangerouslySetInnerHTML={{ __html: `
+        .os-btn:hover::after {
+          display: none !important;
+          height: 0 !important;
+          opacity: 0 !important;
+        }
+        .os-btn:hover {
+          background-color: #f5f5f5 !important;
+          color: #000 !important;
+          border-color: #ebebeb !important;
+          transform: none !important;
+        }
+        .os-btn-black:hover {
+          background-color: #000 !important;
+          color: #fff !important;
+          border-color: #000 !important;
+        }
+        .checkout-form-list select {
+          width: 100%;
+          height: 50px;
+          border: 1px solid #ebebeb;
+          padding: 0 15px;
+          background: #fff;
+          font-size: 14px;
+          color: #201f1f;
+        }
+        .checkout-form-list textarea {
+          width: 100%;
+          border: 1px solid #ebebeb;
+          padding: 12px 15px;
+          font-size: 14px;
+          background: #fff;
+          resize: vertical;
+        }
+      ` }} />
+
+      <div className="password__change">
+        <div className="password__change-top d-flex justify-content-between align-items-center">
+          <h3 className="password__change-title">
+            <i className="fa fa-edit"></i> Edit Blog
+          </h3>
+          <button className="profile__info-btn" onClick={() => router.back()}>
+            <i className="fa fa-arrow-left"></i> Back to list
           </button>
+        </div>
+
+        <div className="password__form white-bg">
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Title <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Amazon Premium"
+                    value={formData.title}
+                    onChange={handleChange}
+                    name="title"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Slug (URL) <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    className="font-monospace"
+                    value={formData.slug}
+                    onChange={handleChange}
+                    name="slug"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Author</label>
+                  <input
+                    type="text"
+                    value={formData.author}
+                    onChange={handleChange}
+                    name="author"
+                  />
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="checkout-form-list mb-20">
+                  <label>Category</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Featured Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ paddingTop: '10px' }}
+                  />
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <img
+                        src={imagePreview}
+                        alt="preview"
+                        style={{ maxWidth: 200, maxHeight: 200, objectFit: "cover", border: "1px solid #ebebeb" }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Tags (comma separated)</label>
+                  <input
+                    type="text"
+                    value={formData.tags}
+                    onChange={handleChange}
+                    name="tags"
+                  />
+                </div>
+              </div>
+
+              <div className="col-lg-12">
+                <div className="checkout-form-list mb-20">
+                  <label>Content <span className="required">*</span> (HTML Supported)</label>
+                  <textarea
+                    name="content"
+                    rows={12}
+                    value={formData.content}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-end gap-3 mt-10">
+              <button type="button" className="os-btn" onClick={() => router.back()}>Cancel</button>
+              <button type="submit" disabled={submitting} className="os-btn os-btn-black">
+                {submitting ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
-      <form onSubmit={handleSubmit} className="bg-white p-4 shadow-sm">
-
-        {/* ── Row 1: Title + Slug ── */}
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">
-              Title <span className="text-danger">*</span>
-            </label>
-            <input
-              type="text"
-              name="title"
-              className="form-control"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">
-              Slug (URL) <span className="text-danger">*</span>
-            </label>
-            <input
-              type="text"
-              name="slug"
-              className="form-control font-monospace"
-              value={formData.slug}
-              onChange={handleChange}
-              required
-            />
-            {formData.slug && (
-              <small className="text-muted">
-                URL: /blog/<strong>{formData.slug}</strong>
-              </small>
-            )}
-          </div>
-        </div>
-
-        {/* ── Row 2: Author + Category ── */}
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">Author</label>
-            <input
-              type="text"
-              name="author"
-              className="form-control"
-              placeholder="e.g. Sadaka"
-              value={formData.author}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-md-6 mb-3">
-            <label className="form-label fw-semibold">Category</label>
-            <select
-              name="category"
-              className="form-control"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* ── Row 3: Image URL + Preview ── */}
-        <div className="row">
-          <div className="col-md-7 mb-3">
-            <label className="form-label fw-semibold">
-              Featured Image <span className="text-danger">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control"
-              onChange={handleFileChange}
-            />
-            <small className="text-muted">Upload a new image to replace the current one, or leave empty to keep it.</small>
-          </div>
-          <div className="col-md-5 mb-3">
-            <label className="form-label fw-semibold">Image Preview</label>
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                style={{ width: "100%", height: "250px", objectFit: "cover", borderRadius: "6px", border: "1px solid #ddd" }}
-                onError={(e: any) => { e.target.style.display = "none"; }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "100%", height: "250px", background: "#f5f5f5",
-                  border: "1px dashed #ccc", borderRadius: "6px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#aaa", fontSize: "13px"
-                }}
-              >
-                Enter a file to preview
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Tags ── */}
-        <div className="row">
-          <div className="col-12 mb-3">
-            <label className="form-label fw-semibold">Tags</label>
-            <input
-              type="text"
-              name="tags"
-              className="form-control"
-              placeholder="e.g. AI, ChatGPT, Productivity  (comma separated)"
-              value={formData.tags}
-              onChange={handleChange}
-            />
-            <small className="text-muted">Separate tags with commas</small>
-          </div>
-        </div>
-
-        {/* ── Content ── */}
-        <div className="row">
-          <div className="col-12 mb-3">
-            <label className="form-label fw-semibold">
-              Content <span className="text-danger">*</span>
-              <small className="text-muted fw-normal ms-2">— supports HTML for headings, bold, lists, links, etc.</small>
-            </label>
-            <textarea
-              name="content"
-              className="form-control font-monospace"
-              rows={16}
-              value={formData.content}
-              onChange={handleChange}
-              required
-              style={{ fontSize: "13px" }}
-            />
-            <small className="text-muted">
-              Tip: Use <code>&lt;h2&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;strong&gt;</code>, <code>&lt;a href=""&gt;</code>, <code>&lt;img src=""&gt;</code>
-            </small>
-          </div>
-        </div>
-
-
-        {/* ── Actions ── */}
-        <div className="d-flex gap-3 pt-2 border-top mt-2">
-          <button type="submit" className="tp-btn" disabled={submitting}>
-            {submitting ? "Saving..." : "Save Changes"}
-          </button>
-          <button type="button" onClick={() => router.back()} className="tp-btn-2">
-            Cancel
-          </button>
-          {formData.slug && (
-            <a
-              href={`/blog/${formData.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tp-btn-2 ms-auto"
-            >
-              👁 Preview on Site
-            </a>
-          )}
-        </div>
-      </form>
     </AdminShell>
   );
 }

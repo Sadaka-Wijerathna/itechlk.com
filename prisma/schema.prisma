@@ -100,6 +100,7 @@ model Product {
   detailsList    String[]
   detailsText2   String   @default("We pride ourselves on offering the best digital products with maximum reliability.")
   active         Boolean  @default(true)
+  sortOrder      Int      @default(0)
   durationPrices Json?    // { "1 Month": { price: Float, oldPrice: Float? }, ... }
   reviews        Review[]
   createdAt      DateTime @default(now())

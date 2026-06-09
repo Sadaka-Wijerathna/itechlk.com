@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
 
   useEffect(() => {
     fetchBlogs();
@@ -60,129 +61,206 @@ export default function AdminBlogsPage() {
     }
   };
 
-  const published = blogs.filter((b) => b.active).length;
-  const drafts = blogs.filter((b) => !b.active).length;
+  const publishedCount = blogs.filter((b) => b.active).length;
+  const draftsCount = blogs.filter((b) => !b.active).length;
+
+  const filteredBlogs = blogs.filter(b => {
+    if (activeTab === "All") return true;
+    if (activeTab === "Published") return b.active;
+    if (activeTab === "Drafts") return !b.active;
+    return true;
+  });
 
   return (
     <AdminShell>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h3 className="mb-1">Manage Blogs</h3>
-          <small className="text-muted">
-            {blogs.length} total &nbsp;·&nbsp;
-            <span className="text-success">{published} published</span> &nbsp;·&nbsp;
-            <span className="text-warning">{drafts} drafts</span>
-          </small>
-        </div>
-        <Link href="/admin/blogs/add" className="tp-btn">
-          + Add New Blog
-        </Link>
-      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .tab-buttons .os-btn:hover::after,
+        .order__info-top .os-btn:hover::after {
+          display: none !important;
+          height: 0 !important;
+          opacity: 0 !important;
+        }
+        .tab-buttons .os-btn:hover,
+        .order__info-top .os-btn:hover {
+          background-color: #f5f5f5 !important;
+          color: #000 !important;
+          border-color: #ebebeb !important;
+          transform: none !important;
+        }
+        .tab-buttons .os-btn-black:hover,
+        .order__info-top .os-btn-black:hover {
+          background-color: #000 !important;
+          color: #fff !important;
+          border-color: #000 !important;
+        }
+        .tab-buttons .os-btn-black:hover span {
+          color: #fff !important;
+        }
+        .tab-buttons .os-btn:hover span {
+          color: #000 !important;
+        }
+      ` }} />
 
-      <div className="table-responsive bg-white p-4 shadow-sm">
-        <table className="table table-hover align-middle">
-          <thead className="table-light">
-            <tr>
-              <th style={{ width: "60px" }}>Image</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Category</th>
-              <th>Tags</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th style={{ width: "160px" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+      <div className="order__info" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
+        <div className="order__info-top d-flex justify-content-between align-items-center mb-10">
+          <h3 className="order__info-title m-0">
+            <i className="fa fa-newspaper"></i> Manage Blogs
+          </h3>
+        </div>
+
+        <div className="d-flex justify-content-between align-items-center mb-25 flex-wrap gap-2" style={{ padding: '0 70px' }}>
+          <div className="tab-buttons d-flex gap-2 flex-wrap">
+            {["All", "Published", "Drafts"].map((tab) => {
+              const count = tab === "All" ? blogs.length : (tab === "Published" ? publishedCount : draftsCount);
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`os-btn ${isActive ? "os-btn-black" : ""}`}
+                  style={{
+                    padding: "0 12px",
+                    height: "30px",
+                    lineHeight: "28px",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    backgroundColor: isActive ? "#000" : "#f5f5f5",
+                    color: isActive ? "#fff" : "#000",
+                    border: "1px solid #ebebeb",
+                    transition: "all 0.3s ease",
+                    borderRadius: "0px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px"
+                  }}
+                >
+                  {tab}
+                  <span style={{ 
+                    marginLeft: "4px",
+                    fontSize: "11px",
+                    color: isActive ? "#fff" : "#000",
+                    opacity: isActive ? 1 : 0.7,
+                    fontWeight: 600
+                  }}>
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <Link 
+            href="/admin/blogs/add" 
+            className="os-btn os-btn-black"
+            style={{ 
+              padding: '0 12px',
+              height: '30px',
+              lineHeight: '28px',
+              fontSize: '11px',
+              color: '#fff'
+            }}
+          >
+            + ADD NEW BLOG
+          </Link>
+        </div>
+
+        <div className="order__list white-bg table-responsive">
+          <table className="table">
+            <thead>
               <tr>
-                <td colSpan={8} className="text-center py-4">Loading...</td>
+                <th scope="col" style={{ width: "80px" }}>Image</th>
+                <th scope="col">Blog Title</th>
+                <th scope="col">Category</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col" className="text-end">Actions</th>
               </tr>
-            ) : blogs.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="text-center py-4 text-muted">
-                  No blogs yet. <Link href="/admin/blogs/add">Add your first blog →</Link>
-                </td>
-              </tr>
-            ) : (
-              blogs.map((blog) => (
-                <tr key={blog.id}>
-                  <td>
-                    <img
-                      src={blog.image}
-                      alt={blog.title}
-                      style={{ width: "52px", height: "40px", objectFit: "cover", borderRadius: "4px" }}
-                      onError={(e: any) => { e.target.src = "/assets/img/logo/logo.png"; }}
-                    />
-                  </td>
-                  <td>
-                    <div className="fw-semibold">{blog.title}</div>
-                    <small className="text-muted font-monospace">/blog/{blog.slug}</small>
-                  </td>
-                  <td>{blog.author || "Admin"}</td>
-                  <td>
-                    <span className="badge bg-info text-white">{blog.category}</span>
-                  </td>
-                  <td>
-                    {Array.isArray(blog.tags) && blog.tags.length > 0 ? (
-                      <span className="text-muted" style={{ fontSize: "12px" }}>
-                        {blog.tags.slice(0, 2).join(", ")}
-                        {blog.tags.length > 2 && ` +${blog.tags.length - 2}`}
-                      </span>
-                    ) : (
-                      <span className="text-muted" style={{ fontSize: "12px" }}>—</span>
-                    )}
-                  </td>
-                  <td>
-                    <span className={`badge ${blog.active ? "bg-success" : "bg-warning text-dark"}`}>
-                      {blog.active ? "Published" : "Draft"}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: "13px" }}>
-                    {new Date(blog.createdAt).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", year: "numeric"
-                    })}
-                  </td>
-                  <td>
-                    <div className="d-flex gap-1 flex-wrap">
-                      <button
-                        onClick={() => toggleStatus(blog)}
-                        className={`btn btn-sm ${blog.active ? "btn-outline-success" : "btn-outline-warning"}`}
-                        title={blog.active ? "Make Invisible" : "Make Visible"}
-                      >
-                        <i className={`fa ${blog.active ? "fa-eye" : "fa-eye-slash"}`} />
-                      </button>
-                      <Link
-                        href={`/admin/blogs/edit/${blog.id}`}
-                        className="btn btn-sm btn-outline-primary"
-                        title="Edit"
-                      >
-                        <i className="fa fa-edit" />
-                      </Link>
-                      <a
-                        href={`/blog/${blog.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-sm btn-outline-secondary"
-                        title="View on site"
-                      >
-                        <i className="fa fa-external-link" />
-                      </a>
-                      <button
-                        onClick={() => deleteBlog(blog.id, blog.title)}
-                        className="btn btn-sm btn-outline-danger"
-                        title="Delete"
-                      >
-                        <i className="fa fa-trash" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-5">Loading blogs...</td>
+                </tr>
+              ) : filteredBlogs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-5 text-muted">
+                    No blogs found. <Link href="/admin/blogs/add" className="order__title">Add your first blog</Link>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredBlogs.map((blog) => (
+                  <tr key={blog.id}>
+                    <td>
+                      <img
+                        src={blog.image}
+                        alt={blog.title}
+                        style={{ width: "40px", height: "40px", objectFit: "cover", border: "1px solid #ebebeb", borderRadius: "0" }}
+                        onError={(e: any) => { e.target.src = "/assets/img/logo/logo.png"; }}
+                      />
+                    </td>
+                    <td>
+                      <Link href={`/blog/${blog.slug}`} className="order__title">
+                        {blog.title}
+                      </Link>
+                      <br />
+                      <small className="text-muted">By {blog.author || "Admin"}</small>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '12px', color: '#6d7170' }}>{blog.category}</span>
+                    </td>
+                    <td>
+                      <span style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '20px', 
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        backgroundColor: blog.active ? '#dcfce7' : '#fee2e2',
+                        color: blog.active ? '#166534' : '#991b1b'
+                      }}>
+                        {blog.active ? "Published" : "Draft"}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: "12px", color: '#848b8a' }}>
+                        {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                          month: "short", day: "numeric", year: "numeric"
+                        })}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2 justify-content-end align-items-center">
+                        <button
+                          onClick={() => toggleStatus(blog)}
+                          className="os-btn"
+                          style={{ padding: "0 10px", height: 28, lineHeight: "26px", fontSize: 11, background: '#f5f5f5', color: '#000' }}
+                          title={blog.active ? "Hide Blog" : "Publish Blog"}
+                        >
+                          <i className={`fa ${blog.active ? "fa-eye-slash" : "fa-eye"}`} />
+                        </button>
+                        <Link
+                          href={`/admin/blogs/edit/${blog.id}`}
+                          className="os-btn os-btn-black"
+                          style={{ padding: "0 10px", height: 28, lineHeight: "26px", fontSize: 11 }}
+                          title="Edit Blog"
+                        >
+                          <i className="fa fa-edit" />
+                        </Link>
+                        <button
+                          onClick={() => deleteBlog(blog.id, blog.title)}
+                          className="os-btn"
+                          style={{ padding: "0 10px", height: 28, lineHeight: "26px", fontSize: 11, background: '#000', borderColor: '#000', color: '#fff' }}
+                          title="Delete Blog"
+                        >
+                          <i className="fa fa-trash" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminShell>
   );
