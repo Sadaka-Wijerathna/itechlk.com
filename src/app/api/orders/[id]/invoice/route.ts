@@ -178,42 +178,72 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       compression: 'DEFLATE',
     });
 
-    // 7. Call ConvertAPI REST endpoint for PDF conversion
+    // 7. Call PDF Conversion REST endpoint
     const convertSecret = process.env.CONVERT_API_SECRET;
-    if (!convertSecret || convertSecret === 'your-convertapi-secret' || convertSecret === 'your_convertapi_secret_here') {
+    const cloudmersiveKey = process.env.CLOUDMERSIVE_API_KEY;
+
+    if (!convertSecret && !cloudmersiveKey) {
       return NextResponse.json({ 
-        error: 'ConvertAPI authentication is missing.', 
-        details: 'Please configure CONVERT_API_SECRET in your environment settings.' 
+        error: 'PDF Conversion API key is missing.', 
+        details: 'Please configure CLOUDMERSIVE_API_KEY or CONVERT_API_SECRET in your environment settings.' 
       }, { status: 500 });
     }
 
-    const formData = new FormData();
-    const pptxBlob = new Blob([new Uint8Array(pptxBuffer)], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
-    formData.append('File', pptxBlob, 'invoice.pptx');
-    formData.append('StoreFile', 'false');
+    let pdfBuffer: Buffer;
 
-    console.log(`[Invoice API] Submitting in-memory PPTX to ConvertAPI...`);
-    const convertRes = await fetch(`https://v2.convertapi.com/convert/pptx/to/pdf`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${convertSecret}`,
-      },
-      body: formData,
-    });
+    if (cloudmersiveKey && cloudmersiveKey !== 'your-cloudmersive-api-key' && cloudmersiveKey !== 'your_cloudmersive_api_key_here') {
+      console.log(`[Invoice API] Submitting in-memory PPTX to Cloudmersive API...`);
+      const formData = new FormData();
+      const pptxBlob = new Blob([new Uint8Array(pptxBuffer)], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+      formData.append('inputFile', pptxBlob, 'invoice.pptx');
 
-    if (!convertRes.ok) {
-      const errText = await convertRes.text();
-      console.error('[Invoice API] ConvertAPI error response:', errText);
-      return NextResponse.json({ 
-        error: 'PDF Conversion Service failed.', 
-        details: errText || 'ConvertAPI returned an error.' 
-      }, { status: 502 });
+      const convertRes = await fetch(`https://api.cloudmersive.com/convert/pptx/to/pdf`, {
+        method: 'POST',
+        headers: {
+          'Apikey': cloudmersiveKey,
+        },
+        body: formData,
+      });
+
+      if (!convertRes.ok) {
+        const errText = await convertRes.text();
+        console.error('[Invoice API] Cloudmersive API error response:', errText);
+        return NextResponse.json({ 
+          error: 'Cloudmersive PDF Conversion failed.', 
+          details: errText || 'Cloudmersive returned an error.' 
+        }, { status: 502 });
+      }
+
+      pdfBuffer = Buffer.from(await convertRes.arrayBuffer());
+    } else {
+      console.log(`[Invoice API] Submitting in-memory PPTX to ConvertAPI...`);
+      const formData = new FormData();
+      const pptxBlob = new Blob([new Uint8Array(pptxBuffer)], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+      formData.append('File', pptxBlob, 'invoice.pptx');
+      formData.append('StoreFile', 'false');
+
+      const convertRes = await fetch(`https://v2.convertapi.com/convert/pptx/to/pdf`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${convertSecret}`,
+        },
+        body: formData,
+      });
+
+      if (!convertRes.ok) {
+        const errText = await convertRes.text();
+        console.error('[Invoice API] ConvertAPI error response:', errText);
+        return NextResponse.json({ 
+          error: 'ConvertAPI PDF Conversion failed.', 
+          details: errText || 'ConvertAPI returned an error.' 
+        }, { status: 502 });
+      }
+
+      pdfBuffer = Buffer.from(await convertRes.arrayBuffer());
     }
 
-    const pdfBuffer = Buffer.from(await convertRes.arrayBuffer());
-
     console.log(`[Invoice API] PDF generated successfully. Returning in-memory buffer.`);
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `inline; filename="Invoice-${invoiceNo}.pdf"`,
