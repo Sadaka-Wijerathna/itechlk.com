@@ -68,17 +68,146 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const downloadInvoice = (order: any, item: any) => {
-    const content = `ITechLK eCommerce Invoice\n------------------------------------------------\nOrder ID: ${order.id}\nDate: ${new Date(order.createdAt).toLocaleDateString()}\nStatus: ${order.status}\n\nBilled To:\n${order.firstName} ${order.lastName}\n${order.email} | ${order.phone}\nCountry: ${order.country}\n\nProduct: ${item.title}\nDuration: ${item.duration || 'N/A'}\nQuantity: ${item.quantity}\nPrice: ${formatPrice(item.price)}\n\nOrder Total: ${formatPrice(order.totalAmount)}\n------------------------------------------------\nThank you for your purchase!`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Invoice_${order.id.slice(-6)}_${item.title.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const generateInvoice = (order: any) => {
+    const subtotal = order.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+    const logoUrl = `${window.location.origin}/assets/img/logo/logo.png`;
+    const invoiceDate = new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const invoiceNum = order.id.slice(-7).toUpperCase();
+
+    const itemRows = order.items.map((item: any, idx: number) => {
+      const bg = idx % 2 === 0 ? '#ffffff' : '#f5f5f5';
+      const itemTotal = item.price * item.quantity;
+      return `<tr style="background:${bg}">
+        <td style="padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#333">${item.title}${item.duration && item.duration !== 'N/A' ? ' / ' + item.duration : ''}</td>
+        <td style="padding:10px 14px;font-size:11px;color:#333">Rs. ${item.price.toLocaleString()}</td>
+        <td style="padding:10px 14px;font-size:11px;color:#333">${item.quantity}</td>
+        <td style="padding:10px 14px;font-size:11px;color:#333;text-align:right">Rs. ${itemTotal.toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice #${invoiceNum} - ITechLK</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#333;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .toolbar{background:#f0f0f0;padding:12px 20px;text-align:center;font-family:Arial;font-size:13px;border-bottom:1px solid #ddd}
+    .toolbar button{padding:8px 22px;font-size:13px;cursor:pointer;border:none;margin:0 6px;font-weight:600}
+    .btn-print{background:#2d3142;color:#fff}
+    .btn-close{background:#888;color:#fff}
+    .wrap{width:794px;min-height:1050px;margin:0 auto;padding:50px 55px 0;background:#fff;position:relative}
+    .logo{margin-bottom:52px}
+    .logo img{height:42px;object-fit:contain}
+    .logo-text{font-size:28px;font-weight:900;letter-spacing:-1px;color:#00b4c8;display:none}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+    .cust-name{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
+    .cust-info p{font-size:11.5px;color:#555;line-height:1.75}
+    .inv-label{text-align:right}
+    .inv-label .lbl{font-size:11px;font-weight:600;letter-spacing:2.5px;color:#999;text-transform:uppercase}
+    .inv-label .num{font-size:13px;font-weight:700;color:#333;margin-top:2px}
+    .divider{border:none;border-top:1.5px solid #e0e0e0;margin:22px 0}
+    table.items{width:100%;border-collapse:collapse;margin-bottom:30px}
+    table.items thead tr{background:#2d3142}
+    table.items thead th{padding:12px 14px;font-size:10.5px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1.2px;text-align:left}
+    table.items thead th:last-child{text-align:right}
+    .bottom{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+    .pay-data p{font-size:11px;color:#555;line-height:1.85}
+    .pay-data .lbl{font-weight:700;color:#333}
+    .totals{width:260px;border-collapse:collapse}
+    .totals td{padding:5px 0;font-size:12px}
+    .totals td:first-child{font-weight:600;color:#555}
+    .totals td:last-child{text-align:right;color:#333}
+    .totals .total-row td{font-weight:700;font-size:14px;color:#1a1a1a;padding-top:10px;border-top:1.5px solid #e0e0e0}
+    .terms h4{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#1a1a1a;margin-bottom:7px}
+    .terms p{font-size:10px;color:#777;line-height:1.8}
+    .footer-icons{display:flex;justify-content:center;gap:55px;padding:28px 0 22px}
+    .fi{display:flex;align-items:center;gap:9px;font-size:11px;color:#444}
+    .fi-icon{width:30px;height:30px;border:1.5px solid #bbb;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .bottom-bar{height:55px;background:#2d3142;margin:0 -55px;position:relative;overflow:hidden}
+    .bottom-bar::before{content:'';position:absolute;left:0;top:0;width:130px;height:100%;background:#00b4c8;clip-path:polygon(0 0,72% 0,100% 100%,0 100%)}
+    @media print{
+      .toolbar{display:none!important}
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+    @page{size:A4;margin:0}
+  </style>
+</head>
+<body>
+<div class="toolbar no-print">
+  <strong>Invoice Preview</strong>&nbsp;&nbsp;
+  <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button class="btn-close" onclick="window.close()">✖ Close</button>
+</div>
+<div class="wrap">
+  <div class="logo">
+    <img src="${logoUrl}" alt="ITechLK" onerror="this.style.display='none';document.getElementById('lt').style.display='block'">
+    <div id="lt" class="logo-text">ITECHL<span style="color:#2d3142">K</span><span style="color:#00b4c8">.</span></div>
+  </div>
+  <div class="header">
+    <div class="cust-info">
+      <div class="cust-name">${order.firstName} ${order.lastName}</div>
+      <p>${invoiceDate}</p>
+      <p>${order.country}</p>
+      <p>${order.email}</p>
+      ${order.phone ? `<p>${order.phone}</p>` : ''}
+    </div>
+    <div class="inv-label">
+      <div class="lbl">INVOICE</div>
+      <div class="num"># ${invoiceNum}</div>
+    </div>
+  </div>
+  <hr class="divider">
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:55%">Product</th>
+        <th>Price</th>
+        <th>QTY</th>
+        <th style="text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+  <div class="bottom">
+    <div class="pay-data">
+      <p class="lbl">PAYMENT DATA:</p>
+      <p>NAME: ${order.firstName} ${order.lastName}</p>
+      <p>EMAIL: ${order.email}</p>
+      <p>PAYMENT METHOD: BANK TRANSFER / ONLINE</p>
+      <p>ORDER STATUS: ${order.status}</p>
+    </div>
+    <div>
+      <table class="totals">
+        <tr><td>SUBTOTAL</td><td>Rs. ${subtotal.toLocaleString()}</td></tr>
+        <tr><td>TAX</td><td>Rs. 0</td></tr>
+        <tr class="total-row"><td>TOTAL</td><td>Rs. ${order.totalAmount.toLocaleString()}</td></tr>
+      </table>
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="terms">
+    <h4>Terms and Conditions</h4>
+    <p>Payment is due upon receipt of this invoice. All services and digital products are non-refundable once delivered or activated. ITechLK reserves the right to suspend service delivery in case of fraudulent activity or payment disputes. For queries regarding this invoice, please contact us at hello@itechlk.com or via WhatsApp at +94 74 257 0943. Thank you for choosing ITechLK!</p>
+  </div>
+  <div class="footer-icons">
+    <div class="fi"><div class="fi-icon">📞</div><span>+94 74 257 0943</span></div>
+    <div class="fi"><div class="fi-icon">🌐</div><span>www.itechlk.com</span></div>
+    <div class="fi"><div class="fi-icon">📍</div><span>Dewalegma, Dellawa,<br>Morawaka</span></div>
+  </div>
+  <div class="bottom-bar"></div>
+</div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=950,height=1100,scrollbars=yes');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    } else {
+      alert('Popup blocked! Please allow popups for this site and try again.');
+    }
   };
 
   const isPDF = (url: string) => url.toLowerCase().endsWith('.pdf');
@@ -308,17 +437,18 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td>
-                      {o.items.map((item: any, i: number) => (
-                        <div key={i} className="mb-1">
-                          <button 
-                            onClick={() => downloadInvoice(o, item)}
-                            className="os-btn"
-                            style={{ padding: '0 10px', height: '28px', lineHeight: '26px', fontSize: '11px', backgroundColor: '#198754', borderColor: '#198754', color: '#fff' }}
-                          >
-                            Download
-                          </button>
-                        </div>
-                      ))}
+                      <button 
+                        onClick={() => window.open(`/api/orders/${o.id}/invoice`, '_blank', 'width=950,height=1100,scrollbars=yes')}
+                        title="View PDF Invoice"
+                        style={{ 
+                          padding: '0 12px', height: '28px', lineHeight: '26px', fontSize: '11px', 
+                          backgroundColor: '#0d6efd', border: '1px solid #0d6efd', color: '#fff',
+                          transition: 'none', cursor: 'pointer', borderRadius: '0px',
+                          display: 'inline-flex', alignItems: 'center', gap: '5px'
+                        }}
+                      >
+                        <i className="fa fa-file-pdf"></i> Invoice
+                      </button>
                     </td>
                   </tr>
                 ))

@@ -34,7 +34,6 @@ async function getStats() {
 
   if (now - lastUpdate > ONE_DAY) {
     console.log("[Currency] Rates are older than 24h. Triggering background update...");
-    // We don't await this so the dashboard loads instantly
     updateCurrencyRates().catch(err => console.error("Auto-update failed:", err));
   }
 
@@ -55,6 +54,7 @@ export default async function AdminDashboard() {
 
   // Dynamic Currency rate conversion (USD to LKR)
   const lkrRate = rates.LKR;
+  const eurRate = rates.EUR;
   const lkrRevenue = revenue * lkrRate;
 
   const stats = [
@@ -73,12 +73,17 @@ export default async function AdminDashboard() {
             Welcome back, {session?.user?.name?.split(" ")[0] ?? "Admin"} 👋
           </h3>
           <div className="d-flex flex-column align-items-end">
-            <span style={{ fontSize: '11px', color: '#848b8a', background: '#f5f5f5', padding: '4px 10px', borderRadius: '4px' }}>
-              Live Rate: 1 USD = {lkrRate} LKR
-            </span>
+            <div className="d-flex gap-2">
+              <span style={{ fontSize: '11px', color: '#848b8a', background: '#f5f5f5', padding: '4px 10px', borderRadius: '4px' }}>
+                USD/LKR: {lkrRate}
+              </span>
+              <span style={{ fontSize: '11px', color: '#848b8a', background: '#f5f5f5', padding: '4px 10px', borderRadius: '4px' }}>
+                USD/EUR: {eurRate}
+              </span>
+            </div>
             {lastUpdateDate && (
-              <small style={{ fontSize: '9px', color: '#bbb', marginTop: '2px' }}>
-                Updated: {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(lastUpdateDate))}
+              <small style={{ fontSize: '9px', color: '#bbb', marginTop: '4px' }}>
+                Last Sync: {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(lastUpdateDate))}
               </small>
             )}
           </div>

@@ -138,19 +138,6 @@ const ProfileMenuArea = () => {
     setSaving(false);
   };
 
-  const downloadInvoice = (order: any, item: any) => {
-    const content = `ITechLK eCommerce Invoice\n------------------------------------------------\nOrder ID: ${order.id}\nDate: ${new Date(order.createdAt).toLocaleDateString()}\nStatus: ${order.status}\n\nBilled To:\n${order.firstName} ${order.lastName}\n${order.email} | ${order.phone}\nCountry: ${order.country}\n\nProduct: ${item.title}\nQuantity: ${item.quantity}\nPrice: ${formatPrice(item.price)}\n\nOrder Total: ${formatPrice(order.totalAmount)}\n------------------------------------------------\nThank you for your purchase!`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Invoice_${order.id.slice(-6)}_${item.title.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <>
       <section className="profile__menu pb-70 bg-white">
@@ -278,25 +265,22 @@ const ProfileMenuArea = () => {
                                     </span>
                                   </td>
                                   <td>
-                                    {order.items.map((item: any, i: number) => (
-                                      <div key={i} className="mb-1">
-                                        <button
-                                          onClick={() => downloadInvoice(order, item)}
-                                          style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            padding: 0,
-                                            margin: 0,
-                                            color: '#198754',
-                                            fontWeight: '500',
-                                            cursor: 'pointer',
-                                            fontSize: '14px'
-                                          }}
-                                        >
-                                          Download
-                                        </button>
-                                      </div>
-                                    ))}
+                                    <a
+                                      href={`/api/orders/${order.id}/invoice`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      title="Download PDF Invoice"
+                                      style={{
+                                        color: '#198754',
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        textDecoration: 'none',
+                                        display: 'inline-block'
+                                      }}
+                                    >
+                                      Download PDF
+                                    </a>
                                   </td>
                                 </tr>
                               ))
