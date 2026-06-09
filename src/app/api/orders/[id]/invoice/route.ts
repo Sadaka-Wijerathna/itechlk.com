@@ -2,21 +2,46 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/auth';
 import { getCurrencyRates } from '@/lib/currency';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 
-const execAsync = promisify(exec);
+// @ts-ignore
+import PizZip from 'pizzip';
+// @ts-ignore
+import Docxtemplater from 'docxtemplater';
 
-function cleanupFiles(filePaths: string[]) {
-  filePaths.forEach((p) => {
-    if (fs.existsSync(p)) {
-      fs.unlink(p, (err) => {
-        if (err) console.error(`[Invoice API] Failed to delete temp file: ${p}`, err);
-      });
+/**
+ * Recursively search and remove <p:sp> elements containing the target text.
+ * This is used to delete empty background shapes (e.g. {{ITEM_3_BG}}) if
+ * the order contains fewer than 6 items.
+ */
+function removeShapeContainingText(xml: string, text: string): string {
+  let index = xml.indexOf(text);
+  while (index !== -1) {
+    // Search backward for PowerPoint shape tags (<p:sp>)
+    const openTagRegex = /<p:sp\b/g;
+    let match;
+    let lastOpenIndex = -1;
+    
+    openTagRegex.lastIndex = 0;
+    while ((match = openTagRegex.exec(xml.substring(0, index))) !== null) {
+      lastOpenIndex = match.index;
     }
-  });
+    
+    if (lastOpenIndex !== -1) {
+      const closeTag = "</p:sp>";
+      const closeIndex = xml.indexOf(closeTag, index);
+      if (closeIndex !== -1) {
+        const endOfClose = closeIndex + closeTag.length;
+        // Slice out the entire shape block
+        xml = xml.substring(0, lastOpenIndex) + xml.substring(endOfClose);
+        index = xml.indexOf(text);
+        continue;
+      }
+    }
+    break;
+  }
+  return xml;
 }
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -49,7 +74,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const rates = await getCurrencyRates();
     const lkrRate = rates.LKR || 325;
 
-    // 4. Map template placeholders
+    // 4. Map template placeholders (without the delimiters, as required by docxtemplater)
     const invoiceNo = order.id.slice(-6).toUpperCase();
     const invoiceDate = new Date(order.createdAt).toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -68,15 +93,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const taxLKR = 0;
 
     const replacements: Record<string, string> = {
-      '{{CUSTOMER_NAME}}': customerName,
-      '{{EMAIL}}': email,
-      '{{PHONE}}': phone,
-      '{{COUNTRY}}': country,
-      '{{INVOICE_DATE}}': invoiceDate,
-      '{{INVOICE_NO}}': invoiceNo,
-      '{{SUBTOTAL}}': `Rs. ${subtotalLKR.toLocaleString()}`,
-      '{{TAX}}': `Rs. ${taxLKR.toLocaleString()}`,
-      '{{TOTAL}}': `Rs. ${totalLKR.toLocaleString()}`,
+      CUSTOMER_NAME: customerName,
+      EMAIL: email,
+      PHONE: phone,
+      COUNTRY: country,
+      INVOICE_DATE: invoiceDate,
+      INVOICE_NO: invoiceNo,
+      SUBTOTAL: `Rs. ${subtotalLKR.toLocaleString()}`,
+      TAX: `Rs. ${taxLKR.toLocaleString()}`,
+      TOTAL: `Rs. ${totalLKR.toLocaleString()}`,
     };
 
     // Handle invoice line items (up to 6 slots)
@@ -87,79 +112,111 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const itemPriceLKR = Math.round(item.price * lkrRate);
         const itemTotalLKR = Math.round(item.price * item.quantity * lkrRate);
 
-        replacements[`{{ITEM_${i}_NAME}}`] = itemTitle;
-        replacements[`{{ITEM_${i}_PRICE}}`] = `Rs. ${itemPriceLKR.toLocaleString()}`;
-        replacements[`{{item_${i}_qty}}`] = item.quantity.toString();
-        replacements[`{{ITEM_${i}_TOTAL}}`] = `Rs. ${itemTotalLKR.toLocaleString()}`;
+        replacements[`ITEM_${i}_NAME`] = itemTitle;
+        replacements[`ITEM_${i}_PRICE`] = `Rs. ${itemPriceLKR.toLocaleString()}`;
+        replacements[`item_${i}_qty`] = item.quantity.toString();
+        replacements[`ITEM_${i}_TOTAL`] = `Rs. ${itemTotalLKR.toLocaleString()}`;
+        replacements[`ITEM_${i}_BG`] = '';
       } else {
         // Clear unused item slots
-        replacements[`{{ITEM_${i}_NAME}}`] = '';
-        replacements[`{{ITEM_${i}_PRICE}}`] = '';
-        replacements[`{{item_${i}_qty}}`] = '';
-        replacements[`{{ITEM_${i}_TOTAL}}`] = '';
+        replacements[`ITEM_${i}_NAME`] = '';
+        replacements[`ITEM_${i}_PRICE`] = '';
+        replacements[`item_${i}_qty`] = '';
+        replacements[`ITEM_${i}_TOTAL`] = '';
+        replacements[`ITEM_${i}_BG`] = '';
       }
     }
 
-    // 5. Setup temporary directory and files
-    const tmpDir = path.resolve(process.cwd(), 'tmp');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
-    }
-
+    // 5. Locate PPTX Template
     const isConfirmed = order.status === 'Confirmed';
     const templateFileName = isConfirmed
       ? 'Modern Professional Business invoice Template - Paid.pptx'
       : 'Modern Professional Business invoice Template.pptx';
     const templatePath = path.resolve(process.cwd(), 'public', templateFileName);
     
-    const uniqueSuffix = `${order.id}_${Date.now()}_${Math.random().toString(36).substring(3, 8)}`;
-    const dataPath = path.resolve(tmpDir, `data_${uniqueSuffix}.json`);
-    const tempPptxPath = path.resolve(tmpDir, `temp_${uniqueSuffix}.pptx`);
-    const pdfPath = path.resolve(tmpDir, `invoice_${uniqueSuffix}.pdf`);
-
     if (!fs.existsSync(templatePath)) {
       return NextResponse.json({ error: 'Invoice template PPTX file is missing.' }, { status: 500 });
     }
 
-    // Write JSON file for Python input
-    await fs.promises.writeFile(dataPath, JSON.stringify(replacements, null, 2), 'utf-8');
+    // 6. Manipulate PPTX in memory
+    const content = fs.readFileSync(templatePath);
+    const zip = new PizZip(content);
 
-    // 6. Execute Python script to fill PPTX and export PDF
-    const pythonScriptPath = path.resolve(process.cwd(), 'scripts', 'generate_invoice.py');
-    const cmd = `python "${pythonScriptPath}" "${templatePath}" "${dataPath}" "${tempPptxPath}" "${pdfPath}"`;
-
-    try {
-      await execAsync(cmd);
-
-      // Verify PDF was generated
-      if (!fs.existsSync(pdfPath)) {
-        throw new Error('PDF invoice was not generated by PowerPoint script.');
+    // Clean up empty slide shapes before docxtemplater processes them
+    const slideFiles = Object.keys(zip.files).filter(name => name.startsWith("ppt/slides/slide") && name.endsWith(".xml"));
+    for (const slideFile of slideFiles) {
+      let xml = zip.files[slideFile].asText();
+      for (let i = 1; i <= 6; i++) {
+        if (i > order.items.length) {
+          xml = removeShapeContainingText(xml, `{{ITEM_${i}_BG}}`);
+        }
       }
-
-      // Read output PDF file buffer
-      const pdfBuffer = await fs.promises.readFile(pdfPath);
-
-      // Clean up temporary files asynchronously
-      cleanupFiles([dataPath, tempPptxPath, pdfPath]);
-
-      // Return PDF file inline
-      return new Response(pdfBuffer, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `inline; filename="Invoice-${invoiceNo}.pdf"`,
-        },
-      });
-    } catch (cmdError: any) {
-      console.error('[Invoice API] Shell execution error:', cmdError);
-      cleanupFiles([dataPath, tempPptxPath, pdfPath]);
-      return NextResponse.json(
-        {
-          error: 'Failed to generate PDF invoice.',
-          details: cmdError.message || cmdError,
-        },
-        { status: 500 }
-      );
+      zip.file(slideFile, xml);
     }
+
+    // Run Docxtemplater on the zip structure
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      delimiters: {
+        start: '{{',
+        end: '}}'
+      }
+    });
+
+    doc.setData(replacements);
+    
+    try {
+      doc.render();
+    } catch (renderError: any) {
+      console.error('[Invoice API] Docxtemplater rendering error:', renderError);
+      return NextResponse.json({ error: 'Failed to populate template placeholders.' }, { status: 500 });
+    }
+
+    const pptxBuffer = doc.getZip().generate({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+    });
+
+    // 7. Call ConvertAPI REST endpoint for PDF conversion
+    const convertSecret = process.env.CONVERT_API_SECRET;
+    if (!convertSecret || convertSecret === 'your-convertapi-secret' || convertSecret === 'your_convertapi_secret_here') {
+      return NextResponse.json({ 
+        error: 'ConvertAPI authentication is missing.', 
+        details: 'Please configure CONVERT_API_SECRET in your environment settings.' 
+      }, { status: 500 });
+    }
+
+    const formData = new FormData();
+    const pptxBlob = new Blob([new Uint8Array(pptxBuffer)], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+    formData.append('File', pptxBlob, 'invoice.pptx');
+    formData.append('StoreFile', 'false');
+
+    console.log(`[Invoice API] Submitting in-memory PPTX to ConvertAPI...`);
+    const convertRes = await fetch(`https://v2.convertapi.com/convert/pptx/to/pdf?Secret=${convertSecret}`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!convertRes.ok) {
+      const errText = await convertRes.text();
+      console.error('[Invoice API] ConvertAPI error response:', errText);
+      return NextResponse.json({ 
+        error: 'PDF Conversion Service failed.', 
+        details: errText || 'ConvertAPI returned an error.' 
+      }, { status: 502 });
+    }
+
+    const pdfBuffer = Buffer.from(await convertRes.arrayBuffer());
+
+    console.log(`[Invoice API] PDF generated successfully. Returning in-memory buffer.`);
+    return new Response(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="Invoice-${invoiceNo}.pdf"`,
+      },
+    });
+
   } catch (error: any) {
     console.error('[Invoice API] Server error:', error);
     return NextResponse.json({ error: error.message || 'Error processing invoice request' }, { status: 500 });
