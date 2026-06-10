@@ -296,7 +296,7 @@ export default function AdminOrdersPage() {
                     </td>
                     <td>
                       <button 
-                        onClick={() => window.open(`/api/orders/${o.id}/invoice`, '_blank', 'width=950,height=1100,scrollbars=yes')}
+                        onClick={() => window.open(`/api/orders/${o.id}/invoice`, '_blank')}
                         title="View PDF Invoice"
                         style={{ 
                           padding: '0 12px', height: '28px', lineHeight: '26px', fontSize: '11px', 
