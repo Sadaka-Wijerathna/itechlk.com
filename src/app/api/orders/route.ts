@@ -118,20 +118,36 @@ export async function GET(req: Request) {
   try {
     const session = await auth();
     const url = new URL(req.url);
-    const userEmail = url.searchParams.get('email');
+    const requestedEmail = url.searchParams.get('email');
 
-    // Admin requesting all orders
-    if (session?.user?.role === 'admin' && !userEmail) {
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const isAdmin = session.user.role === 'admin';
+
+    // Admin requesting ALL orders (no specific email provided)
+    if (isAdmin && !requestedEmail) {
       const orders = await prisma.order.findMany({
         orderBy: { createdAt: 'desc' },
       });
       return NextResponse.json(orders);
     }
 
-    // User requesting their own orders
-    const emailToFilter = userEmail || session?.user?.email;
+    // Determine which email's orders to fetch
+    let emailToFilter = session.user.email;
+
+    if (requestedEmail) {
+      // Only admins can fetch orders for an email other than their own
+      if (isAdmin || session.user.email === requestedEmail) {
+        emailToFilter = requestedEmail;
+      } else {
+        return NextResponse.json({ error: 'Unauthorized to view these orders' }, { status: 403 });
+      }
+    }
+
     if (!emailToFilter) {
-       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const orders = await prisma.order.findMany({
@@ -142,7 +158,7 @@ export async function GET(req: Request) {
     return NextResponse.json(orders);
   } catch (error: any) {
     console.error('Fetch Orders Error:', error);
-     return NextResponse.json({ error: 'Error fetching orders' }, { status: 500 });
+    return NextResponse.json({ error: 'Error fetching orders' }, { status: 500 });
   }
 }
 

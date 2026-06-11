@@ -7,7 +7,9 @@ import VerifyEmailForm from "@/components/forms/verify-email-form";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Verify Email",
+  title: "Verify Email | ITechLK Store",
+  description: "Verify your email address to activate your ITechLK Store account.",
+  robots: { index: false, follow: false },
 };
 
 export default function VerifyEmailPage() {
@@ -23,7 +25,7 @@ export default function VerifyEmailPage() {
                 <div className="basic-login">
                   <h3 className="text-center mb-60">Enter Verification Code</h3>
                   <p className="text-center mb-40">
-                    We've sent a 6-digit verification code to your email. 
+                    We&apos;ve sent a 6-digit verification code to your email. 
                     Please enter it below to activate your account.
                   </p>
                   <Suspense fallback={<div>Loading...</div>}>

@@ -11,6 +11,7 @@ interface IFilterState {
   itemOffset: number;
   priceValue: number[];
   availability: string[];
+  maxPrice: number;
 }
 
 // Define the initial state using that type
@@ -23,6 +24,7 @@ const initialState: IFilterState = {
   itemOffset: 0,
   priceValue: [0, 500],
   availability: [],
+  maxPrice: 500,
 };
 
 export const filterSlice = createSlice({
@@ -85,6 +87,15 @@ export const filterSlice = createSlice({
     set_price_value: (state, action: PayloadAction<number[]>) => {
       state.priceValue = action.payload;
     },
+    set_max_price: (state, action: PayloadAction<number>) => {
+      state.maxPrice = action.payload;
+      if (state.priceValue[1] > action.payload) {
+        state.priceValue[1] = action.payload;
+      }
+      if (state.priceValue[0] > action.payload) {
+        state.priceValue[0] = action.payload;
+      }
+    },
     reset: (state) => {
       state.category = "";
       state.subCategory = "";
@@ -92,7 +103,7 @@ export const filterSlice = createSlice({
       state.colors = [];
       state.brand = "";
       state.availability = [];
-      state.priceValue = [0, 500];
+      state.priceValue = [0, state.maxPrice];
     },
   },
 });
@@ -107,5 +118,6 @@ export const {
   reset,
   set_item_offset,
   set_price_value,
+  set_max_price,
 } = filterSlice.actions;
 export default filterSlice.reducer;

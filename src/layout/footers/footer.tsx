@@ -43,7 +43,7 @@ const Footer = ({ style_2 }: { style_2?: boolean }) => {
                     </Link>
                   </div>
                   <div className="footer__widget-content">
-                    <p>ITechLK is Sri Lanka's leading digital marketplace, providing premium subscriptions and AI tools with local payment support and 24/7 assistance.</p>
+                    <p>ITechLK is Sri Lanka&apos;s leading digital marketplace, providing premium subscriptions and AI tools with local payment support and 24/7 assistance.</p>
                     <div className="footer__contact">
                       <ul>
                         <li>

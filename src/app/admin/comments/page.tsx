@@ -14,7 +14,7 @@ export default function AdminCommentsPage() {
     fetchComments();
   }, []);
 
-  const fetchComments = async () => {
+  async function fetchComments() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/comments");
@@ -30,7 +30,7 @@ export default function AdminCommentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const deleteComment = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this comment? This cannot be undone.")) {

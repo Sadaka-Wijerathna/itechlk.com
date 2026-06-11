@@ -182,11 +182,11 @@ const ProductDetailsUpper = ({
           className={style_2?"col-xl-7 col-lg-7 col-md-6 col-sm-12 col-12":"col-xl-6 col-lg-6"}
         >
           <div className="product__modal-content product__modal-content-2">
-            <h4>
+            <h2>
               <Link href={`/product-details/${product.id}`}>
                 {product.title}
               </Link>
-            </h4>
+            </h2>
             <div className="product__price-2 mb-25">
               <span>
                 {selectedDuration && product.durationPrices && product.durationPrices[selectedDuration]

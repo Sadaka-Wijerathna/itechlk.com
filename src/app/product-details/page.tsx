@@ -9,7 +9,8 @@ import ProductDetailsBottom from "@/components/product-details/product-details-b
 import RelatedProducts from "@/components/products/related-products";
 
 export const metadata: Metadata = {
-  title: "Shop Details Page",
+  title: "Product Details | ITechLK Store",
+  robots: { index: false, follow: false },
 };
 
 export default async function ProductDetailsPage() {

@@ -42,7 +42,7 @@ const ContactArea = () => {
                   ))}
                 </ul>
                 <p>
-                  ITechLK is Sri Lanka's leading digital marketplace, providing premium subscriptions and AI tools with local payment support and 24/7 assistance. We are committed to making global digital services accessible to everyone in Sri Lanka with ease and reliability.
+                  ITechLK is Sri Lanka&apos;s leading digital marketplace, providing premium subscriptions and AI tools with local payment support and 24/7 assistance. We are committed to making global digital services accessible to everyone in Sri Lanka with ease and reliability.
                 </p>
 
                 <div className="contact__social">

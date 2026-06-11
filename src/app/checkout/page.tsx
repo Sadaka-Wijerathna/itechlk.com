@@ -6,7 +6,9 @@ import Footer from "@/layout/footers/footer";
 import CheckoutArea from "@/components/checkout/checkout-area";
 
 export const metadata: Metadata = {
-  title: "Checkout Page",
+  title: "Checkout | ITechLK Store",
+  description: "Secure checkout for your premium digital subscriptions at ITechLK Store.",
+  robots: { index: false, follow: false },
 };
 
 export default function CheckoutPage() {

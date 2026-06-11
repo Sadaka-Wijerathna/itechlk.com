@@ -1,5 +1,17 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Admin Dashboard | ITechLK Store',
+    template: '%s | Admin | ITechLK Store',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function AdminLayout({
   children,

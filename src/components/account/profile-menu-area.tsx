@@ -88,17 +88,19 @@ const ProfileMenuArea = () => {
       const savedCountry = (session.user as any).country || '';
       const savedPhoneCode = (session.user as any).phoneCode || '';
 
-      setFormData({
-        firstName: dbFirstName || fullName.split(' ')[0] || '',
-        lastName: dbLastName || fullName.split(' ').slice(1).join(' ') || '',
-        // Use saved values first; fall back to geo-detected values
-        country: savedCountry || (geo?.countryName ?? ''),
-        phoneCode: savedPhoneCode || (geo?.callingCode ?? ''),
-        phone: (session.user as any).phone || ''
-      });
+      setTimeout(() => {
+        setFormData({
+          firstName: dbFirstName || fullName.split(' ')[0] || '',
+          lastName: dbLastName || fullName.split(' ').slice(1).join(' ') || '',
+          // Use saved values first; fall back to geo-detected values
+          country: savedCountry || (geo?.countryName ?? ''),
+          phoneCode: savedPhoneCode || (geo?.callingCode ?? ''),
+          phone: (session.user as any).phone || ''
+        });
+        setLoadingOrders(true);
+      }, 0);
 
-      setLoadingOrders(true);
-      fetch('/api/orders')
+      fetch(`/api/orders?email=${session.user.email}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) setOrders(data);

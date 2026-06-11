@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   verification: {
-    google: '', // Add your Google Search Console verification code here
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || '',
   },
 };
 

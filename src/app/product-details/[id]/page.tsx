@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 import Wrapper from "@/layout/wrapper";
 import HeaderTwo from "@/layout/headers/header-2";
 import Breadcrumb from "@/components/common/breadcrumb";
@@ -9,6 +9,14 @@ import ProductDetailsBottom from "@/components/product-details/product-details-b
 import RelatedProducts from "@/components/products/related-products";
 import { getDbProducts } from "@/lib/db-products";
 import { PageParamsProps } from "@/types/custom-d-t";
+import { getCurrencyRates } from "@/lib/currency";
+
+export async function generateStaticParams() {
+  const products = await getDbProducts();
+  return products.map((product) => ({
+    id: String(product.id),
+  }));
+}
 
 export async function generateMetadata(props: PageParamsProps): Promise<Metadata> {
   const resolvedParams = await props.params;
@@ -54,6 +62,9 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   const product = products.find((product) => String(product.id) === String(id));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const rates = await getCurrencyRates();
+  const lkrRate = rates.LKR || 325;
+  const lkrPrice = product ? Math.round(product.price * lkrRate) : 0;
 
   const productJsonLd = product ? {
     '@context': 'https://schema.org',
@@ -70,7 +81,7 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
       '@type': 'Offer',
       url: `${siteUrl}/product-details/${product.id}`,
       priceCurrency: 'LKR',
-      price: (product as any).price || (product as any).priceRange || '',
+      price: lkrPrice || '',
       availability: (product as any).status === 'Out of Stock'
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
@@ -98,7 +109,7 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
 
           <main>
             {/* breadcrumb start */}
-            <Breadcrumb title="Product Details" subtitle="Product Details" />
+            <Breadcrumb title={product.title} subtitle={product.category || "Product Details"} />
             {/* breadcrumb end */}
 
             {/* shop details upper area start */}

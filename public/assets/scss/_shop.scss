@@ -1099,7 +1099,7 @@
       @media #{$xs}{
         margin-top: 40px;
       }
-        & h4{
+        & h4, & h2{
             font-size: 16px;
             margin-bottom: 17px;
             color: $black-soft;
@@ -1110,7 +1110,7 @@
             }
         }
         &-2{
-          & h4{
+          & h4, & h2{
             font-size: 24px;
             color: $black;
             margin-bottom: 27px;

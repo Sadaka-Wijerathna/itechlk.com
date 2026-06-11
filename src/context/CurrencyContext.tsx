@@ -55,7 +55,11 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   // Persist selection across page loads
   useEffect(() => {
     const saved = localStorage.getItem('currency') as Currency | null;
-    if (saved && DEFAULT_RATES[saved]) setCurrencyState(saved);
+    if (saved && DEFAULT_RATES[saved]) {
+      setTimeout(() => {
+        setCurrencyState(saved);
+      }, 0);
+    }
   }, []);
 
   const setCurrency = (c: Currency) => {

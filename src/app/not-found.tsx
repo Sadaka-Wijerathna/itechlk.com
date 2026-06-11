@@ -38,7 +38,7 @@ export default function NotFound() {
                   anymore, if you like you can return to our homepage. If the
                   problem persists, please send us an email to{" "}
                   <span className="highlight comment">
-                    basictheme400@gmail.com
+                    support@itechlk.com
                   </span>
                 </p>
 

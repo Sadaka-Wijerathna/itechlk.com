@@ -20,7 +20,9 @@ export default function AdminOrdersPage() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    setTimeout(() => {
+      fetchOrders();
+    }, 0);
   }, []);
 
   const updateStatus = async (id: string, status: string) => {

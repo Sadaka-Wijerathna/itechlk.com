@@ -94,7 +94,7 @@ const VerifyEmailForm = () => {
 
       <div className="text-center mt-30">
         <p style={{ fontSize: '14px', color: '#666' }}>
-          Didn't receive the code?{' '}
+          Didn&apos;t receive the code?{' '}
           <button 
             type="button"
             onClick={() => router.push("/register")}

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getDbProducts } from '@/lib/db-products';
+import prisma from '@/lib/prisma';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
 
@@ -66,12 +67,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
-    {
-      url: `${siteUrl}/blog-details`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
   ];
 
   // Dynamic product pages
@@ -88,5 +83,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Sitemap: Failed to fetch products', error);
   }
 
-  return [...staticPages, ...productPages];
+  // Dynamic blog pages
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: { active: true },
+    });
+    blogPages = blogs.map((blog) => ({
+      url: `${siteUrl}/blog/${blog.slug}`,
+      lastModified: new Date(blog.updatedAt || blog.createdAt || new Date()),
+      changeFrequency: 'weekly' as const,
+      priority: 0.75,
+    }));
+  } catch (error) {
+    console.error('Sitemap: Failed to fetch blogs', error);
+  }
+
+  return [...staticPages, ...productPages, ...blogPages];
 }
+

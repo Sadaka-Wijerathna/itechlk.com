@@ -28,8 +28,10 @@ const BlogArea = ({ style_2, style_3 }: IProps) => {
       }
     };
 
-    updateSlides();
-    setMounted(true);
+    setTimeout(() => {
+      updateSlides();
+      setMounted(true);
+    }, 0);
     window.addEventListener("resize", updateSlides);
     return () => window.removeEventListener("resize", updateSlides);
   }, []);

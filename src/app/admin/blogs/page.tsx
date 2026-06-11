@@ -14,7 +14,7 @@ export default function AdminBlogsPage() {
     fetchBlogs();
   }, []);
 
-  const fetchBlogs = async () => {
+  async function fetchBlogs() {
     setLoading(true);
     try {
       const res = await fetch("/api/blogs");
@@ -25,7 +25,7 @@ export default function AdminBlogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const deleteBlog = async (id: string, title: string) => {
     if (window.confirm(`Delete "${title}"? This cannot be undone.`)) {

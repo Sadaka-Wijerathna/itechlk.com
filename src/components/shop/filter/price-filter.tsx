@@ -4,11 +4,9 @@ import { set_price_value } from "@/redux/features/filter";
 import { useCurrency } from "@/context/CurrencyContext";
 
 const PriceFilter = () => {
-  const { priceValue } = useAppSelector(state => state.filter);
+  const { priceValue, maxPrice } = useAppSelector(state => state.filter);
   const { symbol, rate } = useCurrency();
   const dispatch = useAppDispatch();
-  
-  const MAX_LIMIT = 500; // Fixed max as requested ($0 - $500)
 
   // handleChanges
   const handleChanges = (val: number[]) => {
@@ -24,7 +22,7 @@ const PriceFilter = () => {
         <div className="price__slider">
           <div className="mb-25">
             <InputRange
-              MAX={MAX_LIMIT}
+              MAX={maxPrice}
               MIN={0}
               STEP={1}
               values={priceValue}

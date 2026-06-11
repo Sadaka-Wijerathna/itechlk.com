@@ -88,19 +88,25 @@ const CheckoutArea = () => {
   const [placingOrder, setPlacingOrder] = useState(false);
   const { geo } = useGeoLocation();
 
-  useEffect(() => {
-    if (!receiptFile) {
-      setPreviewUrl(null);
-      return;
+  const handleFileChange = (file: File | null) => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
-    if (receiptFile.type.startsWith('image/')) {
-      const objectUrl = URL.createObjectURL(receiptFile);
-      setPreviewUrl(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
+    setReceiptFile(file);
+    if (file && file.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(file));
     } else {
       setPreviewUrl(null);
     }
-  }, [receiptFile]);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
@@ -171,9 +177,13 @@ const CheckoutArea = () => {
         }),
       });
       if (res.ok) {
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
         setOrderPlaced(true);
         reset();
         setReceiptFile(null);
+        setPreviewUrl(null);
         dispatch(clearCartSilently());
         
         // Update local session so it fetches latest DB changes (profile overrides from billing)
@@ -290,7 +300,7 @@ const CheckoutArea = () => {
                         <div className="checkout-form-list">
                           <div style={{ background: '#ffffff', border: '1px solid #eaedff', borderRadius: 0, padding: '15px 10px', width: '100%' }}>
                             <ul style={{ color: '#111827', fontSize: 15, lineHeight: '1.8', margin: 0, padding: 0, listStyle: 'none' }}>
-                              <li><strong>Bank Name:</strong> People's Bank</li>
+                              <li><strong>Bank Name:</strong> People&apos;s Bank</li>
                               <li><strong>Branch:</strong> Morawaka</li>
                               <li><strong>Account Name:</strong> P.A.Indira Umanga</li>
                               <li><strong>Account No:</strong> 060200160094469</li>
@@ -333,7 +343,7 @@ const CheckoutArea = () => {
                         <input
                           type="file"
                           accept="image/*,.pdf"
-                          onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                          onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
                           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                         />
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>

@@ -58,7 +58,7 @@ const HeroSliderOne = ({ style_2=false,slider_cls }:IProps) => {
                         <div className="row align-items-center">
                           <div className="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
                             <div className="slider__content p-relative z-index-1">
-                              <h2 dangerouslySetInnerHTML={{ __html: slider.title }}></h2>
+                              <h1 dangerouslySetInnerHTML={{ __html: slider.title }}></h1>
                               <p>{slider.subtitle}</p>
                               <div className="hero-slider-btn">
                                 <Link href="/shop" className="os-btn os-btn-2">
@@ -85,7 +85,7 @@ const HeroSliderOne = ({ style_2=false,slider_cls }:IProps) => {
                       <div className="row">
                         <div className="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
                           <div className="slider__content p-relative z-index-1">
-                            <h2 dangerouslySetInnerHTML={{ __html: slider.title }}></h2>
+                            <h1 dangerouslySetInnerHTML={{ __html: slider.title }}></h1>
                             <p>{slider.subtitle}</p>
                             <div className="hero-slider-btn">
                               <Link href="/shop" className="os-btn os-btn-2">

@@ -5,7 +5,7 @@ import ShopSidebar from "./shop-sidebar";
 import { IProduct } from "@/types/product-d-t";
 import usePagination from "@/hooks/use-pagination";
 import Pagination from "@/ui/pagination";
-import { reset, add_sub_category } from "@/redux/features/filter";
+import { reset, add_sub_category, set_max_price } from "@/redux/features/filter";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import ProductItem from "../products/single-product/product-item";
 import ProductListItem from "../products/single-product/product-list-item";
@@ -68,13 +68,36 @@ const ShopArea = ({product_data,shop_right,shop_col}:IProps) => {
     });
   }, [brand, category, colors, priceValue, product_data, sizes, subCategory, availability]);
 
-  const [products, setProducts] = useState<IProduct[]>(filteredProducts);
+  const [sortBy, setSortBy] = useState<string>("asc");
+
+  const products = useMemo(() => {
+    let result = [...filteredProducts];
+    if (sortBy === "sale") {
+      result = result.filter((p) => (p.discount || 0) > 0);
+    } else if (sortBy === "high") {
+      result = result.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "low") {
+      result = result.sort((a, b) => a.price - b.price);
+    }
+    return result;
+  }, [filteredProducts, sortBy]);
+
   const {currentItems,handlePageClick,pageCount} = usePagination<IProduct>(products,pagination_per_page);
 
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
 
   const dispatch = useAppDispatch();
+
+  const maxProductPrice = useMemo(() => {
+    return product_data.length > 0 
+      ? Math.ceil(Math.max(...product_data.map(p => p.price))) 
+      : 500;
+  }, [product_data]);
+
+  useEffect(() => {
+    dispatch(set_max_price(maxProductPrice));
+  }, [dispatch, maxProductPrice]);
 
   useEffect(() => {
     dispatch(reset());
@@ -86,27 +109,11 @@ const ShopArea = ({product_data,shop_right,shop_col}:IProps) => {
       dispatch(add_sub_category(categoryParam));
     }
   }, [categoryParam, dispatch]);
-  // filteredProducts products update hole products state update
-  useEffect(() => {
-    setProducts(filteredProducts);
-  }, [filteredProducts]);
 
   // handle Sort Change
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    let sortedProducts = [...filteredProducts];
-    
-    if(e.target.value === "sale"){
-      sortedProducts = sortedProducts.filter((p) => p.discount! > 0);
-    }
-    else if(e.target.value === "high"){
-      sortedProducts = sortedProducts.sort((a,b) => b.price - a.price);
-    }
-    else if(e.target.value === "low"){
-      sortedProducts = sortedProducts.sort((a,b) => a.price - b.price);
-    }
-    
-    setProducts(sortedProducts);
-  }
+    setSortBy(e.target.value);
+  };
 
   return (
     <section className="shop__area pt-100 pb-100">

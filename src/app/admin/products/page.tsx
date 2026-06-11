@@ -186,7 +186,9 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    setTimeout(() => {
+      fetchProducts();
+    }, 0);
   }, []);
 
   const openAdd = () => {

@@ -8,7 +8,7 @@ async function getStats() {
   const [activeProducts, totalUsers, totalOrders, revenueData, rates] = await Promise.all([
     prisma.product.count({ where: { active: true } }),
     prisma.user.count(),
-    prisma.order.count(),
+    prisma.order.count({ where: { status: "Confirmed" } }),
     prisma.order.aggregate({
       _sum: {
         totalAmount: true
