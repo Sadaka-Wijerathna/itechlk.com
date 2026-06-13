@@ -13,7 +13,9 @@ const navItems = [
   { href: "/admin/blogs", label: "Blogs", icon: "fa fa-newspaper" },
   { href: "/admin/comments", label: "Comments", icon: "fa fa-comments" },
   { href: "/admin/orders", label: "Orders", icon: "fa fa-file" },
+  { href: "/admin/invoices", label: "Invoices", icon: "fa fa-file-invoice" },
   { href: "/admin/users", label: "Users", icon: "fa fa-users" },
+  { href: "/admin/coupons", label: "Coupons", icon: "fa fa-ticket-alt" },
   { href: "/admin/settings", label: "Settings", icon: "fa fa-cog" },
 ];
 

@@ -27,17 +27,19 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
+
+const getJsonLd = (url: string) => ({
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'Organization',
-      '@id': 'https://itechlk.com/#organization',
+      '@id': `${url}/#organization`,
       name: 'ITechLK Store',
-      url: 'https://itechlk.com',
+      url: url,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://itechlk.com/assets/img/logo/logo.png',
+        url: `${url}/assets/img/logo/logo.png`,
       },
       contactPoint: {
         '@type': 'ContactPoint',
@@ -47,18 +49,18 @@ const jsonLd = {
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://itechlk.com/#website',
-      url: 'https://itechlk.com',
+      '@id': `${url}/#website`,
+      url: url,
       name: 'ITechLK Store',
-      publisher: { '@id': 'https://itechlk.com/#organization' },
+      publisher: { '@id': `${url}/#organization` },
       potentialAction: {
         '@type': 'SearchAction',
-        target: { '@type': 'EntryPoint', urlTemplate: 'https://itechlk.com/shop?search={search_term_string}' },
+        target: { '@type': 'EntryPoint', urlTemplate: `${url}/shop?search={search_term_string}` },
         'query-input': 'required name=search_term_string',
       },
     },
   ],
-};
+});
 
 export default async function HomePageFive() {
   const product_data = await getDbProducts();
@@ -67,7 +69,7 @@ export default async function HomePageFive() {
     <Wrapper>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getJsonLd(siteUrl)) }}
       />
       {/* header start */}
       <HeaderTwo />

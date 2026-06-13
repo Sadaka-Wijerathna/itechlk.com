@@ -10,6 +10,14 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
     whatsappNumber: "+94742570943",
     telegramChatIds: "",
+    bankName1: "",
+    bankBranch1: "",
+    bankAccountName1: "",
+    bankAccountNo1: "",
+    bankName2: "",
+    bankBranch2: "",
+    bankAccountName2: "",
+    bankAccountNo2: "",
   });
 
   useEffect(() => {
@@ -97,9 +105,125 @@ export default function AdminSettingsPage() {
                   </small>
                 </div>
               </div>
+              {/* Bank Account 1 (Left Side) */}
+              <div className="col-lg-6 mt-20">
+                <div className="row">
+                  <div className="col-lg-12 mb-10">
+                    <h4 style={{ fontSize: 16, borderBottom: '1px solid #eaedff', paddingBottom: 8, color: '#111827', fontWeight: 600 }}>
+                      Bank Account 1
+                    </h4>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Bank Name</label>
+                      <input
+                        type="text"
+                        value={settings.bankName1}
+                        onChange={(e) => setSettings({ ...settings, bankName1: e.target.value })}
+                        placeholder="People's Bank"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Branch</label>
+                      <input
+                        type="text"
+                        value={settings.bankBranch1}
+                        onChange={(e) => setSettings({ ...settings, bankBranch1: e.target.value })}
+                        placeholder="Morawaka"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Account Name</label>
+                      <input
+                        type="text"
+                        value={settings.bankAccountName1}
+                        onChange={(e) => setSettings({ ...settings, bankAccountName1: e.target.value })}
+                        placeholder="P.A.Indira Umanga"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Account Number</label>
+                      <input
+                        type="text"
+                        value={settings.bankAccountNo1}
+                        onChange={(e) => setSettings({ ...settings, bankAccountNo1: e.target.value })}
+                        placeholder="060200160094469"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
+              {/* Bank Account 2 (Right Side) */}
+              <div className="col-lg-6 mt-20">
+                <div className="row">
+                  <div className="col-lg-12 mb-10">
+                    <h4 style={{ fontSize: 16, borderBottom: '1px solid #eaedff', paddingBottom: 8, color: '#111827', fontWeight: 600 }}>
+                      Bank Account 2
+                    </h4>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Bank Name</label>
+                      <input
+                        type="text"
+                        value={settings.bankName2}
+                        onChange={(e) => setSettings({ ...settings, bankName2: e.target.value })}
+                        placeholder="Bank of Ceylon (BOC)"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Branch</label>
+                      <input
+                        type="text"
+                        value={settings.bankBranch2}
+                        onChange={(e) => setSettings({ ...settings, bankBranch2: e.target.value })}
+                        placeholder="Morawaka"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Account Name</label>
+                      <input
+                        type="text"
+                        value={settings.bankAccountName2}
+                        onChange={(e) => setSettings({ ...settings, bankAccountName2: e.target.value })}
+                        placeholder="Anuhas P A I U"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="col-lg-6">
+                    <div className="checkout-form-list mb-20">
+                      <label>Account Number</label>
+                      <input
+                        type="text"
+                        value={settings.bankAccountNo2}
+                        onChange={(e) => setSettings({ ...settings, bankAccountNo2: e.target.value })}
+                        placeholder="72790749"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <div className="col-lg-12">
+              <div className="col-lg-12 mt-20">
                 <div className="checkout-form-list">
                   <button
                     type="submit"

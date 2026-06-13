@@ -129,6 +129,9 @@ model Order {
   totalAmount   Float
   receiptUrl    String?
   items         OrderItem[]
+  couponCode    String?
+  discountAmt   Float?      @default(0)
+  isDirectInvoice Boolean   @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -192,4 +195,18 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
-
+// ─── Coupon Model ─────────────────────────────────────────────────────────────
+model Coupon {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  code           String    @unique
+  discountType   String    // "percentage" | "flat"
+  discountValue  Float
+  minOrderValue  Float?    @default(0)
+  maxDiscount    Float?
+  expirationDate DateTime?
+  maxUses        Int?
+  usedCount      Int       @default(0)
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

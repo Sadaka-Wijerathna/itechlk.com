@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
     const body = await req.json();
-    const { firstName, lastName, email, country, phone, phoneCode, receiptUrl, cart_products } = body;
+    const { firstName, lastName, email, country, phone, phoneCode, receiptUrl, cart_products, couponCode } = body;
 
     if (!firstName || !email || !cart_products || cart_products.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -34,6 +34,36 @@ export async function POST(req: Request) {
 
     const totalAmount = cart_products.reduce((acc: number, item: any) => acc + (item.price * item.orderQuantity), 0);
     
+    // Server-side coupon validation
+    let finalTotal = totalAmount;
+    let actualDiscount = 0;
+
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
+      if (coupon && coupon.active && 
+          (!coupon.expirationDate || new Date(coupon.expirationDate) >= new Date()) && 
+          (!coupon.maxUses || coupon.usedCount < coupon.maxUses) && 
+          (!coupon.minOrderValue || totalAmount >= coupon.minOrderValue)) {
+        
+        if (coupon.discountType === 'percentage') {
+          actualDiscount = (totalAmount * coupon.discountValue) / 100;
+          if (coupon.maxDiscount && actualDiscount > coupon.maxDiscount) actualDiscount = coupon.maxDiscount;
+        } else {
+          actualDiscount = coupon.discountValue;
+          if (actualDiscount > totalAmount) actualDiscount = totalAmount;
+        }
+        finalTotal -= actualDiscount;
+
+        // Increment used count
+        await prisma.coupon.update({
+          where: { id: coupon.id },
+          data: { usedCount: { increment: 1 } }
+        });
+      } else {
+        return NextResponse.json({ error: 'Applied coupon is invalid or expired.' }, { status: 400 });
+      }
+    }
+
     // Map products to OrderItem format
     const items = cart_products.map((item: any) => ({
       productId: item.id,
@@ -53,9 +83,11 @@ export async function POST(req: Request) {
         phone,
         country,
         status: 'Pending',
-        totalAmount,
+        totalAmount: finalTotal,
         receiptUrl: receiptUrl || null,
         items,
+        couponCode: couponCode || null,
+        discountAmt: actualDiscount > 0 ? actualDiscount : 0,
       },
     });
 
@@ -77,7 +109,8 @@ export async function POST(req: Request) {
       
       // Convert to LKR for notification using dynamic rates
       const rates = await getCurrencyRates();
-      const lkrTotal = totalAmount * rates.LKR;
+      const lkrTotal = finalTotal * rates.LKR;
+      const lkrDiscount = actualDiscount * rates.LKR;
       
       const caption = `<b>🚀 New Order Received!</b>\n\n` +
         `<b>Order ID:</b> #${order.id.slice(-6).toUpperCase()}\n` +
@@ -86,6 +119,7 @@ export async function POST(req: Request) {
         `<b>Phone:</b> <a href="https://wa.me/${phone.startsWith('0') ? '94' + phone.substring(1).replace(/\D/g, '') : phone.startsWith('94') ? phone.replace(/\D/g, '') : '94' + phone.replace(/\D/g, '')}">${phone}</a>\n` +
         `<b>Country:</b> ${country}\n\n` +
         `<b>Products:</b>\n${orderDetails}\n\n` +
+        (actualDiscount > 0 ? `<b>Discount:</b> Rs. ${Math.round(lkrDiscount).toLocaleString()} (Code: ${couponCode})\n` : '') +
         `<b>Total:</b> Rs. ${Math.round(lkrTotal).toLocaleString()}\n` +
         `<b>Status:</b> ${order.status}`;
 

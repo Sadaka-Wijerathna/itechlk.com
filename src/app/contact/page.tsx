@@ -17,13 +17,15 @@ export const metadata: Metadata = {
   },
 };
 
-const contactJsonLd = {
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
+
+const getContactJsonLd = (url: string) => ({
   '@context': 'https://schema.org',
   '@type': 'OnlineBusiness',
-  '@id': 'https://itechlk.com/#organization',
+  '@id': `${url}/#organization`,
   name: 'ITechLK Store',
-  url: 'https://itechlk.com',
-  logo: 'https://itechlk.com/assets/img/logo/logo.png',
+  url: url,
+  logo: `${url}/assets/img/logo/logo.png`,
   description: 'Premium digital subscriptions in Sri Lanka — AI Tools, Streaming, VPNs, Creative Software and more.',
   areaServed: {
     '@type': 'Country',
@@ -37,14 +39,14 @@ const contactJsonLd = {
       contactOption: 'TollFree',
     },
   ],
-};
+});
 
 export default function ContactPage() {
   return (
     <Wrapper>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getContactJsonLd(siteUrl)) }}
       />
       {/* header start */}
       <HeaderTwo />

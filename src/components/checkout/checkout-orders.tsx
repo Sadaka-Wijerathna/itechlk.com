@@ -5,10 +5,11 @@ import { useCurrency } from "@/context/CurrencyContext";
 
 // prop type 
 type IProps = {
-  cart_products:IProduct[]
+  cart_products:IProduct[];
+  discountAmount?: number;
 }
 
-const CheckoutOrders = ({cart_products}:IProps) => {
+const CheckoutOrders = ({cart_products, discountAmount = 0}:IProps) => {
   const { total } = useCartInfo();
   const { formatPrice } = useCurrency();
 
@@ -42,12 +43,20 @@ const CheckoutOrders = ({cart_products}:IProps) => {
                 <span className="amount">{formatPrice(total)}</span>
               </td>
             </tr>
+            {discountAmount > 0 && (
+              <tr className="cart-discount">
+                <th>Discount</th>
+                <td>
+                  <span className="amount" style={{ color: '#10b981' }}>-{formatPrice(discountAmount)}</span>
+                </td>
+              </tr>
+            )}
             <tr className="order-total">
               <th>Order Total</th>
               <td>
                 <strong>
                   <span className="amount">
-                    {formatPrice(total)}
+                    {formatPrice(total - discountAmount)}
                   </span>
                 </strong>
               </td>

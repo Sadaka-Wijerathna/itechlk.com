@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { getCartProducts, clearCartSilently } from '@/redux/features/cart';
 import Link from 'next/link';
 import { useGeoLocation } from '@/hooks/use-geo-location';
+import useCartInfo from '@/hooks/use-cart-info';
 
 const COUNTRY_DATA = [
   { name: "Afghanistan", code: "+93" }, { name: "Albania", code: "+355" }, { name: "Algeria", code: "+213" },
@@ -82,11 +83,71 @@ const CheckoutArea = () => {
   const { cart_products } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
   const { data: session, update } = useSession();
+  const { total } = useCartInfo();
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
   const { geo } = useGeoLocation();
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{code: string, discountAmount: number} | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponMessage, setCouponMessage] = useState<{type: 'error'|'success', text: string} | null>(null);
+
+  const [bankSettings, setBankSettings] = useState({
+    bankName1: "People's Bank",
+    bankBranch1: "Morawaka",
+    bankAccountName1: "P.A.Indira Umanga",
+    bankAccountNo1: "060200160094469",
+    bankName2: "Bank of Ceylon (BOC)",
+    bankBranch2: "Morawaka",
+    bankAccountName2: "Anuhas P A I U",
+    bankAccountNo2: "72790749",
+  });
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
+          setBankSettings({
+            bankName1: data.bankName1 || "People's Bank",
+            bankBranch1: data.bankBranch1 || "Morawaka",
+            bankAccountName1: data.bankAccountName1 || "P.A.Indira Umanga",
+            bankAccountNo1: data.bankAccountNo1 || "060200160094469",
+            bankName2: data.bankName2 || "Bank of Ceylon (BOC)",
+            bankBranch2: data.bankBranch2 || "Morawaka",
+            bankAccountName2: data.bankAccountName2 || "Anuhas P A I U",
+            bankAccountNo2: data.bankAccountNo2 || "72790749",
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching settings in checkout:", err));
+  }, []);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setCouponLoading(true);
+    setCouponMessage(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, cartTotal: total })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAppliedCoupon({ code: data.coupon.code, discountAmount: data.discountAmount });
+        setCouponMessage({ type: 'success', text: `Coupon applied successfully!` });
+      } else {
+        setCouponMessage({ type: 'error', text: data.error || "Invalid coupon" });
+      }
+    } catch (err) {
+      setCouponMessage({ type: 'error', text: "Error validating coupon" });
+    }
+    setCouponLoading(false);
+  };
 
   const handleFileChange = (file: File | null) => {
     if (previewUrl) {
@@ -174,6 +235,8 @@ const CheckoutArea = () => {
           ...data,
           receiptUrl: uploadedReceiptUrl,
           cart_products,
+          couponCode: appliedCoupon?.code,
+          discountAmount: appliedCoupon?.discountAmount
         }),
       });
       if (res.ok) {
@@ -202,6 +265,18 @@ const CheckoutArea = () => {
 
   return (
     <div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .coupon-remove-btn {
+          transition: all 0.3s ease !important;
+        }
+        .coupon-remove-btn::after {
+          background: #dc3545 !important;
+        }
+        .coupon-remove-btn:hover {
+          color: #fff !important;
+          border-color: #dc3545 !important;
+        }
+      ` }} />
       <section className="checkout-area pb-70">
         <div className="container">
 
@@ -300,10 +375,10 @@ const CheckoutArea = () => {
                         <div className="checkout-form-list">
                           <div style={{ background: '#ffffff', border: '1px solid #eaedff', borderRadius: 0, padding: '15px 10px', width: '100%' }}>
                             <ul style={{ color: '#111827', fontSize: 15, lineHeight: '1.8', margin: 0, padding: 0, listStyle: 'none' }}>
-                              <li><strong>Bank Name:</strong> People&apos;s Bank</li>
-                              <li><strong>Branch:</strong> Morawaka</li>
-                              <li><strong>Account Name:</strong> P.A.Indira Umanga</li>
-                              <li><strong>Account No:</strong> 060200160094469</li>
+                              <li><strong>Bank Name:</strong> {bankSettings.bankName1}</li>
+                              <li><strong>Branch:</strong> {bankSettings.bankBranch1}</li>
+                              <li><strong>Account Name:</strong> {bankSettings.bankAccountName1}</li>
+                              <li><strong>Account No:</strong> {bankSettings.bankAccountNo1}</li>
                             </ul>
                           </div>
                         </div>
@@ -312,10 +387,10 @@ const CheckoutArea = () => {
                         <div className="checkout-form-list">
                           <div style={{ background: '#ffffff', border: '1px solid #eaedff', borderRadius: 0, padding: '15px 10px', width: '100%' }}>
                             <ul style={{ color: '#111827', fontSize: 15, lineHeight: '1.8', margin: 0, padding: 0, listStyle: 'none' }}>
-                              <li><strong>Bank Name:</strong> Bank of Ceylon (BOC)</li>
-                              <li><strong>Branch:</strong> Morawaka</li>
-                              <li><strong>Account Name:</strong> Anuhas P A I U</li>
-                              <li><strong>Account No:</strong> 72790749</li>
+                              <li><strong>Bank Name:</strong> {bankSettings.bankName2}</li>
+                              <li><strong>Branch:</strong> {bankSettings.bankBranch2}</li>
+                              <li><strong>Account Name:</strong> {bankSettings.bankAccountName2}</li>
+                              <li><strong>Account No:</strong> {bankSettings.bankAccountNo2}</li>
                             </ul>
                           </div>
                         </div>
@@ -383,7 +458,7 @@ const CheckoutArea = () => {
                 <div className="col-lg-6">
                   <div className="your-order mb-30 mt-40" style={{ maxWidth: '450px', marginLeft: 'auto' }}>
                     <h3>Your order</h3>
-                    <CheckoutOrders cart_products={cart_products} />
+                    <CheckoutOrders cart_products={cart_products} discountAmount={appliedCoupon?.discountAmount} />
                     
                     {/* Coupon Section */}
                     <div className="checkout-coupon-area" style={{ marginTop: '20px', paddingBottom: '20px', borderBottom: '1px solid #eaedff' }}>
@@ -392,16 +467,41 @@ const CheckoutArea = () => {
                         <input 
                           type="text" 
                           placeholder="Coupon Code" 
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          disabled={!!appliedCoupon}
                           style={{ flex: 1, background: '#ffffff', border: '1px solid #eaedff', height: '45px', padding: '0 15px', outline: 'none' }} 
                         />
-                        <button 
-                          type="button" 
-                          className="os-btn os-btn-black" 
-                          style={{ height: '45px', lineHeight: '41px', padding: '0 20px', marginLeft: '10px', border: '2px solid #111' }}
-                        >
-                          Apply Coupon
-                        </button>
+                        {!appliedCoupon ? (
+                          <button 
+                            type="button" 
+                            className="os-btn os-btn-black" 
+                            onClick={handleApplyCoupon}
+                            disabled={couponLoading || !couponCode}
+                            style={{ height: '45px', lineHeight: '41px', padding: '0 20px', marginLeft: '10px', border: '2px solid #111' }}
+                          >
+                            {couponLoading ? "Applying..." : "Apply"}
+                          </button>
+                        ) : (
+                          <button 
+                            type="button" 
+                            className="os-btn coupon-remove-btn" 
+                            onClick={() => {
+                              setAppliedCoupon(null);
+                              setCouponCode("");
+                              setCouponMessage(null);
+                            }}
+                            style={{ height: '45px', lineHeight: '41px', padding: '0 20px', marginLeft: '10px', border: '1px solid #dc3545', color: '#dc3545', background: 'transparent' }}
+                          >
+                            Remove
+                          </button>
+                        )}
                       </div>
+                      {couponMessage && (
+                        <div style={{ marginTop: '10px', fontSize: '14px', color: couponMessage.type === 'error' ? '#dc3545' : '#10b981' }}>
+                          {couponMessage.text}
+                        </div>
+                      )}
                     </div>
 
                     <div className="payment-method">

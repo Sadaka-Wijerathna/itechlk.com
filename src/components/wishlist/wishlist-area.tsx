@@ -7,10 +7,12 @@ import { IProduct } from "@/types/product-d-t";
 import { add_cart_product } from "@/redux/features/cart";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getWishlistProducts, remove_wishlist_product } from "@/redux/features/wishlist";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const WishlistArea = () => {
   const { wishlist } = useAppSelector((state) => state.wishlist);
   const dispatch = useAppDispatch();
+  const { formatPrice } = useCurrency();
   // handle remove
   const handleRemove = (item: IProduct) => {
     dispatch(remove_wishlist_product(item));
@@ -59,7 +61,7 @@ const WishlistArea = () => {
                           </Link>
                         </td>
                         <td className="product-price">
-                          <span className="amount">${product.price}</span>
+                          <span className="amount">{formatPrice(product.price)}</span>
                         </td>
                         <td className="product-quantity">
                           {(product as any).active === false || product.status?.toLowerCase() === "out of stock" ? (
@@ -71,7 +73,7 @@ const WishlistArea = () => {
                           )}
                         </td>
                         <td className="product-subtotal">
-                          <span className="amount">${product.price}</span>
+                          <span className="amount">{formatPrice(product.price)}</span>
                         </td>
                         <td className="product-remove">
                           <button onClick={() => handleRemove(product)}>

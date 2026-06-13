@@ -17,6 +17,14 @@ export async function GET() {
       supportEmail: "support@itechlk.com",
       currencySymbol: "$",
       storeDescription: "Your one-stop shop for premium digital subscriptions and software.",
+      bankName1: "People's Bank",
+      bankBranch1: "Morawaka",
+      bankAccountName1: "P.A.Indira Umanga",
+      bankAccountNo1: "060200160094469",
+      bankName2: "Bank of Ceylon (BOC)",
+      bankBranch2: "Morawaka",
+      bankAccountName2: "Anuhas P A I U",
+      bankAccountNo2: "72790749",
     };
     return NextResponse.json({ ...defaults, ...settings });
   } catch (error) {

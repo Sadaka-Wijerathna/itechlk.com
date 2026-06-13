@@ -6,11 +6,13 @@ import {useEffect} from 'react';
 import useCartInfo from '@/hooks/use-cart-info';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import {add_cart_product,clearCart,getCartProducts,quantityDecrement,remove_product} from '@/redux/features/cart';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const CartArea = () => {
   const { cart_products } = useAppSelector((state) => state.cart);
   const { total } = useCartInfo();
   const dispatch = useAppDispatch();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
@@ -61,7 +63,7 @@ const CartArea = () => {
                             )}
                           </td>
                           <td className="product-price">
-                            <span className="amount">${item.price}</span>
+                            <span className="amount">{formatPrice(item.price)}</span>
                           </td>
                           <td className="product-quantity">
                             <div className="cart-plus-minus">
@@ -74,7 +76,7 @@ const CartArea = () => {
                             </div>
                           </td>
                           <td className="product-subtotal">
-                            <span className="amount">${item.price * item.orderQuantity!}</span>
+                            <span className="amount">{formatPrice(item.price * item.orderQuantity!)}</span>
                           </td>
                           <td onClick={() => dispatch(remove_product(item))} className="product-remove">
                             <button ><i className="fa fa-times"></i></button>
@@ -88,10 +90,6 @@ const CartArea = () => {
                 <div className="row">
                   <div className="col-12">
                     <div className="coupon-all">
-                      <div className="coupon">
-                        <input required id="coupon_code" className="input-text" name="coupon_code" placeholder="Coupon code" type="text" />
-                        <button className="os-btn os-btn-black" name="apply_coupon" type="submit">Apply coupon</button>
-                      </div>
                       <div className="coupon2">
                         <button onClick={() => dispatch(clearCart())} className="os-btn os-btn-black" 
                         name="update_cart" type="button">Clear cart</button>
@@ -104,8 +102,8 @@ const CartArea = () => {
                     <div className="cart-page-total">
                       <h2>Cart totals</h2>
                       <ul className="mb-20">
-                        <li>Subtotal <span>${total.toFixed(2)}</span></li>
-                        <li>Total <span>${total.toFixed(2)}</span></li>
+                        <li>Subtotal <span>{formatPrice(total)}</span></li>
+                        <li>Total <span>{formatPrice(total)}</span></li>
                       </ul>
                       <Link href='/checkout' className="os-btn">
                          Proceed to checkout
