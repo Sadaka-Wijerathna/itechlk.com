@@ -69,7 +69,7 @@ export default function AboutPage() {
               <div className="col-xl-12">
                 <div style={{ background: '#121212', color: '#fff', borderRadius: '16px', padding: '48px' }}>
                   <div className="row align-items-center">
-                    <div className="col-xl-8">
+                    <div className="col-xl-12">
                       <h2 style={{ fontWeight: 600, color: '#fff', marginBottom: '16px' }}>
                         Our <span style={{ color: '#21a8c9' }}>Mission</span>
                       </h2>
@@ -79,16 +79,6 @@ export default function AboutPage() {
                       <p style={{ color: '#aaa', lineHeight: 1.8, margin: 0 }}>
                         Based in Morawaka, Matara, we proudly serve customers island-wide with fast, reliable, and honest service.
                       </p>
-                    </div>
-                    <div className="col-xl-4 text-center mt-30">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {[['5000+', 'Happy Customers'], ['50+', 'Products Available'], ['24/7', 'Customer Support'], ['100%', 'Satisfaction Rate']].map(([num, label]) => (
-                          <div key={label} style={{ background: 'rgba(33,168,201,0.1)', borderRadius: '8px', padding: '12px 24px', border: '1px solid rgba(33,168,201,0.3)' }}>
-                            <span style={{ color: '#21a8c9', fontWeight: 700, fontSize: '20px' }}>{num}</span>
-                            <span style={{ color: '#aaa', marginLeft: '10px', fontSize: '14px' }}>{label}</span>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </div>
