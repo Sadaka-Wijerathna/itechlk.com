@@ -19,6 +19,21 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Old /products/* URLs → redirect to /shop (301 permanent)
+      {
+        source: '/products',
+        destination: '/shop',
+        permanent: true,
+      },
+      {
+        source: '/products/:path*',
+        destination: '/shop',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
