@@ -34,8 +34,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields: title, img, price" }, { status: 400 });
     }
 
-    // Generate slug from title
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now();
+    // Generate clean slug from title
+    let baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    let slug = baseSlug;
+    let counter = 1;
+    while (true) {
+      const existing = await prisma.product.findUnique({ where: { slug } });
+      if (!existing) break;
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
 
     const product = await prisma.product.create({
       data: {

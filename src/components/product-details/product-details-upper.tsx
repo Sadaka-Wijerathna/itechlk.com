@@ -183,7 +183,7 @@ const ProductDetailsUpper = ({
         >
           <div className="product__modal-content product__modal-content-2">
             <h2>
-              <Link href={`/product-details/${product.id}`}>
+              <Link href={`/product-details/${product.slug || product.id}`}>
                 {product.title}
               </Link>
             </h2>

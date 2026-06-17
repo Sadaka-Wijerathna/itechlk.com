@@ -36,7 +36,7 @@ const ProductItem = ({ product }: { product: IProduct }) => {
   return (
     <div className="product__wrapper mb-60 position-relative">
       <div className="product__thumb">
-        <Link href={`/product-details/${product.id}`}>
+        <Link href={`/product-details/${product.slug || product.id}`}>
           <Image src={product.img} alt={product.title} width={255} height={325} style={imgStyle} />
           <Image className="product__thumb-2" src={product.thumb_img} alt={product.title} width={255} height={325} style={imgStyle} />
         </Link>
@@ -76,7 +76,7 @@ const ProductItem = ({ product }: { product: IProduct }) => {
         <div className="product__content-inner">
           <h3 style={{ fontSize: 'inherit', fontWeight: 'inherit', margin: 0 }}>
             <Link
-              href={`/product-details/${product.id}`}
+              href={`/product-details/${product.slug || product.id}`}
               dangerouslySetInnerHTML={{ __html: product.title }}
             />
           </h3>
@@ -90,7 +90,7 @@ const ProductItem = ({ product }: { product: IProduct }) => {
             <span style={{ color: "#cc0000", fontWeight: 600, fontSize: 13, cursor: "default" }}>Out of Stock</span>
           ) : (
             <button
-              onClick={() => router.push(`/product-details/${product.id}`)}
+              onClick={() => router.push(`/product-details/${product.slug || product.id}`)}
               className="cursor-pointer"
             >
               + Select duration

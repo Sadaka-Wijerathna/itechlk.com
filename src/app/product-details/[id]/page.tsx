@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 export const revalidate = 60;
+import { permanentRedirect } from "next/navigation";
 import Wrapper from "@/layout/wrapper";
 import HeaderTwo from "@/layout/headers/header-2";
 import Breadcrumb from "@/components/common/breadcrumb";
@@ -67,6 +68,10 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   const { id } = resolvedParams;
   const products = await getDbProducts();
   const product = products.find((product) => String(product.id) === String(id) || product.slug === String(id));
+
+  if (product && product.slug && String(id) === String(product.id)) {
+    permanentRedirect(`/product-details/${product.slug}`);
+  }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const rates = await getCurrencyRates();

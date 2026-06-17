@@ -23,13 +23,13 @@ const MiniCart = () => {
             {cartItems.map((item, index) => (
               <li key={index}>
                 <div className="cart-img f-left">
-                  <Link href={`/product-details/${item.id}`}>
+                  <Link href={`/product-details/${item.slug || item.id}`}>
                       <Image src={item.img} alt="cart-img" width={75} height={96} />
                   </Link>
                 </div>
                 <div className="cart-content f-left text-start">
                   <h5>
-                    <Link href={`/product-details/${item.id}`}>
+                    <Link href={`/product-details/${item.slug || item.id}`}>
                        {item.title}
                     </Link>
                   </h5>

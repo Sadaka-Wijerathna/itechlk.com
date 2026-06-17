@@ -28,13 +28,13 @@ const SingleSmProduct = ({ product }: { product: IProduct }) => {
     <>
       <div className="features__product-wrapper d-flex mb-20">
         <div className="features__product-thumb mr-15">
-          <Link href={`/product-details/${product.id}`}>
+          <Link href={`/product-details/${product.slug || product.id}`}>
             <Image src={product.img} alt={product.title} width={85} height={100} />
           </Link>
         </div>
         <div className="features__product-content">
           <h5>
-            <Link href={`/product-details/${product.id}`}>{product.title}</Link>
+            <Link href={`/product-details/${product.slug || product.id}`}>{product.title}</Link>
           </h5>
           <div className="price">
             <span>{formatPrice(product.price)}</span>
@@ -45,7 +45,7 @@ const SingleSmProduct = ({ product }: { product: IProduct }) => {
               {(product as any).active === false || product.status?.toLowerCase() === "out of stock" ? (
                 <span className="text-danger" style={{ fontSize: '12px', fontWeight: 600 }}>Out of Stock</span>
               ) : (
-                <button onClick={() => router.push(`/product-details/${product.id}`)}>
+                <button onClick={() => router.push(`/product-details/${product.slug || product.id}`)}>
                   Select duration
                 </button>
               )}

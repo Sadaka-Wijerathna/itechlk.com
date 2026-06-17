@@ -62,7 +62,7 @@ function SortableRow({ p, idx, formatPrice, openEdit, handleDelete, deleting, se
             <img src={p.img} alt={p.title} style={{ width: 44, height: 44, objectFit: "cover", border: "1px solid #ebebeb" }} />
           )}
           <div>
-            <Link href={`/product-details/${p.id}`} className="order__title">{p.title}</Link>
+            <Link href={`/product-details/${p.slug || p.id}`} className="order__title">{p.title}</Link>
             <br /><small style={{ color: "#848b8a" }}>#{p.id.slice(-8)}</small>
           </div>
         </div>

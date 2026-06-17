@@ -31,17 +31,17 @@ const TrendingProductsTwo = ({products}:IProps) => {
         <div className="product__banner p-relative">
           <div className="product__banner-inner p-absolute fix d-none d-lg-block">
             <div className="product__banner-img fix">
-              <Link href={`/product-details/${big_item.id}`}>
+              <Link href={`/product-details/${big_item.slug || big_item.id}`}>
                 <Image src={big_item.big_img!} alt="product-banner" width={905} height={900} />
               </Link>
             </div>
             <div className="product__banner-content p-absolute">
               <h4>
-                <Link href={`/product-details/${big_item.id}`}>
+                <Link href={`/product-details/${big_item.slug || big_item.id}`}>
                   <span dangerouslySetInnerHTML={{ __html: big_item.title }}></span>
                 </Link>
               </h4>
-              <Link href={`/product-details/${big_item.id}`} className="link-btn">
+              <Link href={`/product-details/${big_item.slug || big_item.id}`} className="link-btn">
                 discover now
               </Link>
             </div>

@@ -28,7 +28,7 @@ const BannerProducts = ({ style_2, products, style_3 }: IProps) => {
             >
               <div className="banner__item-2 p-relative mb-30">
                 <div className="banner__thumb fix">
-                  <Link href={`/product-details/${item.id}`} className="w-img">
+                  <Link href={`/product-details/${item.slug || item.id}`} className="w-img">
                     <Image
                       src={item.banner_img!}
                       alt="banner"
@@ -43,13 +43,13 @@ const BannerProducts = ({ style_2, products, style_3 }: IProps) => {
                 >
                   <span>Products {item.category}</span>
                   <h4>
-                    <Link href={`/product-details/${item.id}`}>{item.title}</Link>
+                    <Link href={`/product-details/${item.slug || item.id}`}>{item.title}</Link>
                   </h4>
                   <p style={{ maxWidth: style_3 ? "250px" : "450px" }}>
                     {style_3 ? item.sm_desc.slice(0, 50) : item.sm_desc}
                   </p>
                   <Link
-                    href={`/product-details/${item.id}`}
+                    href={`/product-details/${item.slug || item.id}`}
                     className="os-btn os-btn-2"
                   >
                     buy now / <span>${item.price.toFixed(2)}</span>

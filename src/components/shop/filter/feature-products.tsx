@@ -20,12 +20,12 @@ const FeatureProducts = ({products}:IProps) => {
                   <li key={i} className="mb-20">
                       <div className="featires__product-wrapper d-flex">
                           <div className="features__product-thumb mr-15">
-                              <Link href={`/product-details/${prd.id}`}>
+                              <Link href={`/product-details/${prd.slug || prd.id}`}>
                                 <Image src={prd.img} alt="pro-sm-1" width={86} height={110}/>
                               </Link>
                           </div>
                           <div className="features__product-content">
-                              <h5><Link href={`/product-details/${prd.id}`}>{prd.title}</Link></h5>
+                              <h5><Link href={`/product-details/${prd.slug || prd.id}`}>{prd.title}</Link></h5>
                               <div className="price">
                                   <span>${prd.price.toFixed(2)}</span>
                                   {prd.old_price&&<span className="price-old">${prd.old_price.toFixed(2)}</span>}

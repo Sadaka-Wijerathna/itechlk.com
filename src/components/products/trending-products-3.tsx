@@ -43,23 +43,23 @@ const TrendingProductsThree = ({products,style_2=false}: IProps) => {
                 ))}
               </div>
             <div className="product__banner mb-30">
-              <Link href={`/product-details/${big_item_2.id}`} className="w-img">
+              <Link href={`/product-details/${big_item_2.slug || big_item_2.id}`} className="w-img">
                 <Image src={big_item_2.big_img!} alt="product_img" width={546} height={543} />
               </Link>
             </div>
           </div>
           <div className="col-xl-6 col-lg-6">
             <div className="product__banner w-img pb-25 mb-30 p-relative">
-              <Link href={`/product-details/${big_item_1.id}`} className="w-img">
+              <Link href={`/product-details/${big_item_1.slug || big_item_1.id}`} className="w-img">
                 <Image src={big_item_1.big_img!} alt="product_img" width={546} height={543} />
               </Link>
               <div className="product__banner-content p-absolute">
                 <h4>
-                  <Link href={`/product-details/${big_item_1.id}`}>
+                  <Link href={`/product-details/${big_item_1.slug || big_item_1.id}`}>
                     <span dangerouslySetInnerHTML={{ __html: big_item_1?.title }}></span>
                   </Link>
                 </h4>
-                <Link href={`/product-details/${big_item_1.id}`} className="link-btn">
+                <Link href={`/product-details/${big_item_1.slug || big_item_1.id}`} className="link-btn">
                   discover now
                 </Link>
               </div>

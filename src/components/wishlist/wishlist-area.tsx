@@ -51,12 +51,12 @@ const WishlistArea = () => {
                     {wishlist.map((product, index) => (
                       <tr key={index}>
                         <td className="product-thumbnail">
-                          <Link href={`/product-details/${product.id}`}>
+                          <Link href={`/product-details/${product.slug || product.id}`}>
                               <Image src={product.img} alt="wishlist-img" width={125} height={159} />
                           </Link>
                         </td>
                         <td className="product-name">
-                          <Link href={`/product-details/${product.id}`}>
+                          <Link href={`/product-details/${product.slug || product.id}`}>
                               {product.title}
                           </Link>
                         </td>

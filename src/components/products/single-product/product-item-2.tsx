@@ -39,7 +39,7 @@ const ProductItemTwo = ({ product }: { product: IProduct }) => {
     <div className="product__item mb-40">
       <div className="product__wrapper">
         <div className="product__thumb">
-          <Link href={`/product-details/${product.id}`} className="w-img">
+          <Link href={`/product-details/${product.slug || product.id}`} className="w-img">
             <Image src={product.img} alt={product.title} width={261} height={333} style={imgStyle} />
             <Image
               className="product__thumb-2"
@@ -95,7 +95,7 @@ const ProductItemTwo = ({ product }: { product: IProduct }) => {
               <a href="#"><i className="fal fa-star"></i></a>
             </div>
             <h4>
-              <Link href={`/product-details/${product.id}`}>
+              <Link href={`/product-details/${product.slug || product.id}`}>
                 {product.title}
               </Link>
             </h4>

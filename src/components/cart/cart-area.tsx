@@ -48,12 +48,12 @@ const CartArea = () => {
                       {cart_products.map((item, index) => (
                         <tr key={index}>
                           <td className="product-thumbnail">
-                            <Link href={`/product-details/${item.id}`}>
+                            <Link href={`/product-details/${item.slug || item.id}`}>
                                 <Image src={item.img} alt="cart_img" width={125} height={160} />
                             </Link>
                           </td>
                           <td className="product-name">
-                            <Link href={`/product-details/${item.id}`}>
+                            <Link href={`/product-details/${item.slug || item.id}`}>
                                {item.title}
                             </Link>
                             {item.selectedDuration && (

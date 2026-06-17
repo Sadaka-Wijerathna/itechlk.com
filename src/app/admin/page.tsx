@@ -125,7 +125,7 @@ export default async function AdminDashboard() {
                 <tr key={p.id}>
                   <td>
                     <Link
-                      href={`/product-details/${p.id}`}
+                      href={`/product-details/${p.slug || p.id}`}
                       className="order__title"
                     >
                       {p.title}

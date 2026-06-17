@@ -23,7 +23,7 @@ const imgStyle = {
 
 const ProductListItem = ({ product }: IProps) => {
   const router = useRouter();
-  const { id, img, details, title, old_price, discount, thumb_img, price, sm_desc } = product || {};
+  const { id, slug, img, details, title, old_price, discount, thumb_img, price, sm_desc } = product || {};
   const { cart_products } = useAppSelector((state) => state.cart);
   const { wishlist } = useAppSelector((state) => state.wishlist);
   const { compare_products } = useAppSelector((state) => state.compare);
@@ -45,7 +45,7 @@ const ProductListItem = ({ product }: IProps) => {
       <div className="row">
         <div className="col-xl-4 col-lg-4 col-4">
           <div className="product__thumb">
-            <Link href={`/product-details/${id}`}>
+            <Link href={`/product-details/${slug || id}`}>
               <Image src={img} alt={title} width={255} height={325} style={imgStyle} />
               <Image src={thumb_img} alt={title} width={255} height={325} style={imgStyle} className="product__thumb-2" />
             </Link>
@@ -66,7 +66,7 @@ const ProductListItem = ({ product }: IProps) => {
         <div className="col-xl-8 col-lg-8 col-8">
           <div className="product__content p-relative">
             <div className="product__content-inner list">
-              <h4><Link href={`/product-details/${id}`}>{title}</Link></h4>
+              <h4><Link href={`/product-details/${slug || id}`}>{title}</Link></h4>
               <div className="product__price-2 mb-10">
                 <span>{formatPrice(price)}</span>
                 {old_price && <span className="old-price">{formatPrice(old_price)}</span>}
@@ -87,7 +87,7 @@ const ProductListItem = ({ product }: IProps) => {
                 </span>
               ) : (
                 <button
-                  onClick={() => router.push(`/product-details/${id}`)}
+                  onClick={() => router.push(`/product-details/${slug || id}`)}
                   className="add-cart-btn mr-10 cursor-pointer"
                 >
                   Select duration
