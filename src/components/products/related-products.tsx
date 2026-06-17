@@ -18,7 +18,7 @@ const RelatedProducts = ({ product_data, product }: IProps) => {
                 <h2 style={{ fontWeight: 600 }}>Related <span style={{ color: '#21a8c9' }}>Products</span></h2>
               </div>
               <div className="section__sub-title">
-                <p>Mirum est notare quam littera gothica quam nunc putamus parum claram!</p>
+                <p>More digital subscriptions you might like — all delivered instantly in Sri Lanka.</p>
               </div>
             </div>
           </div>

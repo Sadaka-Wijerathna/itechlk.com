@@ -62,8 +62,7 @@ const BlogArea = ({ style_2, style_3 }: IProps) => {
                 </div>
                 <div className="section__sub-title">
                   <p>
-                    Mirum est notare quam littera gothica quam nunc putamus
-                    parum claram!
+                    Tips, guides &amp; updates on digital subscriptions, AI tools, streaming, and tech in Sri Lanka.
                   </p>
                 </div>
               </div>

@@ -8,22 +8,22 @@ const footerWidget = [
     id: 1,
     title: 'information',
     footer__links: [
-      { list: 'About Us' },
-      { list: 'Careers' },
-      { list: 'Delivery Inforamtion' },
-      { list: 'Privacy Policy' },
-      { list: 'Terms & Condition' },
+      { list: 'About Us', href: '/about' },
+      { list: 'Careers', href: '/about#careers' },
+      { list: 'Delivery Information', href: '/shipping-policy' },
+      { list: 'Privacy Policy', href: '/privacy-policy' },
+      { list: 'Terms & Conditions', href: '/terms' },
     ]
   },
   {
     id: 2,
     title: 'Customer Service',
     footer__links: [
-      { list: 'Shipping Policy' },
-      { list: 'Help & Contact Us' },
-      { list: 'Returns & Refunds' },
-      { list: 'Online Stores' },
-      { list: 'Terms & Conditions' },
+      { list: 'Shipping Policy', href: '/shipping-policy' },
+      { list: 'Help & Contact Us', href: '/contact' },
+      { list: 'Returns & Refunds', href: '/returns' },
+      { list: 'Shop', href: '/shop' },
+      { list: 'Blog', href: '/blog' },
     ]
   },
 ]
@@ -90,7 +90,7 @@ const Footer = ({ style_2 }: { style_2?: boolean }) => {
                       <div className="footer__links">
                         <ul>
                           {item.footer__links.map((link, index) => (
-                            <li key={index}><a href="#">{link.list}</a></li>
+                            <li key={index}><Link href={link.href}>{link.list}</Link></li>
                           ))}
                         </ul>
                       </div>

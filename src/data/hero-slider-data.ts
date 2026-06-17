@@ -12,16 +12,16 @@ const hero_slider_one: IHeroSlider[] = [
   {
     id: 2,
     bgImg: '/assets/img/slider/slider-2.jpg',
-    title: 'Think Different &<br /> Do it otherwise',
+    title: 'Save Big on<br /> AI &amp; Streaming',
     subtitle:
-      'Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum.',
+      'Get ChatGPT, Gemini, Spotify, Netflix &amp; more at Sri Lanka\'s lowest prices. Instant delivery, 100% genuine accounts.',
   },
   {
     id: 3,
     bgImg: '/assets/img/slider/slider-3.jpg',
-    title: 'High Beam<br /> by Tom Chung',
+    title: 'VPNs, Software<br /> &amp; Creative Tools',
     subtitle:
-      'High Beam is an adjustable desk or shelf light that offers a wide variety of lighting possibilities',
+      'ExpressVPN, Adobe Creative Cloud, Microsoft 365 and more — all available in LKR with local payment support.',
   },
 ];
 
@@ -63,16 +63,16 @@ const hero_slider_four: IHeroSlider[] = [
   {
     id: 2,
     bgImg: '/assets/img/slider/slider-2.jpg',
-    title: 'Think Different &<br /> Do it otherwise',
+    title: 'Save Big on<br /> AI &amp; Streaming',
     subtitle:
-      'As rich and unique as the coffee beans it is intended for, this little scoop will make your morning ritual a special occasion every day.',
+      'Get ChatGPT, Gemini, Spotify, Netflix &amp; more at Sri Lanka\'s lowest prices. Instant delivery, 100% genuine accounts.',
   },
   {
     id: 3,
     bgImg: '/assets/img/slider/slider-3.jpg',
-    title: 'High Beam <br /> by Tom Chung',
+    title: 'VPNs, Software<br /> &amp; Creative Tools',
     subtitle:
-      'As rich and unique as the coffee beans it is intended for, this little scoop will make your morning ritual a special occasion every day.',
+      'ExpressVPN, Adobe Creative Cloud, Microsoft 365 and more — all available in LKR with local payment support.',
   },
 ];
 

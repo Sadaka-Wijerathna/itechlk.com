@@ -73,6 +73,10 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || '',
   },
+  other: {
+    'geo.region': 'LK',
+    'geo.placename': 'Sri Lanka',
+  },
 };
 
 const poppins = Poppins({
@@ -80,6 +84,44 @@ const poppins = Poppins({
   subsets: ["latin"],
   variable: "--tp-ff-body",
 });
+
+const localBusinessJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'OnlineStore',
+  '@id': 'https://www.itechlk.com/#localbusiness',
+  name: 'ITechLK Store',
+  url: 'https://www.itechlk.com',
+  logo: 'https://www.itechlk.com/assets/img/logo/logo.png',
+  image: 'https://www.itechlk.com/assets/img/logo/logo.png',
+  description: 'Sri Lanka\'s leading digital marketplace for premium subscriptions — AI Tools, Streaming, VPNs, Creative Software and more.',
+  telephone: '+94701751530',
+  email: 'indiraumamga@gmail.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Dewalegma, Dellawa, Morawaka',
+    addressLocality: 'Matara',
+    addressRegion: 'Southern Province',
+    addressCountry: 'LK',
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Sri Lanka',
+  },
+  currenciesAccepted: 'LKR',
+  priceRange: '$$',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+      opens: '00:00',
+      closes: '23:59',
+    },
+  ],
+  sameAs: [
+    'https://www.facebook.com/itechlk',
+    'https://www.instagram.com/itechlk',
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -89,6 +131,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={`${poppins.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        />
         <NextAuthProvider>
           <CurrencyProvider>
             <Providers>

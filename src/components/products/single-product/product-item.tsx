@@ -74,12 +74,12 @@ const ProductItem = ({ product }: { product: IProduct }) => {
       </div>
       <div className="product__content p-relative">
         <div className="product__content-inner">
-          <h4>
+          <h3 style={{ fontSize: 'inherit', fontWeight: 'inherit', margin: 0 }}>
             <Link
               href={`/product-details/${product.id}`}
               dangerouslySetInnerHTML={{ __html: product.title }}
             />
-          </h4>
+          </h3>
           <div className="product__price transition-3">
             <span>{formatPrice(product.price)}</span>
             {product.old_price && <span className="old-price">{formatPrice(product.old_price)}</span>}

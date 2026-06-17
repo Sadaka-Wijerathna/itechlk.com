@@ -1,58 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import IBlogType from "@/types/blog-d-t";
 
-const BlogSidebar = () => {
-  const [recentBlogs, setRecentBlogs] = useState<IBlogType[]>([]);
-  const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
-  const [archives, setArchives] = useState<{ label: string; count: number }[]>([]);
-  const [loading, setLoading] = useState(true);
+type SidebarProps = {
+  allBlogs?: IBlogType[];
+};
 
-  useEffect(() => {
-    const fetchSidebarData = async () => {
-      try {
-        const res = await fetch("/api/blogs");
-        const data: IBlogType[] = await res.json();
-        const activeBlogs = Array.isArray(data) ? data.filter((b) => b.active) : [];
+const BlogSidebar = ({ allBlogs = [] }: SidebarProps) => {
+  // ── Derive all sidebar data synchronously from server-passed props ──────
+  const recentBlogs = allBlogs.slice(0, 4);
 
-        // ── Recent Posts: latest 4 ──────────────────────────────────────────
-        setRecentBlogs(activeBlogs.slice(0, 4));
+  const catMap: Record<string, number> = {};
+  allBlogs.forEach((b) => {
+    const cat = b.category || "Uncategorized";
+    catMap[cat] = (catMap[cat] || 0) + 1;
+  });
+  const categories = Object.entries(catMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => ({ name, count }));
 
-        // ── Categories: count per category ─────────────────────────────────
-        const catMap: Record<string, number> = {};
-        activeBlogs.forEach((b) => {
-          const cat = b.category || "Uncategorized";
-          catMap[cat] = (catMap[cat] || 0) + 1;
-        });
-        setCategories(
-          Object.entries(catMap)
-            .sort((a, b) => b[1] - a[1])
-            .map(([name, count]) => ({ name, count }))
-        );
-
-        // ── Archives: group by Month Year ──────────────────────────────────
-        const archiveMap: Record<string, number> = {};
-        activeBlogs.forEach((b) => {
-          const d = new Date(b.createdAt || b.date || new Date().toISOString());
-          const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-          archiveMap[label] = (archiveMap[label] || 0) + 1;
-        });
-        setArchives(
-          Object.entries(archiveMap)
-            .slice(0, 6)
-            .map(([label, count]) => ({ label, count }))
-        );
-      } catch (err) {
-        console.error("BlogSidebar fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSidebarData();
-  }, []);
+  const archiveMap: Record<string, number> = {};
+  allBlogs.forEach((b) => {
+    const d = new Date((b as any).createdAt || (b as any).date || new Date().toISOString());
+    const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    archiveMap[label] = (archiveMap[label] || 0) + 1;
+  });
+  const archives = Object.entries(archiveMap)
+    .slice(0, 6)
+    .map(([label, count]) => ({ label, count }));
 
   return (
     <div className="sidebar__wrapper">
@@ -81,9 +57,7 @@ const BlogSidebar = () => {
         </div>
         <div className="sidebar__widget-content">
           <div className="sidebar__links">
-            {loading ? (
-              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
-            ) : categories.length === 0 ? (
+            {categories.length === 0 ? (
               <p className="text-muted" style={{ fontSize: "13px" }}>No categories yet.</p>
             ) : (
               <ul>
@@ -91,16 +65,7 @@ const BlogSidebar = () => {
                   <li key={name}>
                     <Link href={`/blog?category=${encodeURIComponent(name)}`}>
                       {name}
-                      <span
-                        style={{
-                          float: "right",
-                          background: "#f5f5f5",
-                          borderRadius: "10px",
-                          padding: "0 7px",
-                          fontSize: "12px",
-                          color: "#666",
-                        }}
-                      >
+                      <span style={{ float: "right", background: "#f5f5f5", borderRadius: "10px", padding: "0 7px", fontSize: "12px", color: "#666" }}>
                         {count}
                       </span>
                     </Link>
@@ -119,9 +84,7 @@ const BlogSidebar = () => {
         </div>
         <div className="sidebar__widget-content">
           <div className="rc__post-wrapper">
-            {loading ? (
-              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
-            ) : recentBlogs.length === 0 ? (
+            {recentBlogs.length === 0 ? (
               <p className="text-muted" style={{ fontSize: "13px" }}>No posts yet.</p>
             ) : (
               <ul>
@@ -130,7 +93,7 @@ const BlogSidebar = () => {
                     <div className="rc__post-thumb mr-20">
                       <Link href={`/blog/${b.slug}`}>
                         <img
-                          src={b.image || b.img}
+                          src={b.image || (b as any).img}
                           alt={b.title}
                           width={70}
                           height={70}
@@ -147,10 +110,8 @@ const BlogSidebar = () => {
                       </h6>
                       <div className="rc__meta">
                         <span>
-                          {new Date(b.createdAt || b.date || new Date().toISOString()).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
+                          {new Date((b as any).createdAt || (b as any).date || new Date().toISOString()).toLocaleDateString("en-US", {
+                            month: "short", day: "numeric", year: "numeric",
                           })}
                         </span>
                       </div>
@@ -170,26 +131,15 @@ const BlogSidebar = () => {
         </div>
         <div className="sidebar__widget-content">
           <div className="sidebar__links">
-            {loading ? (
-              <p className="text-muted" style={{ fontSize: "13px" }}>Loading...</p>
-            ) : archives.length === 0 ? (
+            {archives.length === 0 ? (
               <p className="text-muted" style={{ fontSize: "13px" }}>No posts yet.</p>
             ) : (
               <ul>
                 {archives.map(({ label, count }) => (
                   <li key={label}>
-                    <a href="#">
+                    <a href={`/blog?archive=${encodeURIComponent(label)}`}>
                       {label}
-                      <span
-                        style={{
-                          float: "right",
-                          background: "#f5f5f5",
-                          borderRadius: "10px",
-                          padding: "0 7px",
-                          fontSize: "12px",
-                          color: "#666",
-                        }}
-                      >
+                      <span style={{ float: "right", background: "#f5f5f5", borderRadius: "10px", padding: "0 7px", fontSize: "12px", color: "#666" }}>
                         {count}
                       </span>
                     </a>

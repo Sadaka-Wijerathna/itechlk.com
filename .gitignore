@@ -40,3 +40,6 @@ next-env.d.ts
 
 # local admin/seed scripts (may contain credentials - never commit)
 /scripts/
+
+# local audits
+/itechlk.com-audit/

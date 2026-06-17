@@ -9,6 +9,7 @@ import BlogPostboxItem from "./single-blog/blog-postbox-item";
 // props type
 type IProps = {
   blogs: IBlogType[];
+  allBlogs?: IBlogType[];
   left_side?: boolean;
   no_sidebar?: boolean;
   blog_col?: string;
@@ -16,7 +17,7 @@ type IProps = {
   blog_3?: boolean;
 };
 
-const BlogStandardArea = ({blogs, left_side,no_sidebar,blog_col,blog_col_cls,blog_3}:IProps) => {
+const BlogStandardArea = ({blogs, allBlogs, left_side,no_sidebar,blog_col,blog_col_cls,blog_3}:IProps) => {
   const {currentItems,handlePageClick,pageCount} = usePagination<IBlogType>(blogs,blog_3?6:4);
   return (
     <section className="blog__area pt-100 pb-100">
@@ -25,7 +26,7 @@ const BlogStandardArea = ({blogs, left_side,no_sidebar,blog_col,blog_col_cls,blo
           <div className="row">
             {left_side && !no_sidebar && (
               <div className="col-xl-3 col-lg-4">
-                <BlogSidebar />
+                <BlogSidebar allBlogs={allBlogs || blogs} />
               </div>
             )}
             <div
@@ -55,7 +56,7 @@ const BlogStandardArea = ({blogs, left_side,no_sidebar,blog_col,blog_col_cls,blo
             </div>
             {!left_side && !no_sidebar && (
               <div className="col-xl-3 col-lg-4 offset-xl-1">
-                <BlogSidebar />
+                <BlogSidebar allBlogs={allBlogs || blogs} />
               </div>
             )}
           </div>

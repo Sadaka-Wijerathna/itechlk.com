@@ -32,6 +32,17 @@ const nextConfig = {
         destination: '/shop',
         permanent: true,
       },
+      // Redirect old/missing indexed URLs to prevent 404s and preserve SEO
+      {
+        source: '/shipping',
+        destination: '/shipping-policy',
+        permanent: true,
+      },
+      {
+        source: '/dashboard',
+        destination: '/account',
+        permanent: true,
+      },
     ];
   },
 };

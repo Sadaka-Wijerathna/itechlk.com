@@ -14,7 +14,7 @@ import BlogArea from "@/components/blogs/blog-area";
 import Footer from "@/layout/footers/footer";
 
 export const metadata: Metadata = {
-  title: 'Premium Digital Subscriptions in Sri Lanka',
+  title: 'ITechLK Store | Premium Digital Subscriptions in Sri Lanka',
   description: 'Buy AI Tools, Streaming, VPN, Creative Software & more digital subscriptions in Sri Lanka. Fast delivery, lowest prices, trusted by thousands.',
   alternates: {
     canonical: '/',
@@ -58,6 +58,43 @@ const getJsonLd = (url: string) => ({
         target: { '@type': 'EntryPoint', urlTemplate: `${url}/shop?search={search_term_string}` },
         'query-input': 'required name=search_term_string',
       },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How do I buy digital subscriptions in Sri Lanka?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Simply browse our shop at ITechLK, select your product, choose a duration, and complete the checkout. You\'ll receive your subscription details via email instantly.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What payment methods does ITechLK accept?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'ITechLK accepts local Sri Lankan payment methods including bank transfers, and online payments, making it easy to buy subscriptions in LKR.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is instant delivery guaranteed?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. All digital subscriptions are delivered instantly to your email address after payment confirmation. Our team also provides 24/7 support.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What subscriptions are available at ITechLK?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'ITechLK offers AI tools (ChatGPT, Gemini), streaming services (Netflix, Spotify, YouTube Premium), VPNs (ExpressVPN), creative software (CapCut, Adobe), and more.',
+          },
+        },
+      ],
     },
   ],
 });

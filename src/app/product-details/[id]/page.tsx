@@ -13,16 +13,21 @@ import { getCurrencyRates } from "@/lib/currency";
 
 export async function generateStaticParams() {
   const products = await getDbProducts();
-  return products.map((product) => ({
-    id: String(product.id),
-  }));
+  const params: { id: string }[] = [];
+  products.forEach((product) => {
+    params.push({ id: String(product.id) });
+    if (product.slug) {
+      params.push({ id: product.slug });
+    }
+  });
+  return params;
 }
 
 export async function generateMetadata(props: PageParamsProps): Promise<Metadata> {
   const resolvedParams = await props.params;
   const { id } = resolvedParams;
   const product_data = await getDbProducts();
-  const product = product_data.find((item) => String(item.id) === String(id));
+  const product = product_data.find((item) => String(item.id) === String(id) || item.slug === String(id));
 
   if (!product) {
     return { title: 'Product Not Found' };
@@ -33,16 +38,18 @@ export async function generateMetadata(props: PageParamsProps): Promise<Metadata
     ? `${product.sm_desc} Available in Sri Lanka at ITechLK Store. Fast delivery, best prices.`
     : `Buy ${product.title} digital subscription in Sri Lanka. Best price, fast delivery at ITechLK Store.`;
 
+  const canonicalUrl = `/product-details/${product.slug || product.id}`;
+
   return {
     title,
     description,
     alternates: {
-      canonical: `/product-details/${id}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: `${product.title} | ITechLK Store`,
       description,
-      url: `/product-details/${id}`,
+      url: canonicalUrl,
       type: 'website',
       images: product.img ? [{ url: product.img, alt: product.title }] : [],
     },
@@ -59,7 +66,7 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   const resolvedParams = await props.params;
   const { id } = resolvedParams;
   const products = await getDbProducts();
-  const product = products.find((product) => String(product.id) === String(id));
+  const product = products.find((product) => String(product.id) === String(id) || product.slug === String(id));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const rates = await getCurrencyRates();
@@ -79,7 +86,7 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
     },
     offers: {
       '@type': 'Offer',
-      url: `${siteUrl}/product-details/${product.id}`,
+      url: `${siteUrl}/product-details/${product.slug || product.id}`,
       priceCurrency: 'LKR',
       price: lkrPrice || '',
       availability: (product as any).status === 'Out of Stock'

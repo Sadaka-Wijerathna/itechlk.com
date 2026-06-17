@@ -16,6 +16,7 @@ export async function getDbProducts(): Promise<IProduct[]> {
 
   return products.map((p) => ({
     id: p.id as any, // casting to any since IProduct expects number but we have string
+    slug: p.slug,
     img: p.img,
     thumb_img: p.thumbImg,
     big_img: p.img, // fallback

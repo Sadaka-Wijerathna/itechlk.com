@@ -1,5 +1,6 @@
 export interface IProduct {
     id: number;
+    slug?: string;
     img: string;
     trending?: boolean;
     topRated?: boolean;

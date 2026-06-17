@@ -34,8 +34,7 @@ function TrendingProducts({ products, style_2 = false, container = 'container' }
               </div>
               <div className="section__sub-title p-relative">
                 <p>
-                  Mirum est notare quam littera gothica quam nunc putamus parum
-                  claram!
+                  Sri Lanka&apos;s best-selling digital subscriptions at unbeatable prices — delivered instantly to your inbox.
                 </p>
               </div>
             </div>

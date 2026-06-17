@@ -26,10 +26,10 @@ export default function robots(): MetadataRoute.Robots {
         crawlDelay: 1,
       },
       // Block AI crawlers that scrape content without permission
+      // Note: Google-Extended is allowed so we appear in Google AI Overviews
       {
         userAgent: [
           'GPTBot',
-          'Google-Extended',
           'CCBot',
           'PerplexityBot',
           'Bytespider',
@@ -43,6 +43,5 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
-    host: siteUrl,
   };
 }
