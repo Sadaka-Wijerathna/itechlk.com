@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.x"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",
@@ -23,7 +23,7 @@
     "@popperjs/core": "^2.11.8",
     "@prisma/client": "^5.22.0",
     "@reduxjs/toolkit": "^2.10.1",
-    "@studio-freight/lenis": "^1.0.42",
+
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "bcrypt": "^6.0.0",

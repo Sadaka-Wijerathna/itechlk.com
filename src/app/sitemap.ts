@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getDbProducts } from '@/lib/db-products';
 import prisma from '@/lib/prisma';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages

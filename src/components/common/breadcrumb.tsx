@@ -9,7 +9,7 @@ type IProps = {
 };
 
 const Breadcrumb = ({ title, subtitle }: IProps) => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const pathname = usePathname();
   const fullUrl = `${siteUrl}${pathname}`;
   

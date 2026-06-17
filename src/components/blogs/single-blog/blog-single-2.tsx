@@ -6,7 +6,7 @@ const BlogSingleTwo = ({ blog }: { blog: IBlogType }) => {
   return (
     <div key={blog.id} className="blog__slider-item">
       <div className="blog-thumb m-img">
-        <Image src={blog.image || blog.img || ''} alt="blog-img" width={543} height={543} />
+        <Image src={blog.image || blog.img || ''} alt={blog.title} width={543} height={543} />
         <Link href={`/blog-details/${blog.id}`} className="btn">
           <i className="fa fa-link"></i>
         </Link>

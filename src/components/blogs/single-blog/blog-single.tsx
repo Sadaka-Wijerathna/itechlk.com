@@ -7,7 +7,7 @@ const BlogSingle = ({ item }: { item: IBlogType }) => {
     <div className="blog__item mb-30">
       <div className="blog__thumb fix">
         <Link href={`/blog-details/${item.id}`} className="w-img">
-          <Image src={item.image || item.img || ''} alt="blog" width={352} height={226} />
+          <Image src={item.image || item.img || ''} alt={item.title} width={352} height={226} />
         </Link>
       </div>
       <div className="blog__content">

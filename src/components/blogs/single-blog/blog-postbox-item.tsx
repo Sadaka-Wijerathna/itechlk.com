@@ -23,7 +23,7 @@ const BlogPostboxItem = ({blog,blog_col_cls=false}:IProps) => {
     <div className={`blog__item mb-60 ${blog_col_cls?'':'blog__border-bottom pb-60'}`}>
       <div className="blog__thumb fix">
         <Link href={`/blog/${blog.slug}`} className="w-img">
-          <img src={blog.image || blog.img} alt="blog" style={{ width: '100%', height: 'auto' }} />
+          <img src={blog.image || blog.img} alt={blog.title} style={{ width: '100%', height: 'auto' }} />
         </Link>
       </div>
       <div className="blog__content">

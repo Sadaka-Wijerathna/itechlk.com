@@ -9,7 +9,7 @@ import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
 
 export const viewport = {
   themeColor: '#D55433',

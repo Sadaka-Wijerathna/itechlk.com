@@ -37,7 +37,8 @@ const ProductItem = ({ product }: { product: IProduct }) => {
     <div className="product__wrapper mb-60 position-relative">
       <div className="product__thumb">
         <Link href={`/product-details/${product.id}`}>
-       <Image src={product.img} alt="product-img" width={255} height={325} style={imgStyle} /> <Image className="product__thumb-2" src={product.thumb_img} alt="product-img" width={255} height={325} style={imgStyle} />
+          <Image src={product.img} alt={product.title} width={255} height={325} style={imgStyle} />
+          <Image className="product__thumb-2" src={product.thumb_img} alt={product.title} width={255} height={325} style={imgStyle} />
         </Link>
         <div className="product__action transition-3">
           <a

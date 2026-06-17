@@ -61,7 +61,7 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   const products = await getDbProducts();
   const product = products.find((product) => String(product.id) === String(id));
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const rates = await getCurrencyRates();
   const lkrRate = rates.LKR || 325;
   const lkrPrice = product ? Math.round(product.price * lkrRate) : 0;

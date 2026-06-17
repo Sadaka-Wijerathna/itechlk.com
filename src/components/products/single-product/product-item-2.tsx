@@ -40,11 +40,11 @@ const ProductItemTwo = ({ product }: { product: IProduct }) => {
       <div className="product__wrapper">
         <div className="product__thumb">
           <Link href={`/product-details/${product.id}`} className="w-img">
-            <Image src={product.img} alt="product-img" width={261} height={333} style={imgStyle} />
+            <Image src={product.img} alt={product.title} width={261} height={333} style={imgStyle} />
             <Image
               className="product__thumb-2"
               src={product.thumb_img}
-              alt="product-img"
+              alt={product.title}
               width={261} height={333} style={imgStyle}
             />
           </Link>

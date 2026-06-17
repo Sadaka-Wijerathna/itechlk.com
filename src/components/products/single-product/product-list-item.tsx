@@ -46,8 +46,8 @@ const ProductListItem = ({ product }: IProps) => {
         <div className="col-xl-4 col-lg-4 col-4">
           <div className="product__thumb">
             <Link href={`/product-details/${id}`}>
-              <Image src={img} alt="product-img" width={255} height={325} style={imgStyle} />
-              <Image src={thumb_img} alt="product-img" width={255} height={325} style={imgStyle} className="product__thumb-2" />
+              <Image src={img} alt={title} width={255} height={325} style={imgStyle} />
+              <Image src={thumb_img} alt={title} width={255} height={325} style={imgStyle} className="product__thumb-2" />
             </Link>
             <div className="product__sale">
               {(product as any).active === false || product.status?.toLowerCase() === "out of stock" ? (

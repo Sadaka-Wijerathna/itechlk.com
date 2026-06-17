@@ -36,7 +36,7 @@ export const sendVerificationEmail = async (email: string, code: string) => {
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const resetUrl = `${siteUrl}/reset-password?token=${token}`;
 
   const mailOptions = {

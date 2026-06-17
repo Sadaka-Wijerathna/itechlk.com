@@ -18,7 +18,7 @@ type IProps = {
 }
 
 const BlogDetailsArea = ({blog}:IProps) => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const dateStr = blog.createdAt || blog.date || new Date().toISOString();
   const date = new Date(dateStr);
   const formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });

@@ -60,7 +60,7 @@ export default async function DynamicBlogDetailsPage({ params }: Props) {
     },
   });
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itechlk.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
   const cleanDesc = blog?.content 
     ? blog.content.replace(/<[^>]*>/g, '').substring(0, 155) + '...'
     : 'Read the latest article on ITechLK Blog.';

@@ -29,7 +29,7 @@ const SingleSmProduct = ({ product }: { product: IProduct }) => {
       <div className="features__product-wrapper d-flex mb-20">
         <div className="features__product-thumb mr-15">
           <Link href={`/product-details/${product.id}`}>
-            <Image src={product.img} alt="pro-sm-1" width={85} height={100} />
+            <Image src={product.img} alt={product.title} width={85} height={100} />
           </Link>
         </div>
         <div className="features__product-content">

@@ -66,7 +66,7 @@ const ProductDetailsUpper = ({
                         <div className="product__nav-img w-img" onClick={() => handleImageActive(img)}>
                           <Image
                             src={img}
-                            alt="product-img"
+                            alt={product.title}
                             width={92}
                             height={117}
                             style={{ objectFit: "contain" }}
@@ -82,7 +82,7 @@ const ProductDetailsUpper = ({
                 <div className="product__modal-img product__thumb w-img">
                   <Image
                     src={activeImg}
-                    alt="product-img"
+                    alt={product.title}
                     width={418}
                     height={534}
                     style={{ objectFit: "contain" }}
@@ -123,7 +123,7 @@ const ProductDetailsUpper = ({
                 <div className="product__modal-img w-img">
                   <Image
                     src={activeImg}
-                    alt="product-img"
+                    alt={product.title}
                     width={327}
                     height={416}
                     style={{ objectFit: "contain" }}
@@ -163,7 +163,7 @@ const ProductDetailsUpper = ({
                         <div className="product__nav-img w-img" onClick={() => handleImageActive(img)}>
                           <Image
                             src={img}
-                            alt="product-img"
+                            alt={product.title}
                             width={92}
                             height={117}
                             style={{ objectFit: "contain" }}
