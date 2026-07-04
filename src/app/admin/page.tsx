@@ -133,7 +133,7 @@ export default async function AdminDashboard() {
                     <small style={{ color: "#848b8a" }}>{p.brand}</small>
                   </td>
                   <td>{p.category}</td>
-                  <td>Rs. {Math.round(p.price * lkrRate).toLocaleString()}</td>
+                  <td>Rs. {Math.round(p.price).toLocaleString()}</td>
                   <td>
                     <span
                       style={{
