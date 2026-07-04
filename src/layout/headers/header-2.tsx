@@ -45,7 +45,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                   </div>
                   <div className="logo">
                     <Link href="/">
-                      <Image src={logo} alt="logo" priority />
+                      <Image src={logo} alt="iTechLK Store logo" width={154} height={30} priority />
                     </Link>
                   </div>
                 </div>
@@ -64,6 +64,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                       <li className="d-inline-block">
                         <button
                           className="search-toggle"
+                          aria-label="Search"
                           onClick={() => setShowSearch(true)}
                         >
                           <i className="ion-ios-search-strong"></i>
@@ -73,6 +74,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                         <select
                           value={currency}
                           onChange={(e) => setCurrency(e.target.value as Currency)}
+                          aria-label="Select currency"
                           style={{ border: 'none', background: 'transparent', cursor: 'pointer', outline: 'none', fontWeight: 500, color: '#333' }}
                         >
                           <option value="USD">USD</option>
@@ -81,7 +83,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                         </select>
                       </li>
                       <li className="d-inline-block">
-                        <Link href="/wishlist" className="action-btn">
+                        <Link href="/wishlist" className="action-btn" aria-label="Wishlist">
                           <i className="far fa-heart"></i>
                         </Link>
                       </li>
@@ -91,7 +93,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                             <Link href="/account" className="os-btn os-btn-2 d-none d-md-inline-block" style={{ height: '38px', lineHeight: '36px', padding: '0 20px' }}>
                               My Account
                             </Link>
-                            <Link href="/account" className="action-btn d-inline-block d-md-none">
+                            <Link href="/account" className="action-btn d-inline-block d-md-none" aria-label="My Account">
                               <i className="far fa-user"></i>
                             </Link>
                           </>
@@ -100,7 +102,7 @@ const HeaderTwo = ({ hideCart = false }: { hideCart?: boolean }) => {
                             <Link href="/login" className="os-btn os-btn-2 d-none d-md-inline-block" style={{ height: '38px', lineHeight: '36px', padding: '0 20px' }}>
                               Login
                             </Link>
-                            <Link href="/login" className="action-btn d-inline-block d-md-none">
+                            <Link href="/login" className="action-btn d-inline-block d-md-none" aria-label="Login">
                               <i className="far fa-user"></i>
                             </Link>
                           </>

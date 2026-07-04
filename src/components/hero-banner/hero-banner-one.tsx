@@ -1,18 +1,9 @@
 'use client'
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Slider from "react-slick";
 import { HeroSliderData } from "@/data/hero-slider-data";
-
-
-// slick setting
-const settings = {
-  autoplay: false,
-  autoplaySpeed: 10000,
-  dots: true,
-  fade: true,
-  arrows: false,
-};
 
 // prop type
 type IProps = {
@@ -22,16 +13,29 @@ type IProps = {
 
 const HeroSliderOne = ({ style_2=false,slider_cls }:IProps) => {
   const {hero_slider_one} = HeroSliderData;
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // slick setting
+  const settings = {
+    autoplay: false,
+    autoplaySpeed: 10000,
+    dots: true,
+    fade: true,
+    arrows: false,
+    beforeChange: (current: number, next: number) => setCurrentSlide(next),
+  };
+
   return (
     <>
       <section className={`slider__area ${style_2 ? `slider__area-${slider_cls?slider_cls:'2'}` : ''} p-relative`}>
         <Slider className='slider-active' {...settings}>
           {
             hero_slider_one.map((slider, index) => {
+              const isActive = index === currentSlide;
               // First slide: plain white bg + hero_img1.png as actual image
               if (index === 0) {
                 return (
-                  <div key={index}>
+                  <div key={index} inert={isActive ? undefined : true}>
                     <div
                       className={`${style_2 ? 'single-slider-2' : 'single-slider'} d-flex align-items-center`}
                       style={{ backgroundColor: '#f5f5f5', minHeight: '100vh', width: '100%', position: 'relative', overflow: 'hidden' }}
@@ -76,7 +80,7 @@ const HeroSliderOne = ({ style_2=false,slider_cls }:IProps) => {
 
               // Slides 2+ keep existing background-image behaviour
               return (
-                <div key={index}>
+                <div key={index} inert={isActive ? undefined : true}>
                   <div
                     className={`${style_2 ? 'single-slider-2' : 'single-slider'} d-flex align-items-center`}
                     style={{ backgroundImage: `url(${slider.bgImg})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh', width: '100%' }}

@@ -44,19 +44,19 @@ const HeaderFour = () => {
               <div className="col-xl-3 col-lg-4 col-md-7 col-sm-8">
                 <div className="header__right p-relative d-flex justify-content-between justify-content-sm-end align-items-center">
                   <div className="mobile-menu-btn d-lg-none">
-                    <button className="mobile-menu-toggle" onClick={() => setShowSidebar(true)}>
+                    <button className="mobile-menu-toggle" onClick={() => setShowSidebar(true)} aria-label="Open mobile menu">
                       <i className="fas fa-bars"></i>
                     </button>
                   </div>
                   <div className="header__action">
                     <ul>
                       <li>
-                        <button className="search-toggle" onClick={() => setShowSearch(true)}>
+                        <button className="search-toggle" onClick={() => setShowSearch(true)} aria-label="Search">
                           <i className="fas fa-search"></i>
                         </button>
                       </li>
                       <li>
-                        <button>
+                        <button aria-label="Toggle user info">
                           <i className="fas fa-user"></i>
                         </button>
                         <ExtraInfo />

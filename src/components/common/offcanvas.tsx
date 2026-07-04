@@ -26,12 +26,14 @@ const OffCanvas = ({ openMobileMenus, setOpenMobileMenus }: IProps) => {
       >
         <div className="extra__info-inner">
           <div className="extra__info-close text-end">
-            <a
+            <button
+              type="button"
               onClick={() => setOpenMobileMenus(false)}
               className="extra__info-close-btn cursor-pointer"
+              aria-label="Close menu"
             >
               <i className="fal fa-times"></i>
-            </a>
+            </button>
           </div>
 
           <nav className="side-mobile-menu d-block d-lg-none mm-menu">
@@ -41,7 +43,16 @@ const OffCanvas = ({ openMobileMenus, setOpenMobileMenus }: IProps) => {
                   key={i}
                   className={`${menu.dropdownMenu ? "menu-item-has-children has-droupdown" : ""} ${activeMenu === menu.title ? "active" : ""}`}
                 >
-                  {menu.dropdownMenu && <a onClick={() => handleOpenMenu(menu.title)}>{menu.title}</a>}
+                  {menu.dropdownMenu && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenMenu(menu.title)}
+                      className="border-0 bg-transparent p-0 text-start w-100"
+                      style={{ font: 'inherit', color: 'inherit', cursor: 'pointer' }}
+                    >
+                      {menu.title}
+                    </button>
+                  )}
                   {menu.dropdownMenu ? (
                     <ul className={`sub-menu ${activeMenu === menu.title ? "active" : ""}`}>
                       {menu.dropdownMenu.map((sub_m, index) => (

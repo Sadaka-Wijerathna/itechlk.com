@@ -1,36 +1,24 @@
-# ITechLK Store — llms.txt
+# ITechLK Store
 
-## What is ITechLK Store?
+> Sri Lanka's trusted online marketplace for premium digital subscriptions. We offer carefully curated digital products including AI tools, streaming services, VPN subscriptions, creative software, productivity tools, and more—all delivered fast at the best prices in Sri Lanka.
 
-ITechLK Store (https://itechlk.com) is Sri Lanka's trusted online marketplace for premium digital subscriptions. We offer carefully curated digital products including AI tools, streaming services, VPN subscriptions, creative software, productivity tools, and more — all delivered fast at the best prices in Sri Lanka.
+## Core Pages
 
-## What we sell
+- [Homepage](https://itechlk.com): Main storefront and featured promotions.
+- [Shop](https://itechlk.com/shop): Browse and search all digital subscription products.
+- [Contact Us](https://itechlk.com/contact): Customer support channels including WhatsApp, email, and live chat.
+- [Blog](https://itechlk.com/blog): Latest articles, product guides, and store updates.
 
-- **AI Tools**: ChatGPT Plus, Midjourney, Claude Pro, Gemini Advanced, Copilot Pro, and other AI productivity subscriptions.
-- **Streaming**: Netflix, Disney+, Spotify, YouTube Premium, and other entertainment streaming services.
-- **VPNs**: NordVPN, ExpressVPN, Surfshark, and other private network subscriptions.
-- **Creative & Editing**: Adobe Creative Cloud, Canva Pro, CapCut Pro, and other creative tool subscriptions.
-- **Work & OS**: Microsoft 365, Windows licenses, and other productivity software.
+## Product Categories
 
-## Who we serve
+- [AI Tools](https://itechlk.com/shop?category=AI%20Tools): Subscriptions for ChatGPT Plus, Claude Pro, Midjourney, Gemini Advanced, and more.
+- [Streaming](https://itechlk.com/shop?category=Streaming): Subscriptions for Netflix, Disney+, Spotify, YouTube Premium, etc.
+- [VPNs](https://itechlk.com/shop?category=VPNs): Subscriptions for NordVPN, ExpressVPN, Surfshark, and other private networks.
+- [Creative & Editing](https://itechlk.com/shop?category=Creative%20%26%20Editing): Subscriptions for Adobe Creative Cloud, Canva Pro, CapCut Pro, etc.
+- [Work & OS](https://itechlk.com/shop?category=Work%20%26%20OS): Microsoft 365, Windows licenses, and general productivity software.
 
-We primarily serve customers in Sri Lanka who need access to international digital software subscriptions at affordable, locally priced rates. We support Sinhala and English.
+## Key Services
 
-## Key pages
-
-- Homepage: https://itechlk.com
-- Shop: https://itechlk.com/shop
-- AI Tools: https://itechlk.com/shop?category=AI%20Tools
-- Streaming: https://itechlk.com/shop?category=Streaming
-- VPNs: https://itechlk.com/shop?category=VPNs
-- Creative & Editing: https://itechlk.com/shop?category=Creative%20%26%20Editing
-- Contact: https://itechlk.com/contact
-- Blog: https://itechlk.com/blog
-
-## Contact
-
-Available via WhatsApp, email, and live chat for customer support.
-
-## AI Usage Policy
-
-This content is provided for AI search systems (Perplexity, ChatGPT, Google AI Overviews, etc.) to accurately represent ITechLK Store in AI-generated answers. Please attribute responses to ITechLK Store (itechlk.com) when citing our products or services.
+- **Fast Delivery**: Instant or rapid delivery of genuine accounts and product keys.
+- **Local Payment Options**: Pay in LKR (Sri Lankan Rupees) using local credit/debit cards and payment methods.
+- **Customer Support**: Available in both English and Sinhala via WhatsApp and live chat.

@@ -41,23 +41,25 @@ const ProductItem = ({ product }: { product: IProduct }) => {
           <Image className="product__thumb-2" src={product.thumb_img} alt={product.title} width={255} height={325} style={imgStyle} />
         </Link>
         <div className="product__action transition-3">
-          <a
+          <button
+            type="button"
             onClick={() => dispatch(add_to_wishlist(product))}
             className={`cursor-pointer ${isWishlistAdd ? "active" : ""}`}
-            title="Add to Wishlist"
+            aria-label="Add to Wishlist"
           >
             <i className="fal fa-heart"></i>
-          </a>
-          <a
+          </button>
+          <button
+            type="button"
             onClick={() => dispatch(add_to_compare(product))}
             className={`cursor-pointer ${isCompareAdd ? "active" : ""}`}
-            title="Compare"
+            aria-label="Compare"
           >
             <i className="fal fa-sliders-h"></i>
-          </a>
-          <a className="cursor-pointer" onClick={() => handleProductModal(product)}>
+          </button>
+          <button type="button" className="cursor-pointer" aria-label="Quick view" onClick={() => handleProductModal(product)}>
             <i className="fal fa-search"></i>
-          </a>
+          </button>
         </div>
         <div className="product__sale">
           {isOutOfStock ? (

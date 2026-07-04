@@ -45,6 +45,7 @@ const HeaderThree = () => {
                       <button
                         className="mobile-menu-toggle"
                         onClick={() => setShowSidebar(true)}
+                        aria-label="Open mobile menu"
                       >
                         <i className="fas fa-bars"></i>
                       </button>
@@ -57,7 +58,7 @@ const HeaderThree = () => {
                           </button>
                         </li>
                         <li>
-                          <button>
+                          <button aria-label="Toggle user info">
                             <i className="far fa-bars"></i>
                           </button>
                           <ul className="extra-info">

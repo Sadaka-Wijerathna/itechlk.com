@@ -18,13 +18,13 @@ const BlogTwoCalMasonryArea = () => {
                   <div key={index} className="">
                     <div className="blog__item mb-60">
                       <div className="blog__thumb fix">
-                        <Link href={`/blog-details/${item.id}`} className="w-img">
+                        <Link href={`/blog/${item.slug || item.id}`} className="w-img">
                             <img src={item.image || item.img} alt="blog" />
                         </Link>
                       </div>
                       <div className="blog__content">
                         <h4>
-                          <Link href={`/blog-details/${item.id}`}>
+                          <Link href={`/blog/${item.slug || item.id}`}>
                              {item.title}
                           </Link>
                         </h4>
@@ -33,7 +33,7 @@ const BlogTwoCalMasonryArea = () => {
                           <span>/ {item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '')}</span>
                         </div>
                         <p>{item.desc || item.content?.substring(0, 100)}...</p>
-                        <Link href={`/blog-details/${item.id}`} className="os-btn">
+                        <Link href={`/blog/${item.slug || item.id}`} className="os-btn" aria-label={`Read more about ${item.title}`}>
                            read more
                         </Link>
                       </div>

@@ -22,12 +22,13 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes);
     const base64String = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-    // Upload to Cloudinary
+    // Upload to Cloudinary — resource_type:'auto' supports images AND PDFs
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
         base64String,
         {
           folder: "itechlk",
+          resource_type: "auto",  // allows images, PDFs, and other file types
         },
         (error, result) => {
           if (error) reject(error);

@@ -94,15 +94,15 @@ const ProductListItem = ({ product }: IProps) => {
                 </button>
               )}
               <div className="product__action-2 transition-3 mr-20">
-                <a onClick={() => dispatch(add_to_wishlist(product))} className={`cursor-pointer ${isWishlistAdd ? "active" : ""}`} title="Add to Wishlist">
+                <button type="button" onClick={() => dispatch(add_to_wishlist(product))} className={`cursor-pointer ${isWishlistAdd ? "active" : ""}`} aria-label="Add to Wishlist">
                   <i className="fal fa-heart"></i>
-                </a>
-                <a onClick={() => dispatch(add_to_compare(product))} className={`cursor-pointer ${isCompareAdd ? "active" : ""}`} title="Compare">
+                </button>
+                <button type="button" onClick={() => dispatch(add_to_compare(product))} className={`cursor-pointer ${isCompareAdd ? "active" : ""}`} aria-label="Compare">
                   <i className="fal fa-sliders-h"></i>
-                </a>
-                <a onClick={() => handleProductModal(product)} className="cursor-pointer">
+                </button>
+                <button type="button" onClick={() => handleProductModal(product)} className="cursor-pointer" aria-label="Quick view">
                   <i className="fal fa-search"></i>
-                </a>
+                </button>
               </div>
             </div>
           </div>

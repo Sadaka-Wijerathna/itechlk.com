@@ -6,6 +6,10 @@
 
 .blog{
     &__area{}
+    &__title{
+        font-size: 1.5rem; // preserve h4 visual size after semantic upgrade to h3
+        line-height: 1.4;
+    }
     &__slider{
         & .owl-nav{
             @media #{$xs}{

@@ -426,6 +426,8 @@ const CheckoutArea = () => {
                             <>
                               {previewUrl ? (
                                 <img src={previewUrl} alt="Receipt Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e5e7eb' }} />
+                              ) : receiptFile.type === 'application/pdf' ? (
+                                <i className="fa fa-file-pdf" style={{ fontSize: '48px', color: '#dc3545' }}></i>
                               ) : (
                                 <svg style={{ width: 40, height: 40, color: '#10b981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -23,13 +23,13 @@ const RelatedBlogs = ({ blog }: IProps) => {
           <div key={index} className="col-xl-6 col-lg-6 col-md-6">
             <div className="blog__item mb-30">
               <div className="blog__thumb fix">
-                <Link href={`/blog-details/${blog.id}`} className="w-img">
+                <Link href={`/blog/${blog.slug || blog.id}`} className="w-img">
                   <Image src={blog.image || blog.img || ''} alt="blog" width={404} height={238} style={imgStyle} />
                 </Link>
               </div>
               <div className="blog__content">
                 <h4>
-                  <Link href={`/blog-details/${blog.id}`}>{blog.title}</Link>
+                  <Link href={`/blog/${blog.slug || blog.id}`}>{blog.title}</Link>
                 </h4>
                 <div className="blog__meta">
                   <span>

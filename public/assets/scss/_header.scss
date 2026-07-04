@@ -243,8 +243,10 @@
                         }
                     }
                     & .extra-title{
-                        & h5{
+                        & h5,
+                        & .extra-info__label{
                             font-size: 14px;
+                            font-weight: 700;
                             color: $black-2;
                             margin: 15px 0 10px;
                             text-transform: capitalize;

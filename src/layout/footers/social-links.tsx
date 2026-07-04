@@ -5,7 +5,7 @@ const SocialLinks = () => {
     <>
       {social_links.map((s, i) => (
         <li key={i}>
-          <a href={s.link} target="_blank">
+          <a href={s.link} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
             <i className={s.icon}></i>
           </a>
         </li>

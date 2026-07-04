@@ -131,7 +131,13 @@ export async function POST(req: Request) {
       ];
 
       if (receiptUrl) {
-        await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
+        const isPdfReceipt = receiptUrl.toLowerCase().includes('.pdf') || receiptUrl.toLowerCase().includes('/raw/');
+        if (isPdfReceipt) {
+          const { sendTelegramDocument } = await import('@/lib/telegram');
+          await sendTelegramDocument(receiptUrl, caption, keyboard, settingsChatIds);
+        } else {
+          await sendTelegramPhoto(receiptUrl, caption, keyboard, settingsChatIds);
+        }
       } else {
         const { sendTelegramMessage } = await import('@/lib/telegram');
         await sendTelegramMessage(caption, keyboard, settingsChatIds);

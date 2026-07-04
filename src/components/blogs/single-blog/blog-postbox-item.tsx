@@ -40,7 +40,7 @@ const BlogPostboxItem = ({blog,blog_col_cls=false}:IProps) => {
           style={{ marginBottom: '20px' }}
           dangerouslySetInnerHTML={{ __html: (blog.content || blog.desc || '').length > 200 ? (blog.content || blog.desc || '').substring(0, 200) + '...' : (blog.content || blog.desc || '') }}
         />
-        <Link href={`/blog/${blog.slug}`} className="os-btn">
+        <Link href={`/blog/${blog.slug}`} className="os-btn" aria-label={`Read more about ${blog.title}`}>
           read more
         </Link>
       </div>

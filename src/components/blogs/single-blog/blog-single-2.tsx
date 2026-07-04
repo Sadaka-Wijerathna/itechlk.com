@@ -7,14 +7,14 @@ const BlogSingleTwo = ({ blog }: { blog: IBlogType }) => {
     <div key={blog.id} className="blog__slider-item">
       <div className="blog-thumb m-img">
         <Image src={blog.image || blog.img || ''} alt={blog.title} width={543} height={543} />
-        <Link href={`/blog-details/${blog.id}`} className="btn">
+        <Link href={`/blog/${blog.slug || blog.id}`} className="btn">
           <i className="fa fa-link"></i>
         </Link>
       </div>
       <div className="blog__post-content">
         <div className="blog__wrapper">
           <h5 className="blog__post-title">
-            <Link href={`/blog-details/${blog.id}`}>{blog.title}</Link>
+            <Link href={`/blog/${blog.slug || blog.id}`}>{blog.title}</Link>
           </h5>
           <div className="article-meta d-flex justify-content-center">
             <span className="article-author">

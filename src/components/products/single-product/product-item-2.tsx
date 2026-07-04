@@ -58,19 +58,22 @@ const ProductItemTwo = ({ product }: { product: IProduct }) => {
                 View Cart
               </Link>
             ) : (
-              <a
+              <button
+                type="button"
                 onClick={() => dispatch(add_cart_product(product))}
-                className="action-btn"
+                className="action-btn cursor-pointer"
               >
                 <i className="fal fa-plus"></i> Add to cart
-              </a>
+              </button>
             )}
-            <a
+            <button
+              type="button"
               className="action-btn cursor-pointer"
+              aria-label="Quick view"
               onClick={() => handleProductModal(product)}
             >
               <i className="fal fa-eye"></i>
-            </a>
+            </button>
           </div>
           <div className="product__sale product__sale-3">
             {(product as any).active === false || product.status?.toLowerCase() === "out of stock" ? (

@@ -1,8 +1,9 @@
 "use client";
-import {useRef} from "react";
+import { useRef } from "react";
 import { IProduct } from "@/types/product-d-t";
 import Slider from "react-slick";
 import SingleSmProduct from "./single-product/single-sm-product";
+import { useSlickInert } from "@/hooks/use-slick-inert";
 
 // slick setting
 const settings = {
@@ -31,6 +32,10 @@ const SmSliderProducts = ({ products }: IProps) => {
   const trendingRef = useRef<Slider | null>(null);
   const discountRef = useRef<Slider | null>(null);
   const topRatedRef = useRef<Slider | null>(null);
+  // ARIA: keep inert in sync with aria-hidden on hidden slick slides
+  const trendingInertRef = useSlickInert();
+  const discountInertRef = useSlickInert();
+  const topRatedInertRef = useSlickInert();
   // Smarter unique product selection
   const usedIds = new Set();
 
@@ -85,6 +90,7 @@ const SmSliderProducts = ({ products }: IProps) => {
             <h4 style={{ backgroundColor: '#f5f5f5' }}>Top Seller Products</h4>
           </div>
           <div className="product__offer-slider p-relative">
+            <div ref={trendingInertRef}>
             <Slider {...settings} ref={trendingRef}>
               {trending_slider_products.map((items, i) => (
                 <div key={i} className="product__offer-wrapper">
@@ -96,14 +102,15 @@ const SmSliderProducts = ({ products }: IProps) => {
                 </div>
               ))}
             </Slider>
+            </div>
             <div className="owl-nav">
               <div className="owl-prev" onClick={() => trendingRef.current?.slickPrev()}>
-                <button>
+                <button type="button" aria-label="Previous">
                   <i className="fal fa-angle-left"></i>
                 </button>
               </div>
-              <div className="owl-next" onClick={() => trendingRef.current?.slickNext()}> 
-                <button>
+              <div className="owl-next" onClick={() => trendingRef.current?.slickNext()}>
+                <button type="button" aria-label="Next">
                   <i className="fal fa-angle-right"></i>
                 </button>
               </div>
@@ -117,6 +124,7 @@ const SmSliderProducts = ({ products }: IProps) => {
             <h4 style={{ backgroundColor: '#f5f5f5' }}>On Sale Products</h4>
           </div>
           <div className="product__offer-slider p-relative">
+            <div ref={discountInertRef}>
             <Slider {...settings} ref={discountRef}>
               {discount_slider_products.map((items, i) => (
                 <div key={i} className="product__offer-wrapper">
@@ -128,14 +136,15 @@ const SmSliderProducts = ({ products }: IProps) => {
                 </div>
               ))}
             </Slider>
+            </div>
             <div className="owl-nav">
               <div className="owl-prev" onClick={() => discountRef.current?.slickPrev()}>
-                <button>
+                <button type="button" aria-label="Previous">
                   <i className="fal fa-angle-left"></i>
                 </button>
               </div>
               <div className="owl-next" onClick={() => discountRef.current?.slickNext()}>
-                <button>
+                <button type="button" aria-label="Next">
                   <i className="fal fa-angle-right"></i>
                 </button>
               </div>
@@ -149,6 +158,7 @@ const SmSliderProducts = ({ products }: IProps) => {
             <h4 style={{ backgroundColor: '#f5f5f5' }}>Top Rated Products</h4>
           </div>
           <div className="product__offer-slider p-relative">
+            <div ref={topRatedInertRef}>
             <Slider {...settings} ref={topRatedRef}>
               {top_rated_slider_products.map((items, i) => (
                 <div key={i} className="product__offer-wrapper">
@@ -160,14 +170,15 @@ const SmSliderProducts = ({ products }: IProps) => {
                 </div>
               ))}
             </Slider>
+            </div>
             <div className="owl-nav">
               <div className="owl-prev" onClick={() => topRatedRef.current?.slickPrev()}>
-                <button>
+                <button type="button" aria-label="Previous">
                   <i className="fal fa-angle-left"></i>
                 </button>
               </div>
               <div className="owl-next" onClick={() => topRatedRef.current?.slickNext()}>
-                <button>
+                <button type="button" aria-label="Next">
                   <i className="fal fa-angle-right"></i>
                 </button>
               </div>

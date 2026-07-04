@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Slider from "react-slick";
 import blog_data from "@/data/blog-data";
 import BlogSingle from "./single-blog/blog-single";
+import { useSlickInert } from "@/hooks/use-slick-inert";
 
 // blog items
 const blog_items = blog_data.filter((blog) => blog.blog === "home");
@@ -16,6 +17,8 @@ type IProps = {
 const BlogArea = ({ style_2, style_3 }: IProps) => {
   const [slidesToShow, setSlidesToShow] = useState(3);
   const [mounted, setMounted] = useState(false);
+  // ARIA: keep inert in sync with aria-hidden on hidden slick slides
+  const blogInertRef = useSlickInert();
 
   useEffect(() => {
     const updateSlides = () => {
@@ -72,11 +75,13 @@ const BlogArea = ({ style_2, style_3 }: IProps) => {
             <div className="col-xl-12">
               <div className="blog__slider owl-carousel">
                 {mounted && (
+                  <div ref={blogInertRef}>
                   <Slider {...settings}>
                     {blog_items.map((item, i) => (
                       <BlogSingle key={i} item={item} />
                     ))}
                   </Slider>
+                  </div>
                 )}
               </div>
             </div>

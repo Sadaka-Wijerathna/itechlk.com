@@ -1,25 +1,30 @@
 'use client'
+import { useState } from "react";
 import Link from "next/link";
 import Slider from "react-slick";
 import { HeroSliderData } from "@/data/hero-slider-data";
 
-// slick setting
-const settings = {
-  autoplay: false,
-  autoplaySpeed: 10000,
-  dots: true,
-  fade: true,
-  arrows: false,
-};
-
 const HeroSliderTwo = () => {
   const {hero_slider_two} = HeroSliderData;
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // slick setting
+  const settings = {
+    autoplay: false,
+    autoplaySpeed: 10000,
+    dots: true,
+    fade: true,
+    arrows: false,
+    beforeChange: (current: number, next: number) => setCurrentSlide(next),
+  };
+
   return (
       <section className="slider__area slider__area-2 p-relative pl-15 pr-15">
         <Slider className='slider-active' {...settings}>
           {
             hero_slider_two.map((slider, index) => {
-              return <div key={index}>
+              const isActive = index === currentSlide;
+              return <div key={index} inert={isActive ? undefined : true}>
                 <div className="single-slider single-slider-2 slider__height-2 d-flex align-items-center"
                   style={{ backgroundImage: `url(${slider.bgImg})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center' }}>
                   <div className="container-fluid">

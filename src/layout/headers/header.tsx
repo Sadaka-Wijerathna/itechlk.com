@@ -48,7 +48,7 @@ const Header = ({header_big,white_bg}:IProps) => {
                 </nav>
               </div>
               <div className="mobile-menu-btn d-lg-none">
-                <button onClick={()=> setShowSidebar(true)} className="mobile-menu-toggle">
+                <button onClick={()=> setShowSidebar(true)} className="mobile-menu-toggle" aria-label="Open mobile menu">
                   <i className="fas fa-bars"></i>
                 </button>
               </div>
@@ -61,7 +61,7 @@ const Header = ({header_big,white_bg}:IProps) => {
                     </button>
                   </li>
                   <li> 
-                    <button >
+                    <button aria-label="Toggle user info">
                       <i className="far fa-bars"></i>
                     </button>
                     <ExtraInfo/>

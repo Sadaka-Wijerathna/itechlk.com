@@ -66,12 +66,13 @@ function TrendingProducts({ products, style_2 = false, container = 'container' }
           <div className="col-xl-12">
             <div className="product__load-btn text-center mt-25">
               {perView < trendingProducts.length && (
-                <a
+                <button
+                  type="button"
                   onClick={handlePerView}
                   className="os-btn os-btn-3 cursor-pointer"
                 >
                   Load More
-                </a>
+                </button>
               )}
             </div>
           </div>

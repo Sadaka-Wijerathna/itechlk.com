@@ -76,9 +76,9 @@ const SearchPopup = ({showSearch,setShowSearch}:IProps) => {
                     {uniqueCategory.map((c, index) => {
                       return (
                         <li key={index}>
-                          <a className={`cursor-pointer ${categoryVal === c ? 'active' : ''}`} onClick={() => handleCategorySearch(c)}>
+                          <button type="button" className={`cursor-pointer ${categoryVal === c ? 'active' : ''}`} onClick={() => handleCategorySearch(c)}>
                             {c}
-                          </a>
+                          </button>
                         </li>
                       );
                     })}

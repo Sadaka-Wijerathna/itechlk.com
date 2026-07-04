@@ -30,7 +30,7 @@ const ExtraInfo = () => {
         <li key={index}>
           <div className={`${item.class}`}>
             <div className="extra-title">
-              <h5>{item.title}</h5>
+              <p className="extra-info__label" role="heading" aria-level={2}>{item.title}</p>
             </div>
             <ul>
               {item.listItems.map((list, index) => (
