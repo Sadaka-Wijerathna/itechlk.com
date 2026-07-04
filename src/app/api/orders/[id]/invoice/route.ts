@@ -70,9 +70,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Unauthorized to access this invoice' }, { status: 403 });
     }
 
-    // 3. Fetch currency exchange rate (USD -> LKR)
-    const rates = await getCurrencyRates();
-    const lkrRate = rates.LKR || 325;
+    // Prices are stored in LKR — no conversion needed
 
     // 4. Map template placeholders (without the delimiters, as required by docxtemplater)
     const invoiceNo = order.id.slice(-6).toUpperCase();
@@ -87,9 +85,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const country = order.country || '';
 
     // Calculate pricing in LKR
-    const subtotalUSD = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const subtotalLKR = Math.round(subtotalUSD * lkrRate);
-    const totalLKR = Math.round(order.totalAmount * lkrRate);
+    const subtotalLKR = Math.round(order.items.reduce((acc, item) => acc + item.price * item.quantity, 0));
+    const totalLKR = Math.round(order.totalAmount);
     const taxLKR = 0;
 
     const replacements: Record<string, string> = {
@@ -109,8 +106,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       const item = order.items[i - 1];
       if (item) {
         const itemTitle = `${item.title}${item.duration && item.duration !== 'N/A' ? ' / ' + item.duration : ''}`;
-        const itemPriceLKR = Math.round(item.price * lkrRate);
-        const itemTotalLKR = Math.round(item.price * item.quantity * lkrRate);
+        const itemPriceLKR = Math.round(item.price);
+        const itemTotalLKR = Math.round(item.price * item.quantity);
 
         replacements[`ITEM_${i}_NAME`] = itemTitle;
         replacements[`ITEM_${i}_PRICE`] = `Rs. ${itemPriceLKR.toLocaleString()}`;

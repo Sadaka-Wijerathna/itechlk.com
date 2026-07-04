@@ -10,7 +10,6 @@ import ProductDetailsBottom from "@/components/product-details/product-details-b
 import RelatedProducts from "@/components/products/related-products";
 import { getDbProducts } from "@/lib/db-products";
 import { PageParamsProps } from "@/types/custom-d-t";
-import { getCurrencyRates } from "@/lib/currency";
 
 export async function generateStaticParams() {
   const products = await getDbProducts();
@@ -74,9 +73,8 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
-  const rates = await getCurrencyRates();
-  const lkrRate = rates.LKR || 325;
-  const lkrPrice = product ? Math.round(product.price * lkrRate) : 0;
+  // Prices are stored in LKR — no conversion needed
+  const lkrPrice = product ? Math.round(product.price) : 0;
 
   const productJsonLd = product ? {
     '@context': 'https://schema.org',

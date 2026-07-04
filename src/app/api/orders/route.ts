@@ -107,10 +107,10 @@ export async function POST(req: Request) {
       const { sendTelegramPhoto } = await import('@/lib/telegram');
       const orderDetails = items.map((i: any) => `- ${i.title} (${i.duration}) x${i.quantity}`).join('\n');
       
-      // Convert to LKR for notification using dynamic rates
-      const rates = await getCurrencyRates();
-      const lkrTotal = finalTotal * rates.LKR;
-      const lkrDiscount = actualDiscount * rates.LKR;
+      // Prices are now stored in LKR — no conversion needed for notification
+      const lkrTotal = finalTotal;
+      const lkrDiscount = actualDiscount;
+
       
       const caption = `<b>🚀 New Order Received!</b>\n\n` +
         `<b>Order ID:</b> #${order.id.slice(-6).toUpperCase()}\n` +

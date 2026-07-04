@@ -14,25 +14,25 @@ export async function updateCurrencyRates() {
     const data = await response.json();
 
     if (data.result === "success") {
-      const lkrRate = data.conversion_rates.LKR;
-      const eurRate = data.conversion_rates.EUR;
+      const usdLkrRate = data.conversion_rates.LKR;  // how many LKR per 1 USD
+      const usdEurRate = data.conversion_rates.EUR;  // how many EUR per 1 USD
 
-      // Update Database
+      // Store the raw USD-base rates in DB (no schema change needed)
       await Promise.all([
         prisma.siteSettings.upsert({
           where: { key: "USD_LKR" },
-          update: { value: lkrRate.toString() },
-          create: { key: "USD_LKR", value: lkrRate.toString() },
+          update: { value: usdLkrRate.toString() },
+          create: { key: "USD_LKR", value: usdLkrRate.toString() },
         }),
         prisma.siteSettings.upsert({
           where: { key: "USD_EUR" },
-          update: { value: eurRate.toString() },
-          create: { key: "USD_EUR", value: eurRate.toString() },
+          update: { value: usdEurRate.toString() },
+          create: { key: "USD_EUR", value: usdEurRate.toString() },
         })
       ]);
 
-      console.log(`[Currency] Rates updated: LKR=${lkrRate}, EUR=${eurRate}`);
-      return { LKR: lkrRate, EUR: eurRate };
+      console.log(`[Currency] Rates updated: USD_LKR=${usdLkrRate}, USD_EUR=${usdEurRate}`);
+      return { LKR: usdLkrRate, EUR: usdEurRate };
     } else {
       console.error("ExchangeRate-API Error:", data["error-type"]);
       return null;
@@ -43,28 +43,40 @@ export async function updateCurrencyRates() {
   }
 }
 
+/**
+ * Returns rates relative to 1 LKR (LKR is the fixed base currency).
+ * product.price is stored in LKR — use these rates to convert to other currencies.
+ *
+ * Example: if 1 USD = 325 LKR:
+ *   LKR: 1          (no conversion)
+ *   USD: 1/325      (~0.00308 USD per LKR)
+ *   EUR: 0.92/325   (~0.00283 EUR per LKR)
+ */
 export async function getCurrencyRates() {
   try {
-    const rates = await prisma.siteSettings.findMany({
-      where: {
-        key: { in: ["USD_LKR", "USD_EUR"] }
-      }
+    const rows = await prisma.siteSettings.findMany({
+      where: { key: { in: ["USD_LKR", "USD_EUR"] } }
     });
 
-    const ratesObj: Record<string, number> = {
-      USD: 1,
-      LKR: 325, // Fallback
-      EUR: 0.92, // Fallback
+    // Fallback USD-base rates
+    let usdLkr = 325;
+    let usdEur = 0.92;
+
+    rows.forEach((r) => {
+      if (r.key === "USD_LKR") usdLkr = parseFloat(r.value);
+      if (r.key === "USD_EUR") usdEur = parseFloat(r.value);
+    });
+
+    // Convert to LKR-base: how many foreign currency units per 1 LKR
+    return {
+      LKR: 1,                       // base — always 1
+      USD: 1 / usdLkr,              // e.g. 1/325 ≈ 0.00308
+      EUR: usdEur / usdLkr,         // e.g. 0.92/325 ≈ 0.00283
     };
-
-    rates.forEach((r) => {
-      if (r.key === "USD_LKR") ratesObj.LKR = parseFloat(r.value);
-      if (r.key === "USD_EUR") ratesObj.EUR = parseFloat(r.value);
-    });
-
-    return ratesObj;
   } catch (error) {
     console.error("Failed to get currency rates:", error);
-    return { USD: 1, LKR: 325, EUR: 0.92 };
+    // Fallback to LKR-base rates
+    return { LKR: 1, USD: 1 / 325, EUR: 0.92 / 325 };
   }
 }
+
