@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getDbProducts } from "@/lib/db-products";
 import { Metadata } from "next";
 
@@ -37,8 +38,10 @@ export default async function ShopPage() {
         <Breadcrumb title="Shop" subtitle="Shop" />
         {/* breadcrumb end */}
 
-        {/* shop area start */}
-        <ShopArea product_data={product_data} />
+        {/* shop area start — wrapped in Suspense because ShopArea uses useSearchParams() */}
+        <Suspense fallback={<div style={{ minHeight: '400px' }} />}>
+          <ShopArea product_data={product_data} />
+        </Suspense>
         {/* shop area end */}
       </main>
 
