@@ -2,22 +2,17 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import AdminShell from "./AdminShell";
 import Link from "next/link";
-import { getCurrencyRates, updateCurrencyRates } from "@/lib/currency";
+import { updateCurrencyRates } from "@/lib/currency";
 
 async function getStats() {
-  const [activeProducts, totalUsers, totalOrders, revenueData, rates] = await Promise.all([
+  const [activeProducts, totalUsers, totalOrders, confirmedOrders] = await Promise.all([
     prisma.product.count({ where: { active: true } }),
     prisma.user.count(),
     prisma.order.count({ where: { status: "Confirmed" } }),
-    prisma.order.aggregate({
-      _sum: {
-        totalAmount: true
-      },
-      where: {
-        status: "Confirmed"
-      }
-    }),
-    getCurrencyRates()
+    prisma.order.findMany({
+      where: { status: "Confirmed" },
+      select: { totalAmount: true }
+    })
   ]);
 
   const recentProducts = await prisma.product.findMany({
@@ -26,8 +21,15 @@ async function getStats() {
     take: 5,
   });
 
+  // Calculate revenue: convert older USD orders to LKR using historical rate (325)
+  const revenue = confirmedOrders.reduce((sum, order) => {
+    const amountInLKR = order.totalAmount < 1000 ? order.totalAmount * 325 : order.totalAmount;
+    return sum + amountInLKR;
+  }, 0);
+
   // Lazy Update Check: If rates are older than 24h, trigger an update in the background
   const lkrSetting = await prisma.siteSettings.findUnique({ where: { key: "USD_LKR" } });
+  const eurSetting = await prisma.siteSettings.findUnique({ where: { key: "USD_EUR" } });
   const lastUpdate = lkrSetting?.updatedAt ? new Date(lkrSetting.updatedAt).getTime() : 0;
   const now = new Date().getTime();
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -41,8 +43,9 @@ async function getStats() {
     activeProducts, 
     totalUsers, 
     totalOrders, 
-    revenue: revenueData._sum.totalAmount || 0,
-    rates,
+    revenue,
+    usdLkr: lkrSetting?.value ? parseFloat(lkrSetting.value) : 325,
+    usdEur: eurSetting?.value ? parseFloat(eurSetting.value) : 0.92,
     recentProducts,
     lastUpdateDate: lkrSetting?.updatedAt || null
   };
@@ -50,15 +53,10 @@ async function getStats() {
 
 export default async function AdminDashboard() {
   const session = await auth();
-  const { activeProducts, totalUsers, totalOrders, revenue, rates, recentProducts, lastUpdateDate } = await getStats();
-
-  // Dynamic Currency rate conversion (USD to LKR)
-  const lkrRate = rates.LKR;
-  const eurRate = rates.EUR;
-  const lkrRevenue = revenue * lkrRate;
+  const { activeProducts, totalUsers, totalOrders, revenue, usdLkr, usdEur, recentProducts, lastUpdateDate } = await getStats();
 
   const stats = [
-    { label: "Total Revenue", value: `Rs. ${Math.round(lkrRevenue).toLocaleString()}` },
+    { label: "Total Revenue", value: `Rs. ${Math.round(revenue).toLocaleString()}` },
     { label: "Total Orders", value: totalOrders.toString() },
     { label: "Active Products", value: activeProducts.toString() },
     { label: "Total Users", value: totalUsers.toString() },
@@ -75,10 +73,10 @@ export default async function AdminDashboard() {
           <div className="d-flex flex-column align-items-end">
             <div className="d-flex gap-2">
               <span style={{ fontSize: '11px', color: '#848b8a', background: '#f5f5f5', padding: '4px 10px', borderRadius: '4px' }}>
-                USD/LKR: {lkrRate}
+                USD/LKR: {usdLkr}
               </span>
               <span style={{ fontSize: '11px', color: '#848b8a', background: '#f5f5f5', padding: '4px 10px', borderRadius: '4px' }}>
-                USD/EUR: {eurRate}
+                USD/EUR: {usdEur}
               </span>
             </div>
             {lastUpdateDate && (
@@ -88,6 +86,7 @@ export default async function AdminDashboard() {
             )}
           </div>
         </div>
+
 
         <div className="order__info mt-10" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
           <div className="d-flex justify-content-between flex-wrap gap-4" style={{ padding: '20px 35px' }}>

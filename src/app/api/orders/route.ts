@@ -166,12 +166,28 @@ export async function GET(req: Request) {
 
     const isAdmin = session.user.role === 'admin';
 
+    // Helper to normalize older USD orders to LKR using historical rate (325)
+    const normalizeOrder = (order: any) => {
+      if (order.totalAmount < 1000) {
+        return {
+          ...order,
+          totalAmount: order.totalAmount * 325,
+          discountAmt: (order.discountAmt || 0) * 325,
+          items: order.items.map((item: any) => ({
+            ...item,
+            price: item.price * 325
+          }))
+        };
+      }
+      return order;
+    };
+
     // Admin requesting ALL orders (no specific email provided)
     if (isAdmin && !requestedEmail) {
       const orders = await prisma.order.findMany({
         orderBy: { createdAt: 'desc' },
       });
-      return NextResponse.json(orders);
+      return NextResponse.json(orders.map(normalizeOrder));
     }
 
     // Determine which email's orders to fetch
@@ -195,7 +211,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(orders);
+    return NextResponse.json(orders.map(normalizeOrder));
   } catch (error: any) {
     console.error('Fetch Orders Error:', error);
     return NextResponse.json({ error: 'Error fetching orders' }, { status: 500 });

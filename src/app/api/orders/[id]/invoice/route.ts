@@ -54,14 +54,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 
   try {
-    // 2. Fetch order details from database
-    const order = await prisma.order.findUnique({
+    // 2. Fetch order details from database and normalize pre-migration USD orders to LKR
+    const rawOrder = await prisma.order.findUnique({
       where: { id },
     });
 
-    if (!order) {
+    if (!rawOrder) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
+
+    const order = rawOrder.totalAmount < 1000 ? {
+      ...rawOrder,
+      totalAmount: rawOrder.totalAmount * 325,
+      discountAmt: (rawOrder.discountAmt || 0) * 325,
+      items: rawOrder.items.map((item: any) => ({
+        ...item,
+        price: item.price * 325
+      }))
+    } : rawOrder;
+
 
     // Ensure user has permission (Admin OR Customer Owner)
     const isAdmin = session.user.role === 'admin';

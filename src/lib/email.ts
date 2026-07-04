@@ -92,7 +92,7 @@ export const sendOrderStatusEmail = async (order: any) => {
         <div style="background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
           <h4 style="margin-top: 0;">Order Summary:</h4>
           <p style="margin: 5px 0;"><strong>Order ID:</strong> #${order.id.slice(-6).toUpperCase()}</p>
-          <p style="margin: 5px 0;"><strong>Total Amount:</strong> USD ${order.totalAmount}</p>
+          <p style="margin: 5px 0;"><strong>Total Amount:</strong> Rs. ${Math.round(order.totalAmount).toLocaleString()}</p>
           <p style="margin: 5px 0;"><strong>Order Date:</strong> ${orderDate}</p>
         </div>
 
