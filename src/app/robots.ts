@@ -23,7 +23,7 @@ export default function robots(): MetadataRoute.Robots {
           '/forgot-password',
           '/reset-password',
         ],
-        crawlDelay: 1,
+        // No crawlDelay — letting Googlebot crawl at full speed helps new sites get indexed faster
       },
       // Block AI crawlers that scrape content without permission
       // Note: Google-Extended is allowed so we appear in Google AI Overviews
@@ -45,3 +45,4 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: `${siteUrl}/sitemap.xml`,
   };
 }
+

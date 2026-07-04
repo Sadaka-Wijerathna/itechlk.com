@@ -4,8 +4,12 @@ import prisma from '@/lib/prisma';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.itechlk.com';
 
+// Use a stable date (site launch) — avoids every build marking all pages as "just updated"
+// which wastes Google's crawl budget re-crawling unchanged pages
+const SITE_LAUNCH_DATE = new Date('2025-01-01');
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static pages
+  // Static pages — high-value pages Google should prioritize
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${siteUrl}`,
@@ -20,80 +24,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${siteUrl}/shop?category=AI%20Tools`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/shop?category=Streaming`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/shop?category=VPNs`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/shop?category=Creative%20%26%20Editing`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/shop?category=Work%20%26%20OS`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/shop?category=Adults`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
       url: `${siteUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
+      url: `${siteUrl}/contact`,
+      lastModified: SITE_LAUNCH_DATE,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: `${siteUrl}/about`,
-      lastModified: new Date(),
+      lastModified: SITE_LAUNCH_DATE,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${siteUrl}/privacy-policy`,
-      lastModified: new Date(),
+      lastModified: SITE_LAUNCH_DATE,
       changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
       url: `${siteUrl}/terms`,
-      lastModified: new Date(),
+      lastModified: SITE_LAUNCH_DATE,
       changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
       url: `${siteUrl}/shipping-policy`,
-      lastModified: new Date(),
+      lastModified: SITE_LAUNCH_DATE,
       changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
       url: `${siteUrl}/returns`,
-      lastModified: new Date(),
+      lastModified: SITE_LAUNCH_DATE,
       changeFrequency: 'yearly',
       priority: 0.4,
     },

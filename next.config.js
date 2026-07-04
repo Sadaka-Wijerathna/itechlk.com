@@ -21,15 +21,16 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Old /products/* URLs → redirect to /shop (301 permanent)
+      // Old /products (no slug) → redirect to /shop (301 permanent)
       {
         source: '/products',
         destination: '/shop',
         permanent: true,
       },
+      // Old /products/:slug → redirect to /product-details/:slug (301 permanent, preserves SEO)
       {
         source: '/products/:path*',
-        destination: '/shop',
+        destination: '/product-details/:path*',
         permanent: true,
       },
       // Redirect old/missing indexed URLs to prevent 404s and preserve SEO

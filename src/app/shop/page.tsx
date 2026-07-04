@@ -1,7 +1,9 @@
 import { getDbProducts } from "@/lib/db-products";
 import { Metadata } from "next";
 
-export const dynamic = 'force-dynamic';
+// Revalidate every hour — allows a fast cached version for Googlebot
+// (force-dynamic was preventing static caching and slowing page delivery)
+export const revalidate = 3600;
 import Wrapper from "@/layout/wrapper";
 import HeaderTwo from "@/layout/headers/header-2";
 import Breadcrumb from "@/components/common/breadcrumb";
