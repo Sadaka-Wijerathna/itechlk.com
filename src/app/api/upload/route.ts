@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { auth } from "@/auth";
 
 // Configure Cloudinary with environment variables
 cloudinary.config({
@@ -9,12 +10,30 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
+  // Require a logged-in session — prevents anonymous abuse of Cloudinary quota
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const data = await req.formData();
     const file = data.get("file") as File;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // Validate file type — only allow images and PDFs
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: "Invalid file type. Only images and PDFs are allowed." }, { status: 400 });
+    }
+
+    // Enforce file size limit (10 MB)
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: "File too large. Maximum size is 10 MB." }, { status: 400 });
     }
 
     // Convert file to base64
@@ -40,6 +59,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: (uploadResult as any).secure_url });
   } catch (error: any) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: error.message || "Failed to upload image" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Failed to upload file" }, { status: 500 });
   }
 }

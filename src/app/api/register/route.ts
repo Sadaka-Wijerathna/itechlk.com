@@ -19,12 +19,13 @@ export async function POST(req: NextRequest) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    // Grant admin if email matches ADMIN_EMAIL env var
-    const isAdmin = 
-      email === process.env.ADMIN_EMAIL || 
-      email === "sadakaparamiwijerathna1@gmail.com" || 
-      email === "itechlkstore@gmail.com";
-    
+    // Grant admin only if email matches ADMIN_EMAIL env var (set securely in Vercel/environment)
+    // Never hardcode admin emails in source code
+    const adminEmails = (process.env.ADMIN_EMAIL || '')
+      .split(',')
+      .map((e: string) => e.trim().toLowerCase())
+      .filter(Boolean);
+    const isAdmin = adminEmails.includes(email.toLowerCase());
     const role = isAdmin ? "admin" : "customer";
 
     const userData = {
