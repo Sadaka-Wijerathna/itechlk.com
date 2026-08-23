@@ -94,7 +94,7 @@ const localBusinessJsonLd = {
   logo: 'https://www.itechlk.com/assets/img/logo/logo.png',
   image: 'https://www.itechlk.com/assets/img/logo/logo.png',
   description: 'Sri Lanka\'s leading digital marketplace for premium subscriptions — AI Tools, Streaming, VPNs, Creative Software and more.',
-  telephone: '+94701751530',
+  telephone: '+94742570943',
   email: 'indiraumamga@gmail.com',
   address: {
     '@type': 'PostalAddress',

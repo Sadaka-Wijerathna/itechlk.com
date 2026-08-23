@@ -15,7 +15,7 @@ const contactInfo = [
   {
     icon: "fal fa-phone-alt",
     title: "Number Phone:",
-    subtitle: "+94701751530",
+    subtitle: "+94742570943",
   },
 ];
 

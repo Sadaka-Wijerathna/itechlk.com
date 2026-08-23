@@ -61,7 +61,7 @@ export default function ReturnsPolicyPage() {
                   </p>
                   <ul className="mb-20" style={{ paddingLeft: '20px', listStyleType: 'decimal' }}>
                     <li>Take screenshots or record a short video showing the error or issue you are experiencing.</li>
-                    <li>Contact our support team immediately via <strong>WhatsApp at +94701751530</strong> or email <strong>indiraumamga@gmail.com</strong>. Include your order ID and the email address used during purchase.</li>
+                    <li>Contact our support team immediately via <strong>WhatsApp at +94742570943</strong> or email <strong>indiraumamga@gmail.com</strong>. Include your order ID and the email address used during purchase.</li>
                     <li>Allow our team up to 12–24 hours to review your request, verify the account status, and provide a fix or replacement.</li>
                   </ul>
 

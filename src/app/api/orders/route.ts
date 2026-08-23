@@ -167,18 +167,10 @@ export async function GET(req: Request) {
     const isAdmin = session.user.role === 'admin';
 
     // Helper to normalize older USD orders to LKR using historical rate (325)
+    // DISABLED: This was causing new LKR orders under Rs. 1000 to be incorrectly multiplied.
     const normalizeOrder = (order: any) => {
-      if (order.totalAmount < 1000) {
-        return {
-          ...order,
-          totalAmount: order.totalAmount * 325,
-          discountAmt: (order.discountAmt || 0) * 325,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: item.price * 325
-          }))
-        };
-      }
+      // If you need to restore this for old orders, add a date check:
+      // if (order.totalAmount < 1000 && new Date(order.createdAt) < new Date('2024-07-01')) { ... }
       return order;
     };
 

@@ -67,7 +67,7 @@ const Footer = ({ style_2 }: { style_2?: boolean }) => {
                             <i className="fal fa-phone-alt"></i>
                           </div>
                           <div className="text">
-                            <span>Phone Number: +94701751530</span>
+                            <span>Phone Number: +94742570943</span>
                           </div>
                         </li>
                       </ul>

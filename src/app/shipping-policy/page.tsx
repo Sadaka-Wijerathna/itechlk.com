@@ -60,7 +60,7 @@ export default function ShippingPolicyPage() {
                   </p>
                   <p className="mb-10">We are available via:</p>
                   <ul className="mb-20" style={{ paddingLeft: '20px', listStyleType: 'disc' }}>
-                    <li><strong>WhatsApp / Phone:</strong> +94701751530</li>
+                    <li><strong>WhatsApp / Phone:</strong> +94742570943</li>
                     <li><strong>Email:</strong> indiraumamga@gmail.com</li>
                     <li><strong>Contact Form:</strong> <a href="/contact">Click here to message us</a></li>
                   </ul>

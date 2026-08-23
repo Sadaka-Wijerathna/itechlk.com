@@ -87,6 +87,7 @@ const CheckoutArea = () => {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [placingOrder, setPlacingOrder] = useState(false);
   const { geo } = useGeoLocation();
 
@@ -239,10 +240,12 @@ const CheckoutArea = () => {
           discountAmount: appliedCoupon?.discountAmount
         }),
       });
+      const d = await res.json();
       if (res.ok) {
         if (previewUrl) {
           URL.revokeObjectURL(previewUrl);
         }
+        setPlacedOrderId(d.order?.id || null);
         setOrderPlaced(true);
         reset();
         setReceiptFile(null);
@@ -254,7 +257,6 @@ const CheckoutArea = () => {
           await update();
         }
       } else {
-        const d = await res.json();
         alert(d.error || "Order failed");
       }
     } catch (e) {
@@ -276,6 +278,17 @@ const CheckoutArea = () => {
           color: #fff !important;
           border-color: #dc3545 !important;
         }
+
+        .whatsapp-outline-btn {
+          transition: all 0.3s ease !important;
+        }
+        .whatsapp-outline-btn::after {
+          background: #25D366 !important;
+        }
+        .whatsapp-outline-btn:hover {
+          color: #fff !important;
+          border-color: #25D366 !important;
+        }
       ` }} />
       <section className="checkout-area pb-70">
         <div className="container">
@@ -283,9 +296,20 @@ const CheckoutArea = () => {
           {orderPlaced && (
             <div className="text-center pt-100 pb-100">
               <h3 style={{ fontSize: 32, marginBottom: 20 }}>Order placed, our admins will contact you soon <i className="fa fa-check-circle text-success ms-2"></i></h3>
-              <div className="mt-30 d-flex gap-3 justify-content-center">
-                <Link href="/" className="os-btn os-btn-black">Go to Homepage</Link>
-                <Link href="/account" className="os-btn os-btn-2">Go to My Orders</Link>
+              <p style={{ fontSize: 16, marginBottom: 20, color: '#6b7280' }}>
+                Please contact the seller via WhatsApp to speed up your order processing.
+              </p>
+              <div className="mt-30 d-flex gap-3 justify-content-center flex-wrap">
+                <a 
+                  href={`https://wa.me/94742570943?text=${encodeURIComponent(`Hello, I placed an order. ID: #${placedOrderId?.slice(-6).toUpperCase() || 'N/A'}`)}`}
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="os-btn whatsapp-outline-btn" 
+                  style={{ background: 'transparent', color: '#25D366', border: '2px solid #25D366' }}
+                >
+                  <i className="fab fa-whatsapp"></i> Contact on WhatsApp
+                </a>
+                <Link href="/account" className="os-btn os-btn-black">Go to My Orders</Link>
               </div>
             </div>
           )}
@@ -518,6 +542,16 @@ const CheckoutArea = () => {
                         </button>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Need Help Section */}
+                  <div style={{ marginTop: '-10px', textAlign: 'center', maxWidth: '450px', marginLeft: 'auto' }}>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '15px' }}>
+                      Need help?<br />
+                      <a href="https://wa.me/94742570943" target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600, textDecoration: 'none', display: 'inline-block', marginTop: '5px' }}>
+                        <i className="fab fa-whatsapp"></i> Contact us on WhatsApp
+                      </a>
+                    </p>
                   </div>
                 </div>
 
