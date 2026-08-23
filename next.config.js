@@ -67,6 +67,21 @@ const nextConfig = {
         destination: '/account',
         permanent: true,
       },
+      {
+        source: '/help',
+        destination: '/contact',
+        permanent: true,
+      },
+      {
+        source: '/privacy',
+        destination: '/privacy-policy',
+        permanent: true,
+      },
+      {
+        source: '/blog-details/:path*',
+        destination: '/blog/:path*',
+        permanent: true,
+      },
     ];
   },
 };

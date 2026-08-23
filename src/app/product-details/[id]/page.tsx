@@ -76,6 +76,37 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
   // Prices are stored in LKR — no conversion needed
   const lkrPrice = product ? Math.round(product.price) : 0;
 
+  let aggregateRating = undefined;
+  let reviews = undefined;
+  
+  if (product && product.reviews && product.reviews.length > 0) {
+    const avgRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0) / product.reviews.length;
+    aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: avgRating.toFixed(1),
+      reviewCount: product.reviews.length,
+    };
+    
+    reviews = product.reviews.map(rev => ({
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: rev.rating
+      },
+      author: {
+        '@type': 'Person',
+        name: rev.name
+      },
+      reviewBody: rev.review_desc
+    }));
+  } else if (product && product.rating) {
+    aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating.toFixed(1),
+      reviewCount: 1,
+    };
+  }
+
   const productJsonLd = product ? {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -99,8 +130,43 @@ export default async function ProductDetailsPage(props: PageParamsProps) {
         '@type': 'Organization',
         name: 'ITechLK Store',
       },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'LK',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+        url: `${siteUrl}/returns`
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'LKR'
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'LK'
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: '0',
+            maxValue: '1',
+            unitCode: 'd'
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: '0',
+            maxValue: '0',
+            unitCode: 'd'
+          }
+        }
+      }
     },
     category: (product as any).category || 'Digital Subscriptions',
+    ...(aggregateRating ? { aggregateRating } : {}),
+    ...(reviews ? { review: reviews } : {})
   } : null;
 
   return (

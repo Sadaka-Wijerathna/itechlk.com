@@ -112,7 +112,7 @@ const Footer = ({ style_2 }: { style_2?: boolean }) => {
               </div>
               <div className="col-xl-6 col-lg-6 col-md-6">
                 <div className="footer__copyright f-right">
-                  <p>Powered by <a href="https://frametoque.online/" target="_blank" rel="noopener noreferrer">Frametoque</a></p>
+                  <p>Powered by <a href="https://frametoque.com/" target="_blank" rel="noopener noreferrer">Frametoque</a></p>
                 </div>
               </div>
             </div>
