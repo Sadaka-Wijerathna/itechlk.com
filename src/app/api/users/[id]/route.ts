@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -14,14 +14,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!params.id) {
+    const { id } = await params;
+
+    if (!id) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
     }
 
-    const userToDelete = await prisma.user.findUnique({ where: { id: params.id } });
+    const userToDelete = await prisma.user.findUnique({ where: { id: id } });
     if (!userToDelete) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -43,7 +45,7 @@ export async function DELETE(
     }
 
     await prisma.user.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ success: true });
