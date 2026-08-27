@@ -166,20 +166,12 @@ export async function GET(req: Request) {
 
     const isAdmin = session.user.role === 'admin';
 
-    // Helper to normalize older USD orders to LKR using historical rate (325)
-    // DISABLED: This was causing new LKR orders under Rs. 1000 to be incorrectly multiplied.
-    const normalizeOrder = (order: any) => {
-      // If you need to restore this for old orders, add a date check:
-      // if (order.totalAmount < 1000 && new Date(order.createdAt) < new Date('2024-07-01')) { ... }
-      return order;
-    };
-
     // Admin requesting ALL orders (no specific email provided)
     if (isAdmin && !requestedEmail) {
       const orders = await prisma.order.findMany({
         orderBy: { createdAt: 'desc' },
       });
-      return NextResponse.json(orders.map(normalizeOrder));
+      return NextResponse.json(orders);
     }
 
     // Determine which email's orders to fetch
@@ -203,7 +195,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(orders.map(normalizeOrder));
+    return NextResponse.json(orders);
   } catch (error: any) {
     console.error('Fetch Orders Error:', error);
     return NextResponse.json({ error: 'Error fetching orders' }, { status: 500 });

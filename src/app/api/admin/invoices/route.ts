@@ -14,22 +14,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    const normalizeOrder = (order: any) => {
-      if (order.totalAmount < 1000) {
-        return {
-          ...order,
-          totalAmount: order.totalAmount * 325,
-          discountAmt: (order.discountAmt || 0) * 325,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: item.price * 325
-          }))
-        };
-      }
-      return order;
-    };
-
-    return NextResponse.json(invoices.map(normalizeOrder));
+    return NextResponse.json(invoices);
   } catch (error: any) {
     console.error('Fetch Invoices Error:', error);
     return NextResponse.json({ error: 'Error fetching invoices' }, { status: 500 });

@@ -21,11 +21,8 @@ async function getStats() {
     take: 5,
   });
 
-  // Calculate revenue: convert older USD orders to LKR using historical rate (325)
-  const revenue = confirmedOrders.reduce((sum, order) => {
-    const amountInLKR = order.totalAmount < 1000 ? order.totalAmount * 325 : order.totalAmount;
-    return sum + amountInLKR;
-  }, 0);
+  // Calculate revenue (all orders are now correctly stored in LKR)
+  const revenue = confirmedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
 
   // Lazy Update Check: If rates are older than 24h, trigger an update in the background
   const lkrSetting = await prisma.siteSettings.findUnique({ where: { key: "USD_LKR" } });
