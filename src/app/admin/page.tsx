@@ -89,13 +89,30 @@ async function getStats(durationStr: string) {
     });
   }
 
-  const productQuantities = new Map<string, number>();
+  const productQuantities = new Map<string, { name: string, qty: number }>();
 
   recentConfirmedOrders.forEach((order) => {
     if (order.items && Array.isArray(order.items)) {
       order.items.forEach((item: any) => {
-        const currentQty = productQuantities.get(item.title) || 0;
-        productQuantities.set(item.title, currentQty + item.quantity);
+        if (!item.title) return;
+        
+        // Normalize title to catch casing differences like "CapCut Pro" and "CAPCUT PRO"
+        const normalized = item.title.trim().toLowerCase();
+        
+        const existing = productQuantities.get(normalized);
+        if (existing) {
+          existing.qty += item.quantity;
+          
+          // Try to prefer a "better" casing for display (e.g. Title Case over all lowercase/uppercase)
+          // If existing name is all uppercase or all lowercase and the new one isn't, swap it.
+          const isExistingBadCase = existing.name === existing.name.toLowerCase() || existing.name === existing.name.toUpperCase();
+          const isNewBetterCase = item.title !== item.title.toLowerCase() && item.title !== item.title.toUpperCase();
+          if (isExistingBadCase && isNewBetterCase) {
+             existing.name = item.title.trim();
+          }
+        } else {
+          productQuantities.set(normalized, { name: item.title.trim(), qty: item.quantity });
+        }
       });
     }
   });
@@ -105,8 +122,8 @@ async function getStats(durationStr: string) {
     revenue: Math.round(amount)
   }));
 
-  const topProductsData = Array.from(productQuantities.entries())
-    .map(([name, value]) => ({ name, value }))
+  const topProductsData = Array.from(productQuantities.values())
+    .map(({ name, qty }) => ({ name, value: qty }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 
