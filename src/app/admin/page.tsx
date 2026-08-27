@@ -3,8 +3,17 @@ import prisma from "@/lib/prisma";
 import AdminShell from "./AdminShell";
 import Link from "next/link";
 import { updateCurrencyRates } from "@/lib/currency";
+import SalesChart from "./SalesChart";
+import TopProductsChart from "./TopProductsChart";
+import ChartFilter from "./ChartFilter";
 
-async function getStats() {
+async function getStats(durationStr: string) {
+  let days = 30;
+  if (durationStr === '60days') days = 60;
+  else if (durationStr === '180days') days = 180;
+  else if (durationStr === '365days') days = 365;
+  else if (durationStr === 'lifetime') days = 0;
+
   const [activeProducts, totalUsers, totalOrders, confirmedOrders] = await Promise.all([
     prisma.product.count({ where: { active: true } }),
     prisma.user.count(),
@@ -21,8 +30,85 @@ async function getStats() {
     take: 5,
   });
 
-  // Calculate revenue (all orders are now correctly stored in LKR)
   const revenue = confirmedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+  let dateFilter = {};
+  if (days > 0) {
+    const ago = new Date();
+    ago.setDate(ago.getDate() - days);
+    dateFilter = { gte: ago };
+  }
+
+  const recentConfirmedOrders = await prisma.order.findMany({
+    where: { 
+      status: "Confirmed",
+      ...(days > 0 ? { createdAt: dateFilter } : {})
+    },
+    select: { totalAmount: true, createdAt: true, items: true }
+  });
+
+  const salesMap = new Map<string, number>();
+  
+  if (days === 0 || days > 60) {
+    // Group by Month for long durations
+    // Find the earliest date to determine how many months to go back
+    const earliestDate = recentConfirmedOrders.length > 0 
+      ? new Date(Math.min(...recentConfirmedOrders.map(o => new Date(o.createdAt).getTime())))
+      : new Date();
+    const currentDate = new Date();
+    const monthsDiff = (currentDate.getFullYear() - earliestDate.getFullYear()) * 12 + (currentDate.getMonth() - earliestDate.getMonth());
+    
+    // Initialize months in order
+    for (let i = monthsDiff; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const dateStr = d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      salesMap.set(dateStr, 0);
+    }
+
+    recentConfirmedOrders.forEach((order) => {
+      const dateStr = new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      if (salesMap.has(dateStr)) {
+        salesMap.set(dateStr, salesMap.get(dateStr)! + order.totalAmount);
+      }
+    });
+  } else {
+    // Group by Day for shorter durations
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      salesMap.set(dateStr, 0);
+    }
+
+    recentConfirmedOrders.forEach((order) => {
+      const dateStr = new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      if (salesMap.has(dateStr)) {
+        salesMap.set(dateStr, salesMap.get(dateStr)! + order.totalAmount);
+      }
+    });
+  }
+
+  const productQuantities = new Map<string, number>();
+
+  recentConfirmedOrders.forEach((order) => {
+    if (order.items && Array.isArray(order.items)) {
+      order.items.forEach((item: any) => {
+        const currentQty = productQuantities.get(item.title) || 0;
+        productQuantities.set(item.title, currentQty + item.quantity);
+      });
+    }
+  });
+
+  const salesData = Array.from(salesMap.entries()).map(([date, amount]) => ({
+    date,
+    revenue: Math.round(amount)
+  }));
+
+  const topProductsData = Array.from(productQuantities.entries())
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
 
   // Lazy Update Check: If rates are older than 24h, trigger an update in the background
   const lkrSetting = await prisma.siteSettings.findUnique({ where: { key: "USD_LKR" } });
@@ -44,13 +130,17 @@ async function getStats() {
     usdLkr: lkrSetting?.value ? parseFloat(lkrSetting.value) : 325,
     usdEur: eurSetting?.value ? parseFloat(eurSetting.value) : 0.92,
     recentProducts,
-    lastUpdateDate: lkrSetting?.updatedAt || null
+    lastUpdateDate: lkrSetting?.updatedAt || null,
+    salesData,
+    topProductsData
   };
 }
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ duration?: string }> }) {
   const session = await auth();
-  const { activeProducts, totalUsers, totalOrders, revenue, usdLkr, usdEur, recentProducts, lastUpdateDate } = await getStats();
+  const params = await searchParams;
+  const durationStr = params?.duration || "30days";
+  const { activeProducts, totalUsers, totalOrders, revenue, usdLkr, usdEur, recentProducts, lastUpdateDate, salesData, topProductsData } = await getStats(durationStr);
 
   const stats = [
     { label: "Total Revenue", value: `Rs. ${Math.round(revenue).toLocaleString()}` },
@@ -59,8 +149,19 @@ export default async function AdminDashboard() {
     { label: "Total Users", value: totalUsers.toString() },
   ];
 
+  let durationLabel = "Last 30 Days";
+  if (durationStr === '60days') durationLabel = "Last 2 Months";
+  else if (durationStr === '180days') durationLabel = "Last 6 Months";
+  else if (durationStr === '365days') durationLabel = "Last Year";
+  else if (durationStr === 'lifetime') durationLabel = "Lifetime";
+
   return (
     <AdminShell>
+      <style>{`
+        .recharts-wrapper, .recharts-surface, .recharts-surface * {
+          outline: none !important;
+        }
+      `}</style>
       {/* Profile info block */}
       <div className="profile__info">
         <div className="profile__info-top d-flex justify-content-between align-items-center">
@@ -84,7 +185,6 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-
         <div className="order__info mt-10" style={{ padding: '25px', background: '#fff', border: '1px solid #ebebeb' }}>
           <div className="d-flex justify-content-between flex-wrap gap-4" style={{ padding: '20px 35px' }}>
             {stats.map((s) => (
@@ -94,6 +194,19 @@ export default async function AdminDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="d-flex justify-content-end" style={{ marginBottom: '-20px', marginTop: '20px', position: 'relative', zIndex: 10 }}>
+        <ChartFilter />
+      </div>
+
+      <div className="row">
+        <div className="col-lg-8">
+          <SalesChart data={salesData} durationLabel={durationLabel} />
+        </div>
+        <div className="col-lg-4">
+          <TopProductsChart data={topProductsData} durationLabel={durationLabel} />
         </div>
       </div>
 

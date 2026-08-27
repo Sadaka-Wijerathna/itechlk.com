@@ -10,6 +10,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("All");
+  const [search, setSearch] = useState("");
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -72,6 +73,19 @@ export default function AdminOrdersPage() {
 
   const isPDF = (url: string) => url.toLowerCase().endsWith('.pdf');
 
+  const filteredOrders = orders.filter((o) => {
+    const matchesTab = activeTab === "All" || o.status === activeTab;
+    const s = search.toLowerCase();
+    const matchesSearch = 
+      !search ||
+      (o.id && o.id.toLowerCase().includes(s)) ||
+      (o.firstName && o.firstName.toLowerCase().includes(s)) ||
+      (o.lastName && o.lastName.toLowerCase().includes(s)) ||
+      (o.email && o.email.toLowerCase().includes(s)) ||
+      (o.phone && o.phone.toLowerCase().includes(s));
+    return matchesTab && matchesSearch;
+  });
+
   return (
     <AdminShell>
       <style dangerouslySetInnerHTML={{ __html: `
@@ -115,6 +129,20 @@ export default function AdminOrdersPage() {
           <h3 className="order__info-title m-0">
             <i className="fa fa-shopping-cart"></i> Manage Orders
           </h3>
+        </div>
+
+        <div className="password__change-top d-flex justify-content-between align-items-center mb-4" style={{ paddingTop: 0 }}>
+          <input
+            type="text"
+            placeholder="Search by ID, name, email or phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="password__input"
+            style={{
+              width: "100%", maxWidth: 340, height: 44, border: "1px solid #ebebeb",
+              padding: "0 15px", fontSize: 14, background: "#fff",
+            }}
+          />
         </div>
 
         <div className="d-flex justify-content-between align-items-center mb-25 flex-wrap gap-2" style={{ padding: '0 70px' }}>
@@ -190,14 +218,12 @@ export default function AdminOrdersPage() {
                 <tr>
                   <td colSpan={8} className="text-center py-5">Loading orders...</td>
                 </tr>
-              ) : orders.filter(o => activeTab === "All" || o.status === activeTab).length === 0 ? (
+              ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-5">No {activeTab.toLowerCase()} orders found.</td>
+                  <td colSpan={8} className="text-center py-5">No orders found matching your criteria.</td>
                 </tr>
               ) : (
-                orders
-                  .filter(o => activeTab === "All" || o.status === activeTab)
-                  .map((o) => (
+                filteredOrders.map((o) => (
                   <tr key={o.id}>
                     <td>#{o.id.slice(-6).toUpperCase()}</td>
                     <td>
